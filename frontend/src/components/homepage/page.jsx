@@ -6,7 +6,6 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-gray-50">
         <div className="h-screen flex flex-col">
-            <Navigation />
             <HeroSection />
         </div>
       

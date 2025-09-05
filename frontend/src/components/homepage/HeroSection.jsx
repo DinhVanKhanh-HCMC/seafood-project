@@ -1,45 +1,94 @@
+import { useState } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Autoplay } from "swiper/modules"
 import "swiper/css"
+import { motion, AnimatePresence } from "framer-motion"
 
 const HeroSection = () => {
+
+  const [activeIndex, setActiveIndex] = useState(0)
+
   const slides = [
     {
-      title: "Hải sản tươi sống",
+      title: "Cua Cà Mau tươi ngon",
       subtitle: "Giao hàng hàng ngày",
-      desc: "Khám phá bộ sưu tập hải sản tươi ngon nhất...",
-      img: "/assets/backgr_1.jpg",
+      desc: "Khám phá bộ sưu tập cua tươi sống từ Cà Mau...",
+      img: "/assets/slide-1.jpg",
+      buttonText: "Xem ngay",
+      buttonLink: "#cua-ca-mau"
+    },
+    {
+      title: "Livestream bán cua",
+      subtitle: "Trải nghiệm mua sắm trực tuyến",
+      desc: "Tham gia buổi livestream để mua cua tươi ngon với giá tốt!",
+      img: "/assets/slide-2.jpg",
+      buttonText: "Tham gia ngay",
+      buttonLink: "#livestream"
     },
     {
       title: "Đấu giá trực tuyến",
-      subtitle: "Trải nghiệm trực tiếp",
-      desc: "Tham gia phiên đấu giá hải sản với giá cực tốt...",
+      subtitle: "Cơ hội sở hữu cua chất lượng",
+      desc: "Tham gia phiên đấu giá cua độc quyền, giá cực tốt...",
       img: "/assets/backgr_2.png",
+      buttonText: "Đấu giá ngay",
+      buttonLink: "#auction"
     },
     {
       title: "Khuyến mãi đặc biệt",
       subtitle: "Giảm giá sốc",
-      desc: "Cơ hội sở hữu hải sản tươi ngon với ưu đãi hấp dẫn...",
-      img: "/discount-seafood.png",
+      desc: "Sở hữu cua Cà Mau với ưu đãi hấp dẫn...",
+      img: "/assets/slide-4.jpg",
+      buttonText: "Khám phá các ưu đãi",
+      buttonLink: "#promotions"
     },
   ]
 
   return (
-    <section className="relative h-screen bg-gradient-to-br from-amber-50 to-orange-50 overflow-hidden">
-      <Swiper spaceBetween={50} slidesPerView={1} loop autoplay={{ delay: 4000, disableOnInteraction: false }} modules={[Autoplay]}>
+    <section
+      className="relative h-screen overflow-hidden bg-center bg-cover"
+      style={{ backgroundImage: "url('/assets/background_hero.jpg')" }} // 👈 ảnh nền
+    >
+      {/* overlay màu phủ lên ảnh nền */}
+      <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 to-orange-50/80"></div>
+
+      <Swiper
+        spaceBetween={50}
+        slidesPerView={1}
+        speed={1000}
+        loop
+        autoplay={{ delay: 4000, disableOnInteraction: false }}
+        modules={[Autoplay]}
+        onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
+        className="relative z-10"
+      >
         {slides.map((s, idx) => (
           <SwiperSlide key={idx}>
-            {/* Lớp wrapper ép full màn hình + căn giữa theo dọc */}
             <div className="h-screen flex items-center">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                 {/* Left */}
-                <div className="space-y-8">
-                  <h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
-                    {s.title}
-                    <span className="text-amber-600 block">{s.subtitle}</span>
-                  </h1>
-                  <p className="text-lg text-gray-600 max-w-lg leading-relaxed">{s.desc}</p>
-                </div>
+                {activeIndex === idx && (
+                  <motion.div
+                    key={s.title + idx + activeIndex}
+                    className="space-y-8"
+                    initial={{ opacity: 0, y: 50 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                  >
+                    <h1 className="text-4xl md:text-6xl font-bold text-gray-900 leading-tight">
+                      {s.title}
+                      <span className="text-amber-600 block">{s.subtitle}</span>
+                    </h1>
+                    <p className="text-lg text-gray-600 max-w-lg leading-relaxed">
+                      {s.desc}
+                    </p>
+                    <a
+                      href={s.buttonLink}
+                      className="mt-4 inline-block px-6 py-2 text-white bg-amber-600 rounded-md shadow-md hover:bg-amber-700 transition"
+                    >
+                      {s.buttonText}
+                    </a>
+                  </motion.div>
+                )}
 
                 {/* Right */}
                 <div className="flex justify-center">

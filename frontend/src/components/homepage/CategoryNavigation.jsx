@@ -1,77 +1,101 @@
 const CategoryNavigation = () => {
-  const categories = [
-    {
-      name: "Cá tươi",
-      image: "/fresh-fish-on-ice.png",
-      href: "/products?category=fish",
-    },
-    {
-      name: "Tôm cua",
-      image: "/fresh-lobster-and-crab.png",
-      href: "/products?category=shellfish",
-    },
-    {
-      name: "Cá hồi",
-      image: "/fresh-salmon-fillet.png",
-      href: "/products?category=salmon",
-    },
-    {
-      name: "Cá ngừ",
-      image: "/fresh-tuna-steak.png",
-      href: "/products?category=tuna",
-    },
-    {
-      name: "Tôm",
-      image: "/fresh-jumbo-shrimp.png",
-      href: "/products?category=shrimp",
-    },
-    {
-      name: "Hàu",
-      image: "/fresh-oysters-on-half-shell.png",
-      href: "/products?category=oysters",
-    },
-    {
-      name: "Đấu giá",
-      image: "/auction-gavel-with-seafood.png",
-      href: "/auction",
-    },
-    {
-      name: "Livestream",
-      image: "/live-streaming-camera-with-seafood-market.png",
-      href: "/livestreaming",
-    },
+  const crabCategories = [
+    { name: "Cua gạch", image: "/assets/cuagach.jpg", href: "/products?category=crab-roe", desc: "Cua cái nhiều gạch son, béo bùi và giàu dinh dưỡng." },
+    { name: "Cua thịt", image: "/assets/cuathit.jpg", href: "/products?category=crab-meat", desc: "Cua đực nhiều thịt, chắc khỏe, vị ngọt đậm đà." },
+    { name: "Cua gốm", image: "/assets/cuacom.jpg", href: "/products?category=crab-rice" },
+    
+  ]
+
+  const seafoodCategories = [
+    { name: "Tôm Cà Mau", image: "/assets/tomcamau.jpg", href: "/products?category=ca-mau-shrimp" },
+    { name: "Mực Cà Mau", image: "/assets/muccamau.jpg", href: "/products?category=ca-mau-squid" },
   ]
 
   return (
-    <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Khám phá bộ sưu tập của chúng tôi</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Lựa chọn từ bộ sưu tập đa dạng với những sản phẩm hải sản tốt nhất được lấy trực tiếp từ những ngư dân và
-            nhà cung cấp đáng tin cậy.
-          </p>
+    <section className="py-20 bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
+
+        {/* --- Phần Cua --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Bên trái: Giới thiệu */}
+          <div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Cua Cà Mau</h2>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              Cua Cà Mau nổi tiếng khắp Việt Nam nhờ hương vị đậm đà, thịt chắc ngọt và giá trị dinh dưỡng cao. 
+              Được đánh bắt trực tiếp từ vùng biển Cà Mau, mỗi loại cua đều mang hương vị riêng biệt.
+            </p>
+            <a
+              href="/products?category=crabs"
+              className="inline-block bg-amber-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-amber-700 transition-colors shadow-md"
+            >
+              Khám phá ngay
+            </a>
+          </div>
+
+          {/* Bên phải: 3 loại cua */}
+          <div className="grid grid-cols-1 gap-6">
+            {crabCategories.map((item, index) => (
+              <a
+                key={index}
+                href={item.href}
+                className="group flex items-center gap-4 p-4 rounded-xl border border-gray-200 hover:border-amber-600 hover:bg-gray-50 transition-all"
+              >
+                <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-gray-200 group-hover:border-amber-600 transition-colors">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                  />
+                </div>
+                <div>
+                  <span className="text-lg font-medium text-gray-700 group-hover:text-amber-600 transition-colors">
+                    {item.name}
+                  </span>
+                  <p className="text-sm text-gray-500">{item.desc}</p>
+                </div>
+              </a>
+            ))}
+          </div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
-          {categories.map((category, index) => (
+        {/* --- Phần Hải sản khác --- */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          {/* Bên trái: Giới thiệu */}
+          <div>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Hải sản Cà Mau khác</h2>
+            <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              Không chỉ nổi tiếng với cua, Cà Mau còn là vùng đất của nhiều loại hải sản tươi ngon như tôm và mực. 
+              Đây là những sản phẩm được ngư dân khai thác thủ công, đảm bảo chất lượng và hương vị tự nhiên.
+            </p>
             <a
-              key={index}
-              href={category.href}
-              className="group flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+              href="/products?category=seafood"
+              className="inline-block bg-amber-600 text-white px-6 py-3 rounded-lg text-base font-medium hover:bg-amber-700 transition-colors shadow-md"
             >
-              <div className="w-20 h-20 mb-3 rounded-full overflow-hidden border-2 border-gray-200 group-hover:border-amber-600 transition-colors duration-200">
-                <img
-                  src={category.image || "/placeholder.svg"}
-                  alt={category.name}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
-                />
-              </div>
-              <span className="text-sm font-medium text-gray-700 text-center group-hover:text-amber-600 transition-colors duration-200">
-                {category.name}
-              </span>
+              Xem thêm hải sản
             </a>
-          ))}
+          </div>
+
+          {/* Bên phải: Tôm + Mực */}
+          <div className="grid grid-cols-2 gap-6">
+            {seafoodCategories.map((item, index) => (
+              <a
+                key={index}
+                href={item.href}
+                className="group flex flex-col items-center p-6 rounded-xl bg-white shadow-sm hover:shadow-md hover:bg-gray-100 transition-all"
+              >
+                <div className="w-24 h-24 mb-4 rounded-full overflow-hidden border-2 border-gray-200 group-hover:border-amber-600 transition-colors">
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-200"
+                  />
+                </div>
+                <span className="text-base font-semibold text-gray-700 text-center group-hover:text-amber-600 transition-colors">
+                  {item.name}
+                </span>
+              </a>
+            ))}
+          </div>
         </div>
       </div>
     </section>

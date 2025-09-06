@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { routers } from "./routers/routers";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 import "./App.css"
 
 function renderRoutes(routes) {
@@ -30,6 +32,13 @@ function renderRoutes(routes) {
 }
 
 function App() {
+  useEffect(() => {
+    AOS.init({
+      duration: 800, // tốc độ animation
+      once: true,    // chỉ chạy 1 lần
+    });
+  }, []);
+
   return (
     <BrowserRouter>
       <Suspense fallback={<div>Loading ...</div>}>

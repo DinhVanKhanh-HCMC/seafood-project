@@ -15,10 +15,21 @@ const CategoryNavigation = () => {
     <section className="py-20 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-24">
 
+        {/* --- Giới thiệu chung --- */}
+        <div className="text-center mb-12" data-aos="fade-up">
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Cùng khám phá bộ sưu tập cua và hải sản Cà Mau của chúng tôi
+          </h2>
+          <p className="text-gray-600 max-w-2xl mx-auto">
+            Tận hưởng hương vị tươi ngon từ biển Cà Mau – từ cua gạch béo ngậy, cua thịt chắc ngọt, 
+            đến tôm, mực và nhiều loại hải sản đặc sản khác, tất cả đều được chọn lọc kỹ càng từ ngư dân địa phương.
+          </p>
+        </div>
+
         {/* --- Phần Cua --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Bên trái: Giới thiệu */}
-          <div>
+          <div data-aos="fade-right">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">Cua Cà Mau</h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               Cua Cà Mau nổi tiếng khắp Việt Nam nhờ hương vị đậm đà, thịt chắc ngọt và giá trị dinh dưỡng cao. 
@@ -33,7 +44,7 @@ const CategoryNavigation = () => {
           </div>
 
           {/* Bên phải: 3 loại cua */}
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-6" data-aos="fade-left">
             {crabCategories.map((item, index) => (
               <a
                 key={index}
@@ -61,7 +72,7 @@ const CategoryNavigation = () => {
         {/* --- Phần Hải sản khác --- */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Bên trái: Giới thiệu */}
-          <div>
+          <div data-aos="fade-right">
             <h2 className="text-4xl font-bold text-gray-900 mb-6">Hải sản Cà Mau khác</h2>
             <p className="text-lg text-gray-600 mb-8 leading-relaxed">
               Không chỉ nổi tiếng với cua, Cà Mau còn là vùng đất của nhiều loại hải sản tươi ngon như tôm và mực. 
@@ -76,7 +87,7 @@ const CategoryNavigation = () => {
           </div>
 
           {/* Bên phải: Tôm + Mực */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6" data-aos="fade-left">
             {seafoodCategories.map((item, index) => (
               <a
                 key={index}

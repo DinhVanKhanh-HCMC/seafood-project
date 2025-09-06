@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState("all")
@@ -8,6 +9,7 @@ export default function ProductsPage() {
   const [fishEasterEgg, setFishEasterEgg] = useState(false)
   const [konamiSequence, setKonamiSequence] = useState([])
   const [showPriceEasterEgg, setShowPriceEasterEgg] = useState(false)
+  const navigate = useNavigate()
 
   // Easter egg: Konami code for fish animation
   const konamiCode = [
@@ -370,6 +372,7 @@ export default function ProductsPage() {
                 <div
                   key={product.id}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+                  onClick={() => navigate(`/product-detail/${product.id}`)}
                 >
                   <div className="relative group">
                     <img

@@ -10,6 +10,9 @@ const NewsPage = lazy(() => import("../components/news/News.jsx"))
 const Contact = lazy(() => import("../components/contact/Contact.jsx"))
 const Livestream = lazy(() => import("../components/livestreaming/LiveStream.jsx"))
 const Auction = lazy(() => import("../components/auction/Auction.jsx"))
+const ProductDetail = lazy(() => import("../components/products/productDetail.jsx"))
+const NewsDetail = lazy(() => import("../components/news/NewDetail.jsx"))
+const Cart = lazy(() => import("../components/cart/page.jsx"))
 
 
 const routers = [
@@ -19,11 +22,14 @@ const routers = [
         children: [
             { index: true, component: HomePage },
             { path: "products", component: Products},
+            { path: "product-detail/:id", component: ProductDetail},
             { path: "about", component: Introduction },
             { path: "news", component: NewsPage },
+            { path: "news-detail/:id", component: NewsDetail },
             { path: "contact", component: Contact },
             { path: "livestreaming", component: Livestream },
-            { path: "auction", component: Auction }
+            { path: "auction", component: Auction },
+            { path: "cart", component: Cart },
             
             
         ]

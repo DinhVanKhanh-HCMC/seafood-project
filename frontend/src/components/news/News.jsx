@@ -7,11 +7,13 @@ import image_6 from '../../../public/assets/image_news6.jpg'
 import image_7 from '../../../public/assets/image_news7.jpg'
 import image_8 from '../../../public/assets/image_news8.jpg'
 import image_9 from '../../../public/assets/image_news9.jpg'
+import { useNavigate } from 'react-router-dom'
 
 
 
 
 export default function NewsPage() {
+  const navigate = useNavigate()
   const featuredNews = {
     id: 1,
     title: "SeaFresh Hợp Tác Với Hội Bảo Tồn Biển Để Thực Hiện Sáng Kiến Bảo Vệ Đại Dương",
@@ -132,7 +134,7 @@ export default function NewsPage() {
         {/* Featured Article */}
         <section className="mb-16">
           <div className="bg-card rounded-2xl overflow-hidden shadow-lg">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
+            <div className="grid grid-cols-1 lg:grid-cols-2" onClick={() => navigate(`/news-detail/${featuredNews.id}`)}>
               <div className="relative">
                 <img
                   src={featuredNews.image || "/placeholder.svg"}

@@ -1,20 +1,24 @@
 
-import { useState } from "react"
+import { Children, useState } from "react"
+import { NavLink } from "react-router-dom";
+import AuthModal from "../auth/AuthModal";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
 
   const navItems = [
     { name: "Trang chủ", href: "/" },
     { name: "Giới thiệu", href: "/about" },
-    { name: "Sản phẩm", href: "/products" },
-    { name: "Tin tức", href: "/news" },
+    { name: "Sản phẩm", href: "/products", Children: ["/product-detail/:id"] },
+    { name: "Tin tức", href: "/news", Children: ["/news-detail/:id"] },
     { name: "Livestream", href: "/livestreaming" },
     { name: "Đấu giá", href: "/auction" },
     { name: "Liên hệ", href: "/contact" },
   ]
 
   return (
+    <>
     <nav className="bg-white border-b border-gray-200 shadow-sm">
       <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
@@ -27,13 +31,17 @@ const Navigation = () => {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline gap-8">
               {navItems.map((item) => (
-                <a
+                <NavLink
                   key={item.name}
-                  href={item.href}
-                  className="flex text-center text-gray-700 hover:text-amber-600 px-3 text-sm font-medium transition-colors duration-200"
+                  to={item.href}
+                  className={({ isActive }) =>
+                    `relative text-gray-700 px-3 text-sm font-medium transition-colors duration-200
+                     hover:text-amber-600
+                     ${isActive ? "text-amber-600 after:content-[''] after:absolute after:left-0 after:-bottom-1 after:w-full after:h-[2px] after:bg-amber-600" : ""}`
+                  }
                 >
                   {item.name}
-                </a>
+                </NavLink>
               ))}
             </div>
           </div>
@@ -60,7 +68,7 @@ const Navigation = () => {
                 3
               </span>
             </a>
-            <button className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
+            <button onClick={() => setIsAuthModalOpen(true)} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
               Đăng nhập
             </button>
           </div>
@@ -92,7 +100,9 @@ const Navigation = () => {
                 Giỏ hàng (3)
               </a>
               <div className="pt-4 pb-3 border-t border-gray-200">
-                <button className="bg-amber-600 text-white w-full px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
+                <button 
+                onClick={() => setIsAuthModalOpen(true)}
+                className="bg-amber-600 text-white w-full px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
                   Đăng nhập
                 </button>
               </div>
@@ -101,6 +111,9 @@ const Navigation = () => {
         )}
       </div>
     </nav>
+
+    <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+    </>
   )
 }
 

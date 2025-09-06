@@ -6,7 +6,7 @@ const Navigation = () => {
 
   const navItems = [
     { name: "Trang chủ", href: "/" },
-    { name: "Giới thiệu", href: "/introduction" },
+    { name: "Giới thiệu", href: "/about" },
     { name: "Sản phẩm", href: "/products" },
     { name: "Tin tức", href: "/news" },
     { name: "Livestream", href: "/livestreaming" },

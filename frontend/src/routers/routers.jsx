@@ -13,7 +13,6 @@ const Auction = lazy(() => import("../components/auction/Auction.jsx"))
 const ProductDetail = lazy(() => import("../components/products/productDetail.jsx"))
 const NewsDetail = lazy(() => import("../components/news/NewDetail.jsx"))
 const Cart = lazy(() => import("../components/cart/page.jsx"))
-const LivestreamDetail = lazy(() => import("../components/livestreaming/LiveStream-Detail.jsx"))
 
 
 
@@ -32,7 +31,6 @@ const routers = [
             { path: "livestreaming", component: Livestream },
             { path: "auction", component: Auction },
             { path: "cart", component: Cart },
-            { path: "livestream-detail/:id", component: LivestreamDetail },
             
             
         ]

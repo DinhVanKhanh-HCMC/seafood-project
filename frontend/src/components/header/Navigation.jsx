@@ -12,10 +12,7 @@ const Navigation = () => {
     { name: "Giới thiệu", href: "/about" },
     { name: "Sản phẩm", href: "/products", Children: ["/product-detail/:id"] },
     { name: "Tin tức", href: "/news", Children: ["/news-detail/:id"] },
-    { name: "Livestream", href: "/livestreaming" },
-    { name: "Sản phẩm", href: "/products" },
-    { name: "Tin tức", href: "/news" },
-    { name: "Livestream", href: "/livestreaming", Children: ["/livestream-detail/:id"]}, 
+    { name: "Livestream", href: "/livestreaming" }, 
     { name: "Đấu giá", href: "/auction" },
     { name: "Liên hệ", href: "/contact" },
   ]

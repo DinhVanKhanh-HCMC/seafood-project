@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import image_1 from "../../../public/assets/image_livestream1.jpg"
+import "./LiveStream.css"
 import image_2 from "../../../public/assets/image_livestream2.jpg"
 import image_3 from "../../../public/assets/image_livestream3.jpg"
 import image_4 from "../../../public/assets/image_livestream4.jpg"
@@ -25,7 +25,7 @@ export default function LivestreamingPage() {
       streamer: "Chợ Hải Cảng Boston",
       viewers: 1247,
       category: "Đấu Giá Trực Tiếp",
-      thumbnail: image_1,
+      thumbnail: "/assets/image_livestream1.jpg",
       isLive: true,
       duration: "2:34:15",
       description: "Trực tiếp từ chợ cá hàng đầu Boston. Xem các mẻ cá tươi được đấu giá cho người trả giá cao nhất.",
@@ -110,127 +110,6 @@ export default function LivestreamingPage() {
   return (
     <div className="min-h-screen bg-orange-50"
     >
-      {/* Custom Styles */}
-      <style jsx>{`
-        .live-badge {
-          background: linear-gradient(45deg, #ff4444, #ff6666);
-          animation: pulse 2s infinite;
-        }
-        
-        .stream-card {
-          transition: all 0.3s ease;
-          background: white;
-          border-radius: 16px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        }
-        
-        .stream-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 12px 40px rgba(0,0,0,0.15);
-        }
-        
-        .stream-image {
-          transition: transform 0.5s ease;
-        }
-        
-        .stream-card:hover .stream-image {
-          transform: scale(1.1);
-        }
-        
-        .gradient-text {
-          background: linear-gradient(45deg, #1976d2, #00acc1);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-        
-        .chat-message {
-          background: #f8f9fa;
-          border-radius: 12px;
-          padding: 12px;
-          margin-bottom: 8px;
-          transition: all 0.2s ease;
-        }
-        
-        .chat-message:hover {
-          background: #e9ecef;
-        }
-        
-        .btn-primary {
-          background: linear-gradient(45deg, #1976d2, #00acc1);
-          border: none;
-          color: white;
-          padding: 12px 24px;
-          border-radius: 12px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-        
-        .btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(25, 118, 210, 0.3);
-        }
-        
-        .btn-secondary {
-          background: white;
-          border: 2px solid #e0e0e0;
-          color: #555;
-          padding: 12px 24px;
-          border-radius: 12px;
-          font-weight: 600;
-          transition: all 0.3s ease;
-          cursor: pointer;
-        }
-        
-        .btn-secondary:hover {
-          border-color: #1976d2;
-          color: #1976d2;
-          transform: translateY(-1px);
-        }
-        
-        .category-tag {
-          background: linear-gradient(45deg, #e3f2fd, #e1f5fe);
-          color: #0277bd;
-          padding: 6px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 600;
-        }
-        
-        .viewer-count {
-          background: rgba(0,0,0,0.7);
-          color: white;
-          padding: 4px 8px;
-          border-radius: 20px;
-          font-size: 12px;
-        }
-        
-        @keyframes pulse {
-          0% { opacity: 1; }
-          50% { opacity: 0.7; }
-          100% { opacity: 1; }
-        }
-        
-        .scrollbar-thin {
-          scrollbar-width: thin;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar {
-          width: 4px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 4px;
-        }
-        
-        .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: #c1c1c1;
-          border-radius: 4px;
-        }
-      `}</style>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

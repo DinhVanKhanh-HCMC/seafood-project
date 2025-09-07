@@ -268,7 +268,7 @@ export default function AuctionPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-amber-600 bg-clip-text text-transparent">
                 Đấu Giá Hải Sản
               </h1>
               <p className="text-gray-600 mt-2">Đấu giá hải sản cao cấp trực tiếp từ nhà cung cấp</p>
@@ -293,10 +293,10 @@ export default function AuctionPage() {
             <div className="lg:col-span-2">
               <button
                 onClick={() => setSelectedAuction(null)}
-                className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium mb-6 transition-colors group"
+                className="inline-flex items-center gap-2 p-3 bg-amber-600 text-white hover:text-amber-400 font-medium mb-6 transition-colors group"
               >
-                <span className="group-hover:-translate-x-1 transition-transform">←</span>
-                Quay lại danh sách
+                <span className="group-hover:-translate-x-1 transition-transform"></span>
+                Trở Về
               </button>
 
               <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
@@ -348,8 +348,8 @@ export default function AuctionPage() {
                   <div className="mb-8">
                     <h3 className="text-xl font-semibold text-gray-800 mb-4">Mô tả sản phẩm</h3>
                     <p className="text-gray-600 leading-relaxed text-lg">{selectedAuction.description}</p>
-                    <div className="mt-4 p-4 bg-blue-50 rounded-xl border-l-4 border-blue-500">
-                      <p className="text-blue-800"><strong>Vùng đánh bắt:</strong> {selectedAuction.origin}</p>
+                    <div className="mt-4 p-4 bg-amber-50 rounded-xl border-l-4 border-amber-500">
+                      <p className="text-amber-600"><strong>Vùng đánh bắt:</strong> {selectedAuction.origin}</p>
                     </div>
                   </div>
 
@@ -362,7 +362,7 @@ export default function AuctionPage() {
                           selectedAuction.bidHistory.map((bid, index) => (
                             <div key={index} className="flex justify-between items-center py-3 px-4 bg-white rounded-lg shadow-sm">
                               <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                                <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full flex items-center justify-center text-white font-bold text-sm">
                                   {index + 1}
                                 </div>
                                 <span className="font-medium text-gray-800">{bid.bidder}</span>
@@ -427,7 +427,7 @@ export default function AuctionPage() {
                       </div>
                       <button
                         type="submit"
-                        className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                        className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
                       >
                         🎯 Đấu Giá Ngay
                       </button>
@@ -517,16 +517,16 @@ export default function AuctionPage() {
             {/* Tabs */}
             <div className="flex gap-2 mb-8 bg-white p-2 rounded-2xl shadow-lg border border-gray-100 w-fit mx-auto">
               {[
-                { id: "live", label: "🔴 Đang Diễn Ra", count: auctions.filter(a => a.status === "live").length },
-                { id: "upcoming", label: "🔵 Sắp Diễn Ra", count: auctions.filter(a => a.status === "upcoming").length },
-                { id: "ended", label: "⚫ Đã Kết Thúc", count: auctions.filter(a => a.status === "ended").length },
+                { id: "live", label: "Đang Diễn Ra", count: auctions.filter(a => a.status === "live").length },
+                { id: "upcoming", label: "Sắp Diễn Ra", count: auctions.filter(a => a.status === "upcoming").length },
+                { id: "ended", label: "Đã Kết Thúc", count: auctions.filter(a => a.status === "ended").length },
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`px-6 py-3 rounded-xl font-semibold transition-all duration-200 flex items-center gap-2 ${
                     activeTab === tab.id
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-lg transform scale-105"
+                      ? "bg-gradient-to-r from-amber-600 to-amber-400 text-white shadow-lg transform scale-105"
                       : "text-gray-600 hover:text-gray-800 hover:bg-gray-50"
                   }`}
                 >
@@ -578,7 +578,7 @@ export default function AuctionPage() {
                   </div>
 
                   <div className="p-6">
-                    <h3 className="font-bold text-gray-800 mb-2 text-lg leading-tight group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-gray-800 mb-2 text-lg leading-tight group-hover:text-amber-600 transition-colors">
                       {auction.title}
                     </h3>
                     
@@ -632,16 +632,16 @@ export default function AuctionPage() {
 
                     <button className={`w-full py-3 rounded-xl font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
                       auction.status === "live"
-                        ? "bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl"
+                        ? "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-800 hover:to-amber-700 text-white shadow-lg hover:shadow-xl"
                         : auction.status === "upcoming"
                           ? "bg-gradient-to-r from-gray-100 to-gray-200 hover:from-gray-200 hover:to-gray-300 text-gray-700 border border-gray-300"
                           : "bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 border border-green-200"
                     }`}>
                       {auction.status === "live"
-                        ? "🎯 Đấu Giá Ngay"
+                        ? "Đấu Giá Ngay"
                         : auction.status === "upcoming"
-                          ? "👁️ Xem Chi Tiết"
-                          : "📊 Xem Kết Quả"}
+                          ? "Xem Chi Tiết"
+                          : "Xem Kết Quả"}
                     </button>
 
                     {/* Winner Badge for Ended Auctions */}
@@ -683,7 +683,7 @@ export default function AuctionPage() {
             )}
 
             {/* Statistics Footer */}
-            <div className="mt-12 bg-gradient-to-r from-blue-600 to-cyan-600 rounded-2xl p-8 text-white">
+            <div className="mt-12 bg-gradient-to-r bg-amber-600  rounded-2xl p-8 text-white">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
                 <div>
                   <div className="text-3xl font-bold mb-2">{auctions.length}</div>

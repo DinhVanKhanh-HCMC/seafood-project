@@ -80,13 +80,7 @@ export default function IntroductionPage() {
       price: "700.000đ - 900.000đ/kg", 
       season: "Tháng 4 - Tháng 8",
     },
-    {
-      title: "Cua Lột",
-      description: "Cua vừa lột xác, vỏ còn mềm, thường dùng để chiên giòn",
-      weight: "150-250g/con",
-      price: "400.000đ - 600.000đ/kg", 
-      season: "Quanh Năm",
-    },
+  
   ]
 
   const categories = [
@@ -125,7 +119,7 @@ export default function IntroductionPage() {
   return (
     <div className="min-h-screen bg-orange-50">
       {/* Hero Section - Crab Focus */}
-      <section className="py-20 px-4 bg-gradient-to-r bg-orange-50  text-gray-950 relative overflow-hidden">
+      <section className="py-20 px-4 bg-gradient-to-r bg-orange-50  text-gray-950 relative overflow-hidden" data-aos="fade-up">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 text-9xl animate-bounce">🦀</div>
           <div className="absolute bottom-20 right-20 text-7xl animate-pulse">🦀</div>
@@ -160,7 +154,7 @@ export default function IntroductionPage() {
       {/* Crab Specifications Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-left">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
               <span className="text-orange-600">🦀</span> Các loại cua Cà Mau
             </h2>
@@ -168,7 +162,7 @@ export default function IntroductionPage() {
               Từ cua gạch béo ngậy đến cua đồng thịt chắc, chúng tôi cung cấp đầy đủ các loại cua Cà Mau chất lượng cao nhất
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8" data-aos="fade-right">
             {crabSpecs.map((crab, index) => (
               <div key={index} className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-orange-100 group hover:-translate-y-2">
                 <div className="text-center mb-6">
@@ -203,7 +197,7 @@ export default function IntroductionPage() {
       <section className="py-20 px-4 bg-gradient-to-r from-orange-100 to-red-100">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
+            <div data-aos="fade-right">
               <h2 className="text-4xl font-bold text-gray-800 mb-8">
                 Câu chuyện của <span className="text-orange-600">Cua Cà Mau</span>
               </h2>
@@ -237,8 +231,8 @@ export default function IntroductionPage() {
                   <div className="text-gray-600 font-medium">Nước xuất khẩu</div>
                 </div>
               </div>
-            </div>
-            <div className="relative">
+            </div >
+            <div className="relative" data-aos="fade-left">
               <div className="bg-gradient-to-br from-blue-500 to-teal-600 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                 <div className="absolute top-4 right-4 text-white/30 text-8xl">🦀</div>
                 <div className="bg-white/10 rounded-2xl p-8 backdrop-blur-sm relative z-10">
@@ -262,7 +256,7 @@ export default function IntroductionPage() {
         {/* Values Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-right">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
               Cam kết <span className="text-orange-600">Chất lượng Cua Cà Mau</span>
             </h2>
@@ -270,7 +264,7 @@ export default function IntroductionPage() {
               Những tiêu chuẩn nghiêm ngặt này đảm bảo mỗi con cua Cà Mau đến tay bạn đều đạt chất lượng xuất khẩu
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" data-aos="fade-left">
             {values.map((value, index) => (
               <div key={index} className="bg-gradient-to-br from-orange-50 to-yellow-50 rounded-2xl p-8 text-center hover:from-orange-100 hover:to-yellow-100 transition-all duration-300 shadow-lg hover:shadow-2xl group hover:-translate-y-2 border border-orange-100">
                 <div className="text-6xl mb-6 group-hover:scale-110 transition-transform duration-300">{value.icon}</div>
@@ -293,7 +287,7 @@ export default function IntroductionPage() {
               <div className="absolute bottom-10 right-10 text-9xl">🦀</div>
               <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-12xl">🦀</div>
             </div>
-            <div className="text-center relative z-10">
+            <div className="text-center relative z-10" data-aos="fade-down">
               <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-8">
                 Sứ mệnh <span className="text-orange-600">Cua Cà Mau</span>
               </h2>
@@ -317,7 +311,7 @@ export default function IntroductionPage() {
 
         {/* Statistics Section */}
       <section className="py-20 px-4 bg-gradient-to-r from-orange-600 to-red-600 text-white">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto" data-aos="fade-right">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">Con số ấn tượng của Cua Cà Mau SeaFresh</h2>
           </div>
@@ -345,7 +339,7 @@ export default function IntroductionPage() {
             {/* Categories Section */}
       <section className="py-20 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16" data-aos="fade-left">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
               Sản phẩm khác ngoài <span className="text-orange-600">Cua Cà Mau</span>
             </h2>
@@ -354,7 +348,7 @@ export default function IntroductionPage() {
               được lựa chọn kỹ lưỡng từ ngư dân và vùng biển Việt Nam.
             </p>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-8" data-aos="fade-right">
             {categories.map((item, index) => (
               <a
                 key={index}
@@ -384,7 +378,7 @@ export default function IntroductionPage() {
         <section className="py-16 px-4 bg-orange-50">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-              <div className="relative">
+              <div className="relative"  data-aos="fade-right">
                 <div className="bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl p-8 shadow-2xl">
                   <div className="bg-white/10 rounded-lg p-6 backdrop-blur-sm">
                     <Wave fill="white" paused={false} className="w-full h-64 opacity-80" 
@@ -401,7 +395,7 @@ export default function IntroductionPage() {
                   </div>
                 </div>
               </div>
-              <div>
+              <div data-aos="fade-left">
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">Cam kết về tính bền vững</h2>
                 <div className="space-y-4 text-gray-600 leading-relaxed">
                   <p>

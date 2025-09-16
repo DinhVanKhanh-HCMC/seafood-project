@@ -1,4 +1,4 @@
-import{a as x,r as m,j as e}from"./index-nh7pqTXD.js";function u(){x();const[h,l]=m.useState(!1),[s,i]=m.useState({name:"",email:"",comment:""}),t={title:"SeaFresh Hợp Tác Với Hiệp Hội Bảo Tồn Biển Để Bảo Vệ Đại Dương",content:`
+import{a as x,r as m,j as e}from"./index-DLzat-U3.js";function u(){x();const[h,l]=m.useState(!1),[s,i]=m.useState({name:"",email:"",comment:""}),t={title:"SeaFresh Hợp Tác Với Hiệp Hội Bảo Tồn Biển Để Bảo Vệ Đại Dương",content:`
       <p>Chúng tôi vui mừng thông báo về sự hợp tác mới nhằm bảo vệ hệ sinh thái biển đồng thời hỗ trợ các hoạt động đánh bắt cá bền vững. Đây là một bước tiến quan trọng trong cam kết của SeaFresh về việc bảo vệ môi trường biển.</p>
       
       <h3>Mục Tiêu Của Chương Trình Hợp Tác</h3>

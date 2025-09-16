@@ -2,11 +2,6 @@
 
 import { useState, useEffect } from "react"
 import "./LiveStream.css"
-import image_2 from "../../../public/assets/image_livestream2.jpg"
-import image_3 from "../../../public/assets/image_livestream3.jpg"
-import image_4 from "../../../public/assets/image_livestream4.jpg"
-import image_5 from "../../../public/assets/image_livestream5.jpg"
-import image_6 from "../../../public/assets/image_livestream6.jpg"
 
 export default function LivestreamingPage() {
   const [selectedStream, setSelectedStream] = useState(null)
@@ -36,7 +31,7 @@ export default function LivestreamingPage() {
       streamer: "Bếp Trưởng Rodriguez",
       viewers: 892,
       category: "Demo Nấu Ăn",
-      thumbnail: image_2,
+      thumbnail: "/assets/image_livestream2.jpg",
       isLive: true,
       duration: "1:15:30",
       description: "Học kỹ thuật phi lê và chuẩn bị cá hồi chuyên nghiệp từ một bếp trưởng bậc thầy.",
@@ -47,7 +42,7 @@ export default function LivestreamingPage() {
       streamer: "Thuyền Trưởng Sarah",
       viewers: 634,
       category: "Tham Quan Chợ",
-      thumbnail: image_3,
+      thumbnail: "/assets/image_livestream3.jpg",
       isLive: true,
       duration: "0:45:22",
       description: "Tham gia cùng chúng tôi trên thuyền tôm hùm Maine khi kiểm tra lưới và thu hoạch hàng ngày.",
@@ -58,7 +53,7 @@ export default function LivestreamingPage() {
       streamer: "Hàu Chesapeake",
       viewers: 423,
       category: "Tham Quan Trại",
-      thumbnail: image_4,
+      thumbnail: "/assets/image_livestream4.jpg",
       isLive: false,
       duration: "Bắt đầu sau 30 phút",
       description: "Khám phá trại nuôi hàu của chúng tôi tại Vịnh Chesapeake và tìm hiểu về nuôi hàu bền vững.",
@@ -71,7 +66,7 @@ export default function LivestreamingPage() {
       title: "Biểu Diễn Cắt Cá Ngừ",
       streamer: "Chợ Cá Tokyo",
       startTime: "2:00 PM EST",
-      thumbnail: image_5,
+      thumbnail: "/assets/image_livestream5.jpg",
       category: "Demo Nấu Ăn",
     },
     {
@@ -79,7 +74,7 @@ export default function LivestreamingPage() {
       title: "Thuyền Tôm Đánh Bắt Trực Tiếp",
       streamer: "Ngư Dân Vịnh Gulf",
       startTime: "4:30 PM EST",
-      thumbnail: image_6,
+      thumbnail: "/assets/image_livestream6.jpg",
       category: "Đánh Bắt Trực Tiếp",
     },
   ]

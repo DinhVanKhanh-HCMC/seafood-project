@@ -1,8 +1,8 @@
-package com.dinhvankhanh.seafood.dtos.responses;
+package com.dinhvankhanh.seafood.dtos.requests;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
-import org.springframework.http.HttpStatus;
+
 import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

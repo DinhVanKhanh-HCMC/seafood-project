@@ -1,11 +1,5 @@
 import Navigation from "../header/Navigation"
 import Wave from "react-wavify"
-import image_1 from '../../../public/assets/image_introduction1.jpg'
-import image_2 from '../../../public/assets/image_introduction2.jpg'
-import image_3 from '../../../public/assets/image_introduction3.jpg'
-import image_4 from '../../../public/assets/image_introduction4.jpg'
-import image_5 from '../../../public/assets/image_introduction5.jpg'
-import image_6 from '../../../public/assets/image_introduction6.jpg'
 
 
 // Simple Wave Component
@@ -86,32 +80,32 @@ export default function IntroductionPage() {
   const categories = [
     {
       name: "Tôm sú",
-      image: image_1,
+      image: "/assets/image_introduction1.jpg",
       href: "/products?category=fish",
     },
     {
       name: "Ghẹ",
-      image: image_2,
+      image: "/assets/image_introduction2.jpg",
       href: "/products?category=shellfish",
     },
     {
       name: "Ốc móng tay",
-      image: image_3,
+      image: "/assets/image_introduction3.jpg",
       href: "/products?category=salmon",
     },
     {
       name: "Cá lóc bông",
-      image: image_4,
+      image: "/assets/image_introduction4.jpg",
       href: "/products?category=tuna",
     },
     {
       name: "Hàu sữa",
-      image: image_5,
+      image: "/assets/image_introduction5.jpg",
       href: "/products?category=shrimp",
     },
     {
       name: "Cá mú",
-      image: image_6,
+      image: "/assets/image_introduction6.jpg",
       href: "/products?category=oysters",
     }
   ]

@@ -1,9 +1,35 @@
 
+server:
+  port: 8080
+
 spring:
+  application:
+    name: SeafoodApplication
+
   data:
     mongodb:
       uri: mongodb+srv://root:12345@cluster0.36rgb.mongodb.net/seafood?retryWrites=true&w=majority&appName=Cluster0
+    redis:
+      host: redis-11166.c62.us-east-1-4.ec2.redns.redis-cloud.com
+      port: 11166
+      password: kjOqKzrjnJYwAKJped2UiisftppHSD7k
+      username: default
+      ssl:
+        enabled: true
+
   servlet:
     multipart:
       max-file-size: 2MB
       max-request-size: 5MB
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: khanhdinhfit@gmail.com
+    password: ajyifuomfdlajcao
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true

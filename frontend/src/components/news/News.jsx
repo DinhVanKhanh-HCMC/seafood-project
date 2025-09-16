@@ -1,12 +1,3 @@
-import image_1 from '../../../public/assets/image_news1.jpg'
-import image_2 from '../../../public/assets/image_news2.jpg'
-import image_3 from '../../../public/assets/image_news3.jpg'
-import image_4 from '../../../public/assets/image_news4.jpg'
-import image_5 from '../../../public/assets/image_news5.jpg'
-import image_6 from '../../../public/assets/image_news6.jpg'
-import image_7 from '../../../public/assets/image_news7.jpg'
-import image_8 from '../../../public/assets/image_news8.jpg'
-import image_9 from '../../../public/assets/image_news9.jpg'
 import { useNavigate } from 'react-router-dom'
 
 
@@ -19,7 +10,7 @@ export default function NewsPage() {
     title: "SeaFresh Hợp Tác Với Hội Bảo Tồn Biển Để Thực Hiện Sáng Kiến Bảo Vệ Đại Dương",
     excerpt:
       "Chúng tôi vui mừng thông báo về quan hệ đối tác mới nhằm bảo vệ hệ sinh thái biển đồng thời hỗ trợ các hoạt động đánh bắt thủy sản bền vững.",
-    image: image_1,
+    image: "/assets/image_news1.jpg",
     date: "15 tháng 12, 2024",
     category: "Bền Vững",
     readTime: "5 phút đọc",
@@ -32,7 +23,7 @@ export default function NewsPage() {
       title: "Ra Mắt Tính Năng Phát Trực Tiếp: Xem Thủy Sản Của Bạn Được Đánh Bắt",
       excerpt:
         "Công nghệ phát trực tiếp sáng tạo của chúng tôi giờ đây cho phép khách hàng xem thủy sản của họ được đánh bắt và chế biến theo thời gian thực.",
-      image: image_2,
+      image: "/assets/image_news2.jpg",
       date: "12 tháng 12, 2024",
       category: "Công Nghệ",
       readTime: "3 phút đọc",
@@ -43,7 +34,7 @@ export default function NewsPage() {
       title: "Phiên Đấu Giá Cá Ngừ Phá Kỷ Lục Thu Về 50.000$ Cho Ngư Dân Địa Phương",
       excerpt:
         "Một con cá ngừ vây xanh hiếm 400 pound đã được bán với giá kỷ lục trên nền tảng đấu giá của chúng tôi, làm nổi bật giá trị của việc bán trực tiếp cho người tiêu dùng.",
-      image: image_3,
+      image: "/assets/image_news3.jpg",
       date: "10 tháng 12, 2024",
       category: "Đấu Giá",
       readTime: "4 phút đọc",
@@ -54,7 +45,7 @@ export default function NewsPage() {
       title: "Mùa Lễ Hội Mang Lại Sự Gia Tăng Nhu Cầu Thủy Sản Cao Cấp",
       excerpt:
         "Doanh số tôm hùm, cua và cá cao cấp đã tăng 300% khi các gia đình chuẩn bị cho các lễ kỷ niệm trong dịp lễ.",
-      image: image_4,
+      image: "/assets/image_news4.jpg",
       date: "8 tháng 12, 2024",
       category: "Xu Hướng Thị Trường",
       readTime: "2 phút đọc",
@@ -65,7 +56,7 @@ export default function NewsPage() {
       title: "Đối Tác Đánh Bắt Mới Tham Gia Từ Tây Bắc Thái Bình Dương",
       excerpt:
         "Chúng tôi chào đón 15 hoạt động đánh bắt bền vững mới từ Oregon và Washington, mở rộng các sản phẩm thủy sản Thái Bình Dương của chúng tôi.",
-      image: image_5,
+      image: "/assets/image_news5.jpg",
       date: "5 tháng 12, 2024",
       category: "Quan Hệ Đối Tác",
       readTime: "3 phút đọc",
@@ -76,7 +67,7 @@ export default function NewsPage() {
       title: "Khóa Học Thạc Sĩ Chế Biến Thủy Sản Của Đầu Bếp Miguel Bắt Đầu",
       excerpt:
         "Tham gia cùng đầu bếp bậc thầy của chúng tôi trong các buổi trình diễn nấu ăn trực tiếp hàng tuần với thủy sản theo mùa và kỹ thuật chuyên nghiệp.",
-      image: image_6,
+      image: "/assets/image_news6.jpg",
       date: "3 tháng 12, 2024",
       category: "Giáo Dục",
       readTime: "2 phút đọc",
@@ -87,7 +78,7 @@ export default function NewsPage() {
       title: "Ứng Dụng Di Động SeaFresh Hiện Có Sẵn Cho iOS Và Android",
       excerpt:
         "Đấu giá, xem phát trực tiếp và đặt hàng thủy sản tươi sống trực tiếp từ thiết bị di động của bạn với ứng dụng mới của chúng tôi.",
-      image: image_7,
+      image: "/assets/image_news7.jpg",
       date: "28 tháng 11, 2024",
       category: "Công Nghệ",
       readTime: "3 phút đọc",
@@ -98,7 +89,7 @@ export default function NewsPage() {
       title: "Tuần Lễ Tạ Ơn Lập Kỷ Lục Doanh Số Mới",
       excerpt:
         "Đơn hàng của khách hàng tăng 250% trong tuần lễ Tạ ơn, với tôm hùm và cua là những sản phẩm phổ biến nhất.",
-      image: image_8,
+      image: "/assets/image_news8.jpg",
       date: "25 tháng 11, 2024",
       category: "Tin Tức Công Ty",
       readTime: "2 phút đọc",
@@ -109,7 +100,7 @@ export default function NewsPage() {
       title: "Nghiên Cứu Nhiệt Độ Đại Dương Cho Thấy Tác Động Đến Chất Lượng Thủy Sản",
       excerpt:
         "Quan hệ đối tác nghiên cứu của chúng tôi tiết lộ cách nhiệt độ đại dương thay đổi ảnh hưởng đến hương vị và giá trị dinh dưỡng của thủy sản.",
-      image: image_9,
+      image: "/assets/image_news9.jpg",
       date: "22 tháng 11, 2024",
       category: "Nghiên Cứu",
       readTime: "6 phút đọc",

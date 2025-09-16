@@ -2,7 +2,7 @@ package com.dinhvankhanh.seafood.controllers;
 
 import com.dinhvankhanh.seafood.dtos.requests.LoginRequest;
 import com.dinhvankhanh.seafood.dtos.requests.RegisterRequest;
-import com.dinhvankhanh.seafood.dtos.responses.ApiResource;
+import com.dinhvankhanh.seafood.dtos.requests.ApiResource;
 import com.dinhvankhanh.seafood.dtos.responses.AuthResponse;
 import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.services.AuthenticationService;

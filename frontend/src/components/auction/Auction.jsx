@@ -1,11 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import image_1 from "../../../public/assets/image_auction1.jpg"
-import image_2 from "../../../public/assets/image_auction2.jpg"
-import image_3 from "../../../public/assets/image_auction3.jpg"
-import image_4 from "../../../public/assets/image_auction4.jpg"
-import image_5 from "../../../public/assets/image_auction5.jpg"
+
 
 
 export default function AuctionPage() {
@@ -26,7 +22,7 @@ export default function AuctionPage() {
       bidCount: 23,
       timeLeft: "2h 15m",
       endTime: new Date(Date.now() + 2 * 60 * 60 * 1000 + 15 * 60 * 1000),
-      image: image_1,
+      image: "/assets/image_auction1.jpg",
       seller: "Nordic Fisheries",
       location: "Na Uy",
       weight: "22.7 kg",
@@ -50,7 +46,7 @@ export default function AuctionPage() {
       bidCount: 18,
       timeLeft: "45m",
       endTime: new Date(Date.now() + 45 * 60 * 1000),
-      image: image_2,
+      image: "/assets/image_auction2.jpg",
       seller: "Maine Coast Lobsters",
       location: "Maine, Hoa Kỳ",
       weight: "16.3 kg tổng",
@@ -74,7 +70,7 @@ export default function AuctionPage() {
       bidCount: 31,
       timeLeft: "1h 32m",
       endTime: new Date(Date.now() + 1 * 60 * 60 * 1000 + 32 * 60 * 1000),
-      image: image_3,
+      image: "/assets/image_auction3.jpg",
       seller: "Pacific Tuna Co.",
       location: "Hawaii, Hoa Kỳ",
       weight: "9.1 kg",
@@ -98,7 +94,7 @@ export default function AuctionPage() {
       bidCount: 0,
       timeLeft: "Bắt đầu sau 2h",
       endTime: new Date(Date.now() + 4 * 60 * 60 * 1000),
-      image: image_4,
+      image: "/assets/image_auction4.jpg",
       seller: "Alaskan Crab Co.",
       location: "Alaska, Hoa Kỳ",
       weight: "6.8 kg",
@@ -118,7 +114,7 @@ export default function AuctionPage() {
       bidCount: 12,
       timeLeft: "Đã kết thúc",
       endTime: new Date(Date.now() - 30 * 60 * 1000),
-      image: image_5,
+      image: "/assets/image_auction5.jpg",
       seller: "Chesapeake Oyster Farm",
       location: "Maryland, Hoa Kỳ",
       weight: "11.3 kg",

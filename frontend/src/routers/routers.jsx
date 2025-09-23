@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import RequireAuth from "../components/auth/RequireAuth.jsx";
 
 
 
@@ -13,6 +14,7 @@ const Auction = lazy(() => import("../components/auction/Auction.jsx"))
 const ProductDetail = lazy(() => import("../components/products/productDetail.jsx"))
 const NewsDetail = lazy(() => import("../components/news/NewDetail.jsx"))
 const Cart = lazy(() => import("../components/cart/page.jsx"))
+const Profile = lazy(() => import("../components/profile/page.jsx"))
 
 
 
@@ -31,8 +33,13 @@ const routers = [
             { path: "livestreaming", component: Livestream },
             { path: "auction", component: Auction },
             { path: "cart", component: Cart },
-            
-            
+            { path: "profile", component: () => (
+                <RequireAuth>
+                    <Profile />
+                </RequireAuth>
+                ),
+            },
+                
         ]
         
     }

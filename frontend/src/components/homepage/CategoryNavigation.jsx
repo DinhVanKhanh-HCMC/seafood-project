@@ -1,14 +1,14 @@
 const CategoryNavigation = () => {
   const crabCategories = [
-    { name: "Cua gạch", image: "/assets/cuagach.jpg", href: "/products?category=crab-roe", desc: "Cua cái nhiều gạch son, béo bùi và giàu dinh dưỡng." },
-    { name: "Cua thịt", image: "/assets/cuathit.jpg", href: "/products?category=crab-meat", desc: "Cua đực nhiều thịt, chắc khỏe, vị ngọt đậm đà." },
-    { name: "Cua gốm", image: "/assets/cuacom.jpg", href: "/products?category=crab-rice" },
+    { name: "Cua gạch", image: `${import.meta.env.BASE_URL}assets/cuagach.jpg`, href: "/products?category=crab-roe", desc: "Cua cái nhiều gạch son, béo bùi và giàu dinh dưỡng." },
+    { name: "Cua thịt", image: `${import.meta.env.BASE_URL}assets/cuathit.jpg`, href: "/products?category=crab-meat", desc: "Cua đực nhiều thịt, chắc khỏe, vị ngọt đậm đà." },
+    { name: "Cua gốm", image: `${import.meta.env.BASE_URL}assets/cuacom.jpg`, href: "/products?category=crab-rice" },
     
   ]
 
   const seafoodCategories = [
-    { name: "Tôm Cà Mau", image: "/assets/tomcamau.jpg", href: "/products?category=ca-mau-shrimp" },
-    { name: "Mực Cà Mau", image: "/assets/muccamau.jpg", href: "/products?category=ca-mau-squid" },
+    { name: "Tôm Cà Mau", image: `${import.meta.env.BASE_URL}assets/tomcamau.jpg`, href: "/products?category=ca-mau-shrimp" },
+    { name: "Mực Cà Mau", image: `${import.meta.env.BASE_URL}assets/muccamau.jpg`, href: "/products?category=ca-mau-squid" },
   ]
 
   return (

@@ -14,7 +14,7 @@ public class EmailService {
     public void sendOtpEmail(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
-        message.setSubject("Mã OTP xác thực");
+        message.setSubject("Mã OTP xác thực từ SEAFRESH");
         message.setText("Mã OTP của bạn là: " + otp + "\nMã có hiệu lực trong 5 phút.");
 
         mailSender.send(message);

@@ -44,6 +44,32 @@ export default class ApiService{
         }
     }
 
+    //login
+    static async logout() {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/auth/logout`,{},
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Đăng xuất thất bại';
+        }
+    }
+
+    //check token valid
+    static async verifyToken() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auth/verify-token`,
+            {headers: this.getHeader(false)}
+        );
+        return response;
+        } catch (error) {
+        throw error.response?.data?.message || 'Xác thực thất bại';
+        }
+    }
+
 
 
 //---------------------------------------
@@ -78,6 +104,24 @@ export default class ApiService{
 
 
 //---------------------------------------
+
+//-------------USER-----------------------
+
+    //get current user
+    static async getCurrentUser() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/users/me`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'lấy user hiện tại thất bại';
+        }
+    }
+
+
+//------------------------------------------
 
 
 

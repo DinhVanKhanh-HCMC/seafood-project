@@ -50,7 +50,7 @@ export default function ArticleDetailPage() {
     `,
     excerpt:
       "Chúng tôi vui mừng thông báo về sự hợp tác mới nhằm bảo vệ hệ sinh thái biển đồng thời hỗ trợ các hoạt động đánh bắt cá bền vững.",
-    image: "/assets/image_news1.jpg",
+    image: `${import.meta.env.BASE_URL}assets/image_news1.jpg`,
     date: "15 tháng 12, 2024",
     category: "Bền Vững",
     readTime: "5 phút đọc",
@@ -71,7 +71,7 @@ export default function ArticleDetailPage() {
       title: "Tính Năng Live Streaming Mới: Xem Hải Sản Được Đánh Bắt Trực Tiếp",
       excerpt:
         "Công nghệ live streaming sáng tạo cho phép khách hàng xem hải sản được đánh bắt và chế biến theo thời gian thực.",
-      image: "/assets/image_news2.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_news2.jpg`,
       date: "12 tháng 12, 2024",
       category: "Công Nghệ",
       readTime: "3 phút đọc",
@@ -81,7 +81,7 @@ export default function ArticleDetailPage() {
       title: "Phiên Đấu Giá Cá Ngừ Kỷ Lục Gây Quỹ 50.000$ Cho Ngư Dân",
       excerpt:
         "Con cá ngừ vây xanh hiếm 400 pound được bán với giá kỷ lục, làm nổi bật giá trị của việc bán trực tiếp cho người tiêu dùng.",
-      image: "/assets/image_news3.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_news3.jpg`,
       date: "10 tháng 12, 2024",
       category: "Đấu Giá",
       readTime: "4 phút đọc",
@@ -90,7 +90,7 @@ export default function ArticleDetailPage() {
       id: 4,
       title: "Mùa Lễ Hội Tăng Nhu Cầu Hải Sản Cao Cấp",
       excerpt: "Doanh số tôm hùm, cua và cá cao cấp tăng 300% khi các gia đình chuẩn bị cho các lễ hội.",
-      image: "/assets/image_news4.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_news4.jpg`,
       date: "8 tháng 12, 2024",
       category: "Xu Hướng Thị Trường",
       readTime: "2 phút đọc",

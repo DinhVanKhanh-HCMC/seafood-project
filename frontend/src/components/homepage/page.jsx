@@ -25,7 +25,7 @@ export default function HomePage() {
                 name: "Cua có gạch",
                 price: "620.000₫",
                 originalPrice: "750.000₫",
-                image: "/assets/cuagach.jpg",
+                image: `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
                 rating: 4.8,
                 inStock: true,
               },
@@ -33,7 +33,7 @@ export default function HomePage() {
                 name: "Cua thịt",
                 price: "1.150.000₫",
                 originalPrice: "1.320.000₫",
-                image: "/assets/cuathit.jpg",
+                image: `${import.meta.env.BASE_URL}assets/cuathit.jpg`,
                 rating: 4.9,
                 inStock: true,
               },
@@ -41,7 +41,7 @@ export default function HomePage() {
                 name: "Cua cơm",
                 price: "475.000₫",
                 originalPrice: "575.000₫",
-                image: "/assets/cuacom.jpg",
+                image: `${import.meta.env.BASE_URL}assets/cuacom.jpg`,
                 rating: 4.7,
                 inStock: false,
               },
@@ -49,7 +49,7 @@ export default function HomePage() {
                 name: "Cua mềm",
                 price: "825.000₫",
                 originalPrice: "975.000₫",
-                image: "/assets/cuagach.jpg",
+                image: `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
                 rating: 4.8,
                 inStock: true,
               },
@@ -113,7 +113,7 @@ export default function HomePage() {
                 name: "Tôm sú Cà Mau",
                 price: "550.000₫",
                 originalPrice: "650.000₫",
-                image: "/assets/tomcamau.jpg",
+                image: `${import.meta.env.BASE_URL}assets/tomcamau.jpg`,
                 rating: 4.7,
                 inStock: true,
               },
@@ -121,7 +121,7 @@ export default function HomePage() {
                 name: "Mực nang Cà Mau",
                 price: "700.000₫",
                 originalPrice: "850.000₫",
-                image: "/assets/muccamau.jpg",
+                image: `${import.meta.env.BASE_URL}assets/muccamau.jpg`,
                 rating: 4.6,
                 inStock: true,
               },
@@ -180,17 +180,17 @@ export default function HomePage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-              <img src="/assets/baiviet1homepage.jpg" className="w-full h-50"/>
+              <img src={`${import.meta.env.BASE_URL}assets/baiviet1homepage.jpg`} className="w-full h-50"/>
               <h3 className="font-semibold text-gray-900 mb-2">Cách chọn cua tươi</h3>
               <p className="text-gray-600">Hướng dẫn chọn cua Cà Mau chất lượng cao.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-              <img src="/assets/baiviet2homepage.jpg" className="w-full h-50"/>
+              <img src={`${import.meta.env.BASE_URL}assets/baiviet2homepage.jpg`} className="w-full h-50"/>
               <h3 className="font-semibold text-gray-900 mb-2">Món ngon từ cua</h3>
               <p className="text-gray-600">Các công thức nấu ăn hấp dẫn với cua Cà Mau.</p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-shadow">
-              <img src="/assets/baiviet3homepage.jpg" className="w-full h-50"/>
+              <img src={`${import.meta.env.BASE_URL}assets/baiviet3homepage.jpg`} className="w-full h-50"/>
               <h3 className="font-semibold text-gray-900 mb-2">Lợi ích sức khỏe</h3>
               <p className="text-gray-600">Tìm hiểu lợi ích dinh dưỡng từ cua Cà Mau.</p>
             </div>
@@ -220,7 +220,7 @@ export default function HomePage() {
               </div>
               <div className="relative">
                 <img
-                  src="/assets/live-homepage.jpg"
+                  src={`${import.meta.env.BASE_URL}assets/live-homepage.jpg`}
                   alt="Đấu giá cua trực tuyến"
                   className="w-full h-auto rounded-xl"
                 />

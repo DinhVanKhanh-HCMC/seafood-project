@@ -15,6 +15,7 @@ public class UserMapper {
                 .address(user.getAddress())
                 .role(user.getRole())
                 .dateOfBirth(user.getDateOfBirth())
+                .avatar(user.getAvatar())
                 .updatedAt(user.getUpdateAt())
                 .createdAt(user.getCreatedAt())
                 .build();

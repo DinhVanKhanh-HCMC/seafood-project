@@ -8,11 +8,11 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb+srv://root:12345@cluster0.36rgb.mongodb.net/seafood?retryWrites=true&w=majority&appName=Cluster0
+      uri: ${URI_MONGO}
     redis:
-      host: redis-11166.c62.us-east-1-4.ec2.redns.redis-cloud.com
-      port: 11166
-      password: kjOqKzrjnJYwAKJped2UiisftppHSD7k
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
       username: default
       ssl:
         enabled: true
@@ -25,11 +25,16 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: khanhdinhfit@gmail.com
-    password: ajyifuomfdlajcao
+    username: ${EMAIL_VERIFY}
+    password: ${EMAIL_VERIFY_PASSWORD}
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+
+aws:
+  s3:
+    access-key: ${AWS_S3_ACCESS_KEY_ID}
+    secret-key: ${AWS_S3_SECRET_ACCESS_KEY}

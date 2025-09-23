@@ -18,6 +18,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResource<Object>> handleAllException(Exception ex, WebRequest request) {
+        ex.printStackTrace();
         ApiResource<Object> errorResponse = ApiResource.builder()
                 .code(ErrorCode.INTERNAL_SERVER_ERROR.getCode())
                 .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getDefaultMessage())

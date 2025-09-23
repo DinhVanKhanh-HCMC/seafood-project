@@ -1,11 +1,48 @@
 
-import { Children, useState } from "react"
-import { NavLink } from "react-router-dom";
+import { Children, useState, useEffect } from "react"
+import { NavLink, Link } from "react-router-dom";
 import AuthModal from "../auth/AuthModal";
+import ApiService from "../../services/apis";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
+  const [user, setUser] = useState(null)
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const navigate = useNavigate()
+
+  // Khi component mount, kiểm tra token
+  useEffect(() => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      ApiService.getCurrentUser()
+        .then((res) => {
+          setUser({
+            name: res.data.fullName,
+            avatar: res.data.avatar || "https://seafood-project-1306.s3.ap-southeast-1.amazonaws.com/default-avt.png"
+          })
+        })
+        .catch(() => {
+          localStorage.removeItem("token")
+          setUser(null)
+        })
+    }
+  }, [])
+
+  const handleLogout = async () =>{
+    try {
+      const response = await ApiService.logout()
+      localStorage.removeItem("token")
+      toast.success(response.message)
+      setUser(null)
+      setIsProfileOpen(false)
+      navigate("/")
+    } catch (error) {
+      toast.success(error)
+    }
+  } 
 
   const navItems = [
     { name: "Trang chủ", href: "/" },
@@ -55,7 +92,7 @@ const Navigation = () => {
                 className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
-            <a href="/cart" className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors">
+            <Link to="/cart" className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
@@ -67,10 +104,57 @@ const Navigation = () => {
               <span className="absolute -top-1 -right-1 bg-amber-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                 3
               </span>
-            </a>
-            <button onClick={() => setIsAuthModalOpen(true)} className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
-              Đăng nhập
-            </button>
+            </Link>
+            {user ? (
+              <div>
+                <button 
+                  className="w-10 h-10 rounded-full overflow-hidden border border-gray-300" 
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                >
+                  <img 
+                    src={user.avatar} 
+                    alt={user.name} 
+                    className="w-full h-full object-cover" 
+                  />
+                </button>
+
+                {/* Popup menu */}
+                {isProfileOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                    <div className="px-4 py-2 border-b">
+                      <p className="font-medium text-gray-800">{user.name}</p>
+                      <p className="text-sm text-gray-500">Thông tin cá nhân</p>
+                    </div>
+                    <ul className="py-1">
+                      <li>
+                        <Link
+                          onClick={() => setIsProfileOpen(!isProfileOpen)}
+                          to="/profile" 
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                        >
+                          Hồ sơ cá nhân
+                        </Link>
+                      </li>
+                      <li>
+                        <button 
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
+                          onClick={handleLogout}
+                        >
+                          Đăng xuất
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button 
+                onClick={() => setIsAuthModalOpen(true)} 
+                className="bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors"
+              >
+                Đăng nhập
+              </button>
+            )}
           </div>
 
           {/* Mobile menu button */}
@@ -112,7 +196,12 @@ const Navigation = () => {
       </div>
     </nav>
 
-    <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+    <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} 
+      onLoginSuccess={(userData) => {
+      setUser(userData)
+      console.log(userData)     // Lưu user vào state
+      setIsAuthModalOpen(false)
+    }} />
     </>
   )
 }

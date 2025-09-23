@@ -13,7 +13,7 @@ const HeroSection = () => {
       title: "Cua Cà Mau tươi ngon",
       subtitle: "Giao hàng hàng ngày",
       desc: "Khám phá bộ sưu tập cua tươi sống từ Cà Mau...",
-      img: "/assets/slide-1.jpg",
+      img: `${import.meta.env.BASE_URL}assets/slide-1.jpg`,
       buttonText: "Xem ngay",
       buttonLink: "#cua-ca-mau"
     },
@@ -21,7 +21,7 @@ const HeroSection = () => {
       title: "Livestream bán cua",
       subtitle: "Trải nghiệm mua sắm trực tuyến",
       desc: "Tham gia buổi livestream để mua cua tươi ngon với giá tốt!",
-      img: "/assets/slide-2.jpg",
+      img: `${import.meta.env.BASE_URL}assets/slide-2.jpg`,
       buttonText: "Tham gia ngay",
       buttonLink: "#livestream"
     },
@@ -29,7 +29,7 @@ const HeroSection = () => {
       title: "Đấu giá trực tuyến",
       subtitle: "Cơ hội sở hữu cua chất lượng",
       desc: "Tham gia phiên đấu giá cua độc quyền, giá cực tốt...",
-      img: "/assets/backgr_2.png",
+      img: `${import.meta.env.BASE_URL}assets/backgr_2.png`,
       buttonText: "Đấu giá ngay",
       buttonLink: "#auction"
     },
@@ -37,7 +37,7 @@ const HeroSection = () => {
       title: "Khuyến mãi đặc biệt",
       subtitle: "Giảm giá sốc",
       desc: "Sở hữu cua Cà Mau với ưu đãi hấp dẫn...",
-      img: "/assets/slide-4.jpg",
+      img: `${import.meta.env.BASE_URL}assets/slide-4.jpg`,
       buttonText: "Khám phá các ưu đãi",
       buttonLink: "#promotions"
     },
@@ -46,7 +46,7 @@ const HeroSection = () => {
   return (
     <section
       className="relative h-screen overflow-hidden bg-center bg-cover"
-      style={{ backgroundImage: "url('/assets/background_hero.jpg')" }} // 👈 ảnh nền
+      style={{ backgroundImage: `url(${import.meta.env.BASE_URL}assets/background_hero.jpg)` }} // 👈 ảnh nền
     >
       {/* overlay màu phủ lên ảnh nền */}
       <div className="absolute inset-0 bg-gradient-to-br from-amber-50/80 to-orange-50/80"></div>

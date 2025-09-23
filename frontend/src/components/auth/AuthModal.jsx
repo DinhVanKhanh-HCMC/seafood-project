@@ -7,7 +7,7 @@ import ResetPassword from "./ResetPassword"
 import ApiService from "../../services/apis"
 import { toast } from "react-toastify"
 
-const AuthModal = ({ isOpen, onClose }) => {
+const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true)
   const [authStep, setAuthStep] = useState("main") // 'main', 'emailVerification', 'register', 'resetPassword'
   const [verificationMode, setVerificationMode] = useState("register") // 'register' or 'resetPassword'
@@ -65,25 +65,28 @@ const AuthModal = ({ isOpen, onClose }) => {
     }
   }
 
-  const handleSubmit = async (e) => {
+  const handleLoginSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setIsLoading(true)
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      
-      if (isLogin) {
-        alert("Đăng nhập thành công!")
-      } else {
-        alert("Đăng ký thành công! Vui lòng kiểm tra email để xác thực.")
+      const response = await ApiService.login(formData.email, formData.password)
+      localStorage.setItem("token",response.data.token);
+      toast.success(response.message)
+      const userLogin = {
+        name: response.data.user?.fullName,
+        avatar: response.data.user?.avatar || 'https://seafood-project-1306.s3.ap-southeast-1.amazonaws.com/default-avt.png'
       }
-      
+      onLoginSuccess(userLogin)
+
       onClose()
       setFormData({ name: "", email: "", password: "", confirmPassword: "", phone: "", agreeToTerms: false })
       setAuthStep("main") // Reset về bước chính sau khi đăng ký thành công
-    } catch {
+    } catch (err){
+      toast.error(err)
+      console.log(err)
       alert("Có lỗi xảy ra. Vui lòng thử lại!")
     } finally {
       setIsLoading(false)
@@ -274,24 +277,15 @@ const AuthModal = ({ isOpen, onClose }) => {
               </div>
 
               {/* Render form */}
-              {isLogin ? (
-                <LoginForm
-                  onSubmit={handleSubmit}
+              <LoginForm
+                  onSubmit={handleLoginSubmit}
                   onForgotPassword={handleForgotPassword}
                   isLoading={isLoading}
                   errors={errors}
                   formData={formData}
                   handleInputChange={handleInputChange}
-                />
-              ) : (
-                <RegisterForm
-                  onSubmit={handleSubmit}
-                  isLoading={isLoading}
-                  errors={errors}
-                  formData={formData}
-                  handleInputChange={handleInputChange}
-                />
-              )}
+               />
+        
 
               {/* Switch Mode */}
               <div className="text-center mt-6">

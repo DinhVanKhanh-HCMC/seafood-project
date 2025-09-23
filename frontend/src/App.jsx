@@ -43,7 +43,8 @@ function App() {
 
   return (
     <>
-    <BrowserRouter>
+  
+    <BrowserRouter basename="/seafood-project">
       <Suspense fallback={<div>Loading ...</div>}>
         <Routes>
           {renderRoutes(routers)}
@@ -61,6 +62,7 @@ function App() {
         draggable
         theme="light"
       />
+      
     </>
   );
 }

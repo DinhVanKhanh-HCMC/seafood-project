@@ -80,32 +80,32 @@ export default function IntroductionPage() {
   const categories = [
     {
       name: "Tôm sú",
-      image: "/assets/image_introduction1.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction1.jpg`,
       href: "/products?category=fish",
     },
     {
       name: "Ghẹ",
-      image: "/assets/image_introduction2.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction2.jpg`,
       href: "/products?category=shellfish",
     },
     {
       name: "Ốc móng tay",
-      image: "/assets/image_introduction3.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction3.jpg`,
       href: "/products?category=salmon",
     },
     {
       name: "Cá lóc bông",
-      image: "/assets/image_introduction4.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction4.jpg`,
       href: "/products?category=tuna",
     },
     {
       name: "Hàu sữa",
-      image: "/assets/image_introduction5.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction5.jpg`,
       href: "/products?category=shrimp",
     },
     {
       name: "Cá mú",
-      image: "/assets/image_introduction6.jpg",
+      image: `${import.meta.env.BASE_URL}assets/image_introduction6.jpg`,
       href: "/products?category=oysters",
     }
   ]

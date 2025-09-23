@@ -1,5 +1,7 @@
 import Navigation from "../header/Navigation"
 import { Outlet } from "react-router-dom"
+import ScrollToTop from "./ScrollToTop"
+import Footer from "../footer/Footer"
 
 const Layout = () => {
   return (
@@ -9,14 +11,17 @@ const Layout = () => {
         <Navigation />
       </header>
 
+      <ScrollToTop/>
+
+
       {/* Nội dung trang */}
       <main className="flex-grow">
         <Outlet />
       </main>
 
       {/* Footer (nếu cần) */}
-      <footer className="bg-gray-100 text-center py-4 text-sm text-gray-500">
-        © 2025 SeaFresh. All rights reserved.
+      <footer className="bg-gray-100 text-left py-4 text-sm text-gray-500">
+        <Footer/>
       </footer>
     </div>
   )

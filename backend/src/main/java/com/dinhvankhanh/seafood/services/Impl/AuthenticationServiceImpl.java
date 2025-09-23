@@ -2,9 +2,12 @@ package com.dinhvankhanh.seafood.services.Impl;
 
 import com.dinhvankhanh.seafood.dtos.requests.LoginRequest;
 import com.dinhvankhanh.seafood.dtos.requests.RegisterRequest;
+import com.dinhvankhanh.seafood.dtos.requests.ResetPassRequest;
 import com.dinhvankhanh.seafood.dtos.responses.AuthResponse;
 import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.enums.UserRole;
+import com.dinhvankhanh.seafood.exception.ErrorCode;
+import com.dinhvankhanh.seafood.exception.ErrorException;
 import com.dinhvankhanh.seafood.mappers.UserMapper;
 import com.dinhvankhanh.seafood.models.User;
 import com.dinhvankhanh.seafood.repositories.UserRepository;
@@ -17,6 +20,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -61,7 +66,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             );
 
             User user = userRepository.findByEmail(loginRequest.getEmail())
-                    .orElseThrow(() -> new RuntimeException("User không tồn tại"));
+                    .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));
 
             String token = jwtUtil.generateToken(user.getEmail());
 
@@ -72,7 +77,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .user(userResponse)
                     .build();
         }catch (BadCredentialsException e){
-            throw new BadCredentialsException("Tài khoản hoặc mật khẩu không chính xác");
+            throw new ErrorException(ErrorCode.INVALID_CREDENTIALS);
         }
+    }
+
+    @Override
+    public boolean resetPassword(ResetPassRequest resetPassRequest) {
+        if (!resetPassRequest.getNewPassword().equals(resetPassRequest.getConfirmPassword())) {
+            throw new ErrorException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        User user = userRepository.findByEmail(resetPassRequest.getEmail())
+                .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));
+        user.setPassword(passwordEncoder.encode(resetPassRequest.getNewPassword()));
+        userRepository.save(user);
+        return true;
     }
 }

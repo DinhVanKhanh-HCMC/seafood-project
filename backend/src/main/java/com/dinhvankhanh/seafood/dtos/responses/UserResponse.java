@@ -25,4 +25,5 @@ public class UserResponse {
     private LocalDate dateOfBirth;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private String avatar;
 }

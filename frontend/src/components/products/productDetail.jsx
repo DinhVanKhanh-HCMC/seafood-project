@@ -19,9 +19,9 @@ export default function ProductDetailPage() {
     price: 599000,
     originalPrice: 719000,
     images: [
-      "/assets/cuathit.jpg",
-      "/fresh-salmon-fillet.png",
-      "/fresh-salmon-fillet-on-ice-with-herbs-and-lemon.png",
+      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
     ],
     rating: 4.8,
     reviews: 124,

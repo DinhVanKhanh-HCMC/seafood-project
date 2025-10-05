@@ -110,11 +110,11 @@ export default class ApiService{
     //get current user
     static async getCurrentUser() {
         try {
-        const response = await axios.get(
-            `${BASE_URL}/users/me`,
-            {headers: this.getHeader(false)}
-        );
-        return response.data;
+            const response = await axios.get(
+                `${BASE_URL}/users/me`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
         } catch (error) {
         throw error.response?.data?.message || 'lấy user hiện tại thất bại';
         }
@@ -122,6 +122,120 @@ export default class ApiService{
 
 
 //------------------------------------------
+
+//-------------CATEGORY-----------------------
+
+    //get all category
+    static async getAllCategory() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/category`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả danh mục thất bại';
+        }
+    }
+
+
+//------------------------------------------
+
+//-------------PRODUCT-----------------------
+
+    //get all product
+    static async getAllProduct() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả sản phẩm thất bại';
+        }
+    }
+
+    //get product by id
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy sản phẩm theo id thất bại';
+        }
+    }
+
+    //get product by category id
+    static async getProductByCategoryId(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products/category/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả sản phẩm theo danh mục thất bại';
+        }
+    }
+
+//------------------------------------------
+
+//-------------REVIEW-----------------------
+
+    //get all review of product id
+    static async getAllReviewOfProduct(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/reviews/product/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả đánh giá của sản phẩm thất bại';
+        }
+    }
+
+    //write review
+    static async createReview(data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/reviews/add`,data,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'viết đánh giá thất bại';
+        }
+    }
+
+
+
+
+//------------------------------------------
+
+//-------------CART-----------------------
+
+    //add item to cart
+    static async addCartItem(data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/cart/add`,data,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Thêm item vào giỏ thất bại';
+        }
+    }
+
+//------------------------------------------
+
+
+
 
 
 

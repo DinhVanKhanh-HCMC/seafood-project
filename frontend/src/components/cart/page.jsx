@@ -1,36 +1,62 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: "Cá hồi tươi Nauy",
-      price: 450000,
-      quantity: 2,
-      image: `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-      weight: "1kg",
-      origin: "Na Uy",
-    },
-    {
-      id: 2,
-      name: "Tôm hùm Canada",
-      price: 850000,
-      quantity: 1,
-      image: `${import.meta.env.BASE_URL}assets/cuathit.jpg`,
-      weight: "500g",
-      origin: "Canada",
-    },
-    {
-      id: 3,
-      name: "Cá ngừ đại dương",
-      price: 320000,
-      quantity: 3,
-      image: `${import.meta.env.BASE_URL}assets/cuacom.jpg`,
-      weight: "800g",
-      origin: "Nhật Bản",
-    },
+    // {
+    //   id: 1,
+    //   name: "Cá hồi tươi Nauy",
+    //   price: 450000,
+    //   quantity: 2,
+    //   image: `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+    //   weight: "1kg",
+    //   origin: "Na Uy",
+    // },
+    // {
+    //   id: 2,
+    //   name: "Tôm hùm Canada",
+    //   price: 850000,
+    //   quantity: 1,
+    //   image: `${import.meta.env.BASE_URL}assets/cuathit.jpg`,
+    //   weight: "500g",
+    //   origin: "Canada",
+    // },
+    // {
+    //   id: 3,
+    //   name: "Cá ngừ đại dương",
+    //   price: 320000,
+    //   quantity: 3,
+    //   image: `${import.meta.env.BASE_URL}assets/cuacom.jpg`,
+    //   weight: "800g",
+    //   origin: "Nhật Bản",
+    // },
   ])
+
+  // useEffect(() => {
+  //   localStorage.setItem("cart", JSON.stringify(cartItems));
+  // }, [cartItems]);
+
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
+    setCartItems(savedCart);
+  }, []);
+
+
+  const handleCheckout = () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      toast.error("Vui lòng đăng nhập để tiến hành thanh toán");
+      navigate("/login"); // hoặc mở modal đăng nhập nếu bạn muốn
+      return;
+    }
+
+    // Nếu đã đăng nhập thì chuyển sang trang checkout
+    navigate("/checkout");
+  };
 
   const updateQuantity = (id, newQuantity) => {
     if (newQuantity === 0) {
@@ -74,12 +100,12 @@ const CartPage = () => {
             </div>
             <h3 className="text-xl font-medium text-gray-900 mb-2">Giỏ hàng trống</h3>
             <p className="text-gray-500 mb-6">Thêm sản phẩm vào giỏ hàng để bắt đầu mua sắm</p>
-            <a
-              href="/products"
+            <Link
+              to="/products"
               className="bg-amber-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition-colors"
             >
               Khám phá sản phẩm
-            </a>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -94,7 +120,7 @@ const CartPage = () => {
                   {cartItems.map((item) => (
                     <div key={item.id} className="p-6 flex items-center gap-4">
                       <img
-                        src={item.image || "/placeholder.svg"}
+                        src={item.images[0] || "/placeholder.svg"}
                         alt={item.name}
                         className="w-20 h-20 object-cover rounded-lg"
                       />

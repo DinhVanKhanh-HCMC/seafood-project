@@ -2,6 +2,7 @@ package com.dinhvankhanh.seafood.services;
 
 import com.dinhvankhanh.seafood.dtos.requests.UserUpdateRequest;
 import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
+import com.dinhvankhanh.seafood.models.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,4 +16,6 @@ public interface UserService {
     public List<UserResponse> getAllUser();
 
     public void deleteUser(String id);
+
+    public User getUserLogin();
 }

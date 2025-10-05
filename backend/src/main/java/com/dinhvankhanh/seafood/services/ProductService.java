@@ -12,6 +12,8 @@ public interface ProductService {
 
     public List<ProductResponse> getAllProduct();
 
+    public List<ProductResponse> getProductByCategoryId(String cateId);
+
     public ProductResponse updateProduct(String id, UpdateProductRequest updateProductRequest, List<MultipartFile> images);
 
     public ProductResponse getProductById(String id);

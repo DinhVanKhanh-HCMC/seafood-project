@@ -55,6 +55,9 @@ public class ProductServiceImpl implements ProductService {
                 .inStock(addProductRequest.isInStock())
                 .categoryId(addProductRequest.getCategoryId())
                 .images(imageUrls)
+                .originalPrice(addProductRequest.getOriginalPrice())
+                .origin(addProductRequest.getOrigin())
+                .weight(addProductRequest.getWeight())
                 .build();
 
         productRepository.save(product);
@@ -69,6 +72,21 @@ public class ProductServiceImpl implements ProductService {
                     return productMapper.mapperToProductResponse(product);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProductResponse> getProductByCategoryId(String cateId) {
+        if(!categoryRepository.existsById(cateId)){
+            throw new ErrorException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+
+        List<Product> products = productRepository.findByCategoryId(cateId);
+        return products.stream()
+                .map(product -> {
+                    return productMapper.mapperToProductResponse(product);
+                })
+                .collect(Collectors.toList());
+
     }
 
     @Override

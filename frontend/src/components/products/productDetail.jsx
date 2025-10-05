@@ -1,113 +1,190 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "react-router-dom"
+import ApiService from "../../services/apis"
+import { Link } from "react-router-dom";
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import { Navigation, Autoplay } from "swiper/modules"
+import "swiper/css/navigation"
+import { toast } from "react-toastify";
+
 
 
 export default function ProductDetailPage() {
-  const params = useParams()
+  const {id} = useParams()
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
   const [activeTab, setActiveTab] = useState("description")
-  const [newReview, setNewReview] = useState({ rating: 5, comment: "" })
+  const [newReview, setNewReview] = useState({ rating: 5, comment: "", productId: "" })
+  const [product, setProduct] = useState([]);
+  const [reviews, setReviews] = useState([]);
+  const [ratingsCount, setRatingsCount] = useState({ 5:0,4:0,3:0,2:0,1:0 });
+  const [relatedProducts, setRelatedProducts] = useState([]);
+  const [refreshReviews, setRefreshReviews] = useState(0)
+
+  const fetchAllData = async (productId) => {
+    try {
+      // Lấy product
+      const productRes = await ApiService.getProductById(productId);
+      setProduct(productRes.data);
+
+      // Lấy related products
+      if (productRes.data?.categoryId) {
+        const relatedRes = await ApiService.getProductByCategoryId(productRes.data.categoryId);
+        const filtered = relatedRes.data.filter(p => p.id !== productRes.data.id);
+        setRelatedProducts(filtered);
+      }
+
+      // Lấy reviews
+      const reviewRes = await ApiService.getAllReviewOfProduct(productId);
+      setReviews(reviewRes.data);
+
+      // Tính toán ratings count
+      const counts = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
+      reviewRes.data.forEach(r => {
+        counts[r.rating] = (counts[r.rating] || 0) + 1;
+      });
+      setRatingsCount(counts);
+
+    } catch (err) {
+      console.error("Lỗi khi fetch dữ liệu:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (!id) return;
+    fetchAllData(id);
+  }, [id, refreshReviews]);
+
 
   // Mock product data - in real app, fetch by ID
-  const product = {
-    id: 1,
-    name: "Cá Hồi Atlantic Phi Lê",
-    category: "salmon",
-    price: 599000,
-    originalPrice: 719000,
-    images: [
-      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-      `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-    ],
-    rating: 4.8,
-    reviews: 124,
-    inStock: true,
-    weight: "1 kg",
-    origin: "Na Uy",
-    description:
-      "Cá hồi Atlantic cao cấp, nuôi bền vững từ vùng biển lạnh Na Uy. Thịt cá chắc, ngọt tự nhiên, giàu Omega-3.",
-    specifications: {
-      "Loại sản phẩm": "Phi lê cá hồi tươi",
-      "Xuất xứ": "Na Uy",
-      "Trọng lượng": "1 kg",
-      "Bảo quản": "Nhiệt độ 0-4°C",
-      "Hạn sử dụng": "3 ngày kể từ ngày mua",
-      "Chứng nhận": "ASC - Nuôi trồng thủy sản bền vững",
-    },
-    nutritionFacts: {
-      Calories: "208 kcal/100g",
-      Protein: "25.4g",
-      "Chất béo": "11g",
-      "Omega-3": "2.3g",
-      "Vitamin D": "526 IU",
-    },
-  }
+  // const product = {
+  //   id: 1,
+  //   name: "Cá Hồi Atlantic Phi Lê",
+  //   category: "salmon",
+  //   price: 599000,
+  //   originalPrice: 719000,
+  //   images: [
+  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
+  //   ],
+  //   rating: 4.8,
+  //   reviews: 124,
+  //   inStock: true,
+  //   weight: "1 kg",
+  //   origin: "Na Uy",
+  //   description:
+  //     "Cá hồi Atlantic cao cấp, nuôi bền vững từ vùng biển lạnh Na Uy. Thịt cá chắc, ngọt tự nhiên, giàu Omega-3.",
+  //   specifications: {
+  //     "Loại sản phẩm": "Phi lê cá hồi tươi",
+  //     "Xuất xứ": "Na Uy",
+  //     "Trọng lượng": "1 kg",
+  //     "Bảo quản": "Nhiệt độ 0-4°C",
+  //     "Hạn sử dụng": "3 ngày kể từ ngày mua",
+  //     "Chứng nhận": "ASC - Nuôi trồng thủy sản bền vững",
+  //   },
+  //   nutritionFacts: {
+  //     Calories: "208 kcal/100g",
+  //     Protein: "25.4g",
+  //     "Chất béo": "11g",
+  //     "Omega-3": "2.3g",
+  //     "Vitamin D": "526 IU",
+  //   },
+  // }
 
-  const reviews = [
-    {
-      id: 1,
-      user: "Nguyễn Minh Anh",
-      rating: 5,
-      date: "2024-01-15",
-      comment: "Cá hồi rất tươi ngon, thịt chắc và ngọt. Đóng gói cẩn thận, giao hàng nhanh. Sẽ mua lại!",
-      helpful: 12,
-    },
-    {
-      id: 2,
-      user: "Trần Văn Hùng",
-      rating: 4,
-      date: "2024-01-10",
-      comment: "Chất lượng tốt, giá hợp lý. Làm sashimi rất ngon. Chỉ có điều muốn có thêm size nhỏ hơn.",
-      helpful: 8,
-    },
-    {
-      id: 3,
-      user: "Lê Thị Mai",
-      rating: 5,
-      date: "2024-01-08",
-      comment: "Cá tươi, không tanh. Nướng lên thơm lắm. Shop đóng gói kỹ, có đá khô giữ lạnh.",
-      helpful: 15,
-    },
-  ]
+  // const reviews = [
+  //   {
+  //     id: 1,
+  //     user: "Nguyễn Minh Anh",
+  //     rating: 5,
+  //     date: "2024-01-15",
+  //     comment: "Cá hồi rất tươi ngon, thịt chắc và ngọt. Đóng gói cẩn thận, giao hàng nhanh. Sẽ mua lại!",
+  //     helpful: 12,
+  //   },
+  //   {
+  //     id: 2,
+  //     user: "Trần Văn Hùng",
+  //     rating: 4,
+  //     date: "2024-01-10",
+  //     comment: "Chất lượng tốt, giá hợp lý. Làm sashimi rất ngon. Chỉ có điều muốn có thêm size nhỏ hơn.",
+  //     helpful: 8,
+  //   },
+  //   {
+  //     id: 3,
+  //     user: "Lê Thị Mai",
+  //     rating: 5,
+  //     date: "2024-01-08",
+  //     comment: "Cá tươi, không tanh. Nướng lên thơm lắm. Shop đóng gói kỹ, có đá khô giữ lạnh.",
+  //     helpful: 15,
+  //   },
+  // ]
 
-  const relatedProducts = [
-    {
-      id: 2,
-      name: "Tôm Hùm Maine",
-      price: 1099000,
-      image: "/fresh-maine-lobster.png",
-      rating: 4.9,
-    },
-    {
-      id: 4,
-      name: "Bít Tết Cá Ngừ Tươi",
-      price: 789000,
-      image: "/fresh-tuna-steak.png",
-      rating: 4.8,
-    },
-    {
-      id: 8,
-      name: "Phi Lê Cá Chẽm",
-      price: 549000,
-      image: "/fresh-sea-bass-fillet.png",
-      rating: 4.5,
-    },
-  ]
+  // const relatedProducts = [
+  //   {
+  //     id: 2,
+  //     name: "Tôm Hùm Maine",
+  //     price: 1099000,
+  //     image: "/fresh-maine-lobster.png",
+  //     rating: 4.9,
+  //   },
+  //   {
+  //     id: 4,
+  //     name: "Bít Tết Cá Ngừ Tươi",
+  //     price: 789000,
+  //     image: "/fresh-tuna-steak.png",
+  //     rating: 4.8,
+  //   },
+  //   {
+  //     id: 8,
+  //     name: "Phi Lê Cá Chẽm",
+  //     price: 549000,
+  //     image: "/fresh-sea-bass-fillet.png",
+  //     rating: 4.5,
+  //   },
+  // ]
 
   const handleAddToCart = () => {
     // Add to cart logic
-    alert(`Đã thêm ${quantity} ${product.name} vào giỏ hàng`)
+    alert(`Đã thêm ${quantity} ${product?.name} vào giỏ hàng`)
   }
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault()
-    // Submit review logic
-    alert("Cảm ơn bạn đã đánh giá sản phẩm!")
-    setNewReview({ rating: 5, comment: "" })
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Bạn cần đăng nhập để gửi đánh giá");
+      return;
+    }
+    
+    
+    try {
+      // 👉 gọi API verify token
+      await ApiService.verifyToken();
+
+      // nếu token hợp lệ thì cho gửi review
+      if (!id) {
+        toast.error("Không tìm thấy sản phẩm để đánh giá");
+        return;
+      }
+
+      const reviewToSubmit = {
+        rating: newReview.rating,
+        comment: newReview.comment,
+        productId: id
+      };
+
+      const response = await ApiService.createReview(reviewToSubmit);
+
+      toast.success(response.message);
+      setNewReview({ rating: 5, comment: "", productId: "" });
+
+      setRefreshReviews(prev => prev + 1);
+    } catch (error) {
+      toast.error(error);
+    }
   }
 
   return (
@@ -117,15 +194,15 @@ export default function ProductDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Breadcrumb */}
         <nav className="flex items-center space-x-2 text-sm text-neutral-600 mb-8">
-          <a href="/" className="hover:text-amber-600">
+          <a href="/seafood-project/" className="hover:text-amber-600">
             Trang chủ
           </a>
           <span>/</span>
-          <a href="/products" className="hover:text-amber-600">
+          <a href="/seafood-project/products" className="hover:text-amber-600">
             Sản phẩm
           </a>
           <span>/</span>
-          <span className="text-neutral-900">{product.name}</span>
+          <span className="text-neutral-900">{product?.name}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
@@ -133,13 +210,13 @@ export default function ProductDetailPage() {
           <div className="space-y-4">
             <div className="aspect-square bg-white rounded-2xl overflow-hidden">
               <img
-                src={product.images[selectedImage] || "/placeholder.svg"}
-                alt={product.name}
+                src={product?.images?.[selectedImage] || "/placeholder.svg"}
+                alt={product?.name}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex space-x-4">
-              {product.images.map((image, index) => (
+              {product?.images?.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
@@ -156,40 +233,40 @@ export default function ProductDetailPage() {
           {/* Product Info */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-neutral-900 mb-2">{product.name}</h1>
+              <h1 className="text-3xl font-bold text-neutral-900 mb-2">{product?.name}</h1>
               <div className="flex items-center space-x-4 mb-4">
                 <div className="flex items-center space-x-1">
-                  <div className="flex text-yellow-400">{"★".repeat(Math.floor(product.rating))}</div>
-                  <span className="text-neutral-600">({product.rating})</span>
+                  <div className="flex text-yellow-400">{"★".repeat(Math.floor(product?.avgRating))}</div>
+                  <span className="text-neutral-600">({product?.avgRating})</span>
                 </div>
-                <span className="text-neutral-600">{product.reviews} đánh giá</span>
+                <span className="text-neutral-600">{product?.reviewCount} đánh giá</span>
                 <span
                   className={`px-2 py-1 rounded text-sm ${
-                    product.inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    product?.inStock ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
                   }`}
                 >
-                  {product.inStock ? "Còn hàng" : "Hết hàng"}
+                  {product?.inStock ? "Còn hàng" : "Hết hàng"}
                 </span>
               </div>
             </div>
 
             <div className="flex items-center space-x-4">
-              <span className="text-3xl font-bold text-amber-600">{product.price.toLocaleString()}₫</span>
-              {product.originalPrice > product.price && (
-                <span className="text-xl text-neutral-500 line-through">{product.originalPrice.toLocaleString()}₫</span>
+              <span className="text-3xl font-bold text-amber-600">{product?.price?.toLocaleString()}₫</span>
+              {product?.originalPrice > product?.price && (
+                <span className="text-xl text-neutral-500 line-through">{product?.originalPrice.toLocaleString()}₫</span>
               )}
             </div>
 
-            <p className="text-neutral-700 leading-relaxed">{product.description}</p>
+            <p className="text-neutral-700 leading-relaxed">{product?.description}</p>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium text-neutral-900">Trọng lượng:</span>
-                <span className="ml-2 text-neutral-600">{product.weight}</span>
+                <span className="ml-2 text-neutral-600">{product?.weight}</span>
               </div>
               <div>
                 <span className="font-medium text-neutral-900">Xuất xứ:</span>
-                <span className="ml-2 text-neutral-600">{product.origin}</span>
+                <span className="ml-2 text-neutral-600">{product?.origin}</span>
               </div>
             </div>
 
@@ -232,8 +309,6 @@ export default function ProductDetailPage() {
             <nav className="flex space-x-8">
               {[
                 { id: "description", label: "Mô tả sản phẩm" },
-                { id: "specifications", label: "Thông số kỹ thuật" },
-                { id: "nutrition", label: "Thành phần dinh dưỡng" },
                 { id: "reviews", label: "Đánh giá" },
               ].map((tab) => (
                 <button
@@ -253,7 +328,7 @@ export default function ProductDetailPage() {
 
           {activeTab === "description" && (
             <div className="prose max-w-none">
-              <p className="text-neutral-700 leading-relaxed mb-6">{product.description}</p>
+              <p className="text-neutral-700 leading-relaxed mb-6">{product?.description}</p>
               <h3 className="text-lg font-semibold text-neutral-900 mb-4">Đặc điểm nổi bật</h3>
               <ul className="space-y-2 text-neutral-700">
                 <li>• Cá hồi Atlantic nuôi tại vùng biển lạnh Na Uy</li>
@@ -265,51 +340,34 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {activeTab === "specifications" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.entries(product.specifications).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-3 border-b border-neutral-100">
-                  <span className="font-medium text-neutral-900">{key}:</span>
-                  <span className="text-neutral-600">{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {activeTab === "nutrition" && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {Object.entries(product.nutritionFacts).map(([key, value]) => (
-                <div key={key} className="flex justify-between py-3 border-b border-neutral-100">
-                  <span className="font-medium text-neutral-900">{key}:</span>
-                  <span className="text-neutral-600">{value}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
           {activeTab === "reviews" && (
             <div className="space-y-8">
               {/* Review Summary */}
               <div className="flex items-center space-x-8">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-neutral-900">{product.rating}</div>
+                  <div className="text-4xl font-bold text-neutral-900">{product?.avgRating}</div>
                   <div className="flex text-yellow-400 justify-center mb-2">
-                    {"★".repeat(Math.floor(product.rating))}
+                    {"★".repeat(Math.floor(product?.avgRating))}
                   </div>
-                  <div className="text-sm text-neutral-600">{product.reviews} đánh giá</div>
+                  <div className="text-sm text-neutral-600">{product?.reviewCount} đánh giá</div>
                 </div>
                 <div className="flex-1 space-y-2">
-                  {[5, 4, 3, 2, 1].map((stars) => (
-                    <div key={stars} className="flex items-center space-x-2">
-                      <span className="text-sm text-neutral-600">{stars} sao</span>
-                      <div className="flex-1 bg-neutral-200 rounded-full h-2">
-                        <div
-                          className="bg-yellow-400 h-2 rounded-full"
-                          style={{ width: `${Math.random() * 80 + 10}%` }}
-                        ></div>
+                  {[5, 4, 3, 2, 1].map((stars) => {
+                    const count = ratingsCount[stars];
+                    const percent = product.reviewCount > 0 ? (count / product.reviewCount) * 100 : 0;
+                    return (
+                      <div key={stars} className="flex items-center space-x-2">
+                        <span className="text-sm text-neutral-600">{stars} sao</span>
+                        <div className="flex-1 bg-neutral-200 rounded-full h-2">
+                          <div
+                            className="bg-yellow-400 h-2 rounded-full"
+                            style={{ width: `${percent}%` }}
+                          ></div>
+                        </div>
+                        <span className="text-sm text-neutral-600">{count}</span>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -344,6 +402,7 @@ export default function ProductDetailPage() {
                   </div>
                   <button
                     type="submit"
+                    disabled={!id}
                     className="bg-amber-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-amber-700 transition-colors"
                   >
                     Gửi đánh giá
@@ -360,13 +419,13 @@ export default function ProductDetailPage() {
                         <div className="font-semibold text-neutral-900">{review.user}</div>
                         <div className="flex items-center space-x-2">
                           <div className="flex text-yellow-400">{"★".repeat(review.rating)}</div>
-                          <span className="text-sm text-neutral-500">{review.date}</span>
+                          <span className="text-sm text-neutral-500">{review.createdAt}</span>
                         </div>
                       </div>
                     </div>
                     <p className="text-neutral-700 mb-3">{review.comment}</p>
                     <div className="flex items-center space-x-4 text-sm text-neutral-500">
-                      <button className="hover:text-amber-600">Hữu ích ({review.helpful})</button>
+                      {/* <button className="hover:text-amber-600">Hữu ích ({review.helpful})</button> */}
                       <button className="hover:text-amber-600">Trả lời</button>
                     </div>
                   </div>
@@ -379,27 +438,63 @@ export default function ProductDetailPage() {
         {/* Related Products */}
         <div className="mb-12">
           <h2 className="text-2xl font-bold text-neutral-900 mb-8">Sản phẩm liên quan</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Swiper
+            spaceBetween={20}
+            slidesPerView={3} // hiện 3 sản phẩm
+            navigation={{
+              prevEl: ".custom-prev",
+              nextEl: ".custom-next",
+            }}
+            autoplay={{ delay: 3000 }}
+            loop={relatedProducts.length > 3}
+            modules={[Navigation, Autoplay]}
+          >
             {relatedProducts.map((product) => (
-              <div
-                key={product.id}
-                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
-              >
-                <img
-                  src={product.image || "/placeholder.svg"}
-                  alt={product.name}
-                  className="w-full h-48 object-cover"
-                />
-                <div className="p-4">
-                  <h3 className="font-semibold text-neutral-900 mb-2">{product.name}</h3>
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-bold text-amber-600">{product.price.toLocaleString()}₫</span>
-                    <div className="flex text-yellow-400">{"★".repeat(Math.floor(product.rating))}</div>
+              <SwiperSlide key={product.id}>
+                <Link
+                  className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow 
+               border border-gray-200 hover:border-amber-400 transform hover:-translate-y-1 
+               hover:scale-[1.02] duration-300 block"
+                  to={`/product-detail/${product.id}`}
+                >
+                  <img
+                    src={product.images[0] || "/placeholder.svg"}
+                    alt={product.name}
+                    className="w-full h-48 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold text-neutral-900 mb-2">{product.name}</h3>
+
+                    <p className="text-sm text-neutral-600 mb-2">{product.weight}</p>
+
+                    <div className="flex items-center justify-between">
+                      <span className="text-lg font-bold text-amber-600">{product.price.toLocaleString()}₫</span>
+                      <div className="flex text-yellow-400">{"★".repeat(Math.floor(product.avgRating))}</div>
+                    </div>
+                    <button
+                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all transform active:scale-95 ${
+                          product.inStock
+                            ? "bg-gradient-to-r from-orange-500 to-orange-600 text-white hover:from-orange-600 hover:to-orange-700 shadow-lg hover:shadow-xl"
+                            : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                        }`}
+                        disabled={!product.inStock}
+                      >
+                        {product.inStock ? "🛒 Thêm vào giỏ" : "❌ Hết hàng"}
+                      </button>
                   </div>
-                </div>
-              </div>
+                </Link>
+              </SwiperSlide>
             ))}
-          </div>
+          </Swiper>
+          
+          {/* Nút custom */}
+          <button className="custom-prev absolute top-1/2 -left-6 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+            ◀
+          </button>
+          <button className="custom-next absolute top-1/2 -right-6 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-md hover:bg-gray-100">
+            ▶
+          </button>
+
         </div>
       </div>
     </div>

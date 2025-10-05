@@ -7,10 +7,12 @@ import com.dinhvankhanh.seafood.exception.ErrorException;
 import com.dinhvankhanh.seafood.mappers.ReviewMapper;
 import com.dinhvankhanh.seafood.models.Product;
 import com.dinhvankhanh.seafood.models.Review;
+import com.dinhvankhanh.seafood.models.User;
 import com.dinhvankhanh.seafood.repositories.ProductRepository;
 import com.dinhvankhanh.seafood.repositories.ReviewRepository;
 import com.dinhvankhanh.seafood.repositories.UserRepository;
 import com.dinhvankhanh.seafood.services.ReviewService;
+import com.dinhvankhanh.seafood.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,20 +31,20 @@ public class ReviewServiceImpl implements ReviewService {
 
     private final ReviewMapper reviewMapper;
 
+    private final UserService userService;
+
 
 
     @Override
     public ReviewResponse addReview(AddReviewRequest addReviewRequest) {
-        if(!userRepository.existsById(addReviewRequest.getUserId())){
-            throw new ErrorException(ErrorCode.USER_NOT_FOUND);
-        }
+        User user = userService.getUserLogin();
 
         if(!productRepository.existsById(addReviewRequest.getProductId())){
             throw new ErrorException(ErrorCode.PRODUCT_NOT_FOUND);
         }
 
         Review review = Review.builder()
-                .userId(addReviewRequest.getUserId())
+                .userId(user.getId())
                 .productId(addReviewRequest.getProductId())
                 .comment(addReviewRequest.getComment())
                 .rating(addReviewRequest.getRating())

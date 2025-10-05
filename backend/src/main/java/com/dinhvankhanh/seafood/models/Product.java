@@ -26,9 +26,13 @@ public class Product {
 
     private String description;
 
+    private BigDecimal originalPrice;
+
     private BigDecimal price;
 
     private String origin;
+
+    private String weight;
 
     private boolean inStock = true;
 

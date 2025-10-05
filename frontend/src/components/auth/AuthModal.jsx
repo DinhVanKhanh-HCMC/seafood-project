@@ -30,6 +30,21 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }))
   }
 
+  const syncLocalCart = async () => {
+    const localCart = JSON.parse(localStorage.getItem("cart")) || [];
+    if (localCart.length === 0) return;
+
+    try {
+      for (const item of localCart) {
+        await ApiService.addCartItem(item)
+      }
+      localStorage.removeItem("cart");
+      toast.success("Đã đồng bộ giỏ hàng của bạn!");
+    } catch (error) {
+      console.error("Lỗi đồng bộ giỏ hàng:", error);
+    }
+  };
+
   const validateForm = () => {
     const newErrors = {}
     if (!formData.email) newErrors.email = "Email là bắt buộc"
@@ -74,6 +89,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     try {
       const response = await ApiService.login(formData.email, formData.password)
       localStorage.setItem("token",response.data.token);
+      syncLocalCart()
       toast.success(response.message)
       const userLogin = {
         name: response.data.user?.fullName,
@@ -87,7 +103,6 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     } catch (err){
       toast.error(err)
       console.log(err)
-      alert("Có lỗi xảy ra. Vui lòng thử lại!")
     } finally {
       setIsLoading(false)
     }

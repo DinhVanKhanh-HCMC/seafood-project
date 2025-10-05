@@ -17,9 +17,13 @@ public class AddProductRequest {
 
     private String description;
 
+    private BigDecimal originalPrice;
+
     private BigDecimal price;
 
     private String origin;
+
+    private String weight;
 
     private boolean inStock;
 

@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface ReviewRepository extends MongoRepository<Review,String> {
     int countByProductId(String id);
 
-    Optional<Review> findByProductId(String id);
+    Optional<List<Review>> findByProductId(String id);
 
     List<Review> findByProductIdOrderByCreatedAtDesc(String id);
 }

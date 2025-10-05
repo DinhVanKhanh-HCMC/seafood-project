@@ -12,6 +12,9 @@ import com.dinhvankhanh.seafood.services.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -103,6 +106,18 @@ public class UserServiceImpl implements UserService {
             throw new ErrorException(ErrorCode.USER_NOT_FOUND,"User không tồn tại: "+id);
         }
         userRepository.deleteById(id);
+    }
+
+    @Override
+    public User getUserLogin() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated() ||
+                authentication instanceof AnonymousAuthenticationToken) {
+            throw new ErrorException(ErrorCode.UNAUTHORIZED, "Unauthorized: User not logged in");
+        }
+        String email = authentication.getName();
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND, "User not found"));
     }
 
 

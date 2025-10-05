@@ -27,11 +27,15 @@ public class ProductResponse {
 
     private boolean inStock;
 
+    private BigDecimal originalPrice;
+
     private String origin;
+
+    private String weight;
 
     private List<String> images;
 
-    private String categoryName;
+    private String categoryId;
 
     private int reviewCount;
 

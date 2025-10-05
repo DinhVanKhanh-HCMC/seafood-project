@@ -39,6 +39,12 @@ public class ProductController {
         return ApiResource.ok(responses,"Lấy danh sách sản phẩm thành công");
     }
 
+    @GetMapping("/category/{id}")
+    public ApiResource<List<ProductResponse>> getProductByCategoryId(@PathVariable String id){
+        List<ProductResponse> responses = productService.getProductByCategoryId(id);
+        return ApiResource.ok(responses,"Lấy danh sách sản phẩm theo danh mục thành công");
+    }
+
     @GetMapping("/{id}")
     public ApiResource<ProductResponse> getProductById(@PathVariable String id){
         ProductResponse response = productService.getProductById(id);

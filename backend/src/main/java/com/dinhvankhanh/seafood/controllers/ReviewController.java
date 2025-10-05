@@ -27,8 +27,8 @@ public class ReviewController {
     }
 
     @GetMapping("/product/{id}")
-    public ApiResource<List<ReviewResponse>> getAllReviewOfProduct(@PathVariable String productId){
-        List<ReviewResponse> responses = reviewService.getAllReviewOfProduct(productId);
+    public ApiResource<List<ReviewResponse>> getAllReviewOfProduct(@PathVariable String id){
+        List<ReviewResponse> responses = reviewService.getAllReviewOfProduct(id);
         return ApiResource.ok(responses,"Lấy danh sách đánh giá của sản phẩm thành công");
     }
 

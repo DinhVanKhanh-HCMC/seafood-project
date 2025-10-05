@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/cart")
 @RequiredArgsConstructor
@@ -30,7 +32,8 @@ public class CartController {
 
     @PostMapping("/update/{productId}")
     public ApiResource<String> updateItem(@PathVariable String productId,
-                           @RequestParam int quantity) {
+                                          @RequestBody Map<String, Integer> body) {
+        int quantity = body.get("quantity");
         cartService.updateItem(productId, quantity);
         return ApiResource.ok("Update item thành công","SUCCESS");
     }

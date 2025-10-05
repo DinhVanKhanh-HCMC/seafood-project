@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
+import ApiService from "../../services/apis";
 
 const CartPage = () => {
   const navigate = useNavigate();
@@ -15,34 +16,88 @@ const CartPage = () => {
     //   weight: "1kg",
     //   origin: "Na Uy",
     // },
-    // {
-    //   id: 2,
-    //   name: "Tôm hùm Canada",
-    //   price: 850000,
-    //   quantity: 1,
-    //   image: `${import.meta.env.BASE_URL}assets/cuathit.jpg`,
-    //   weight: "500g",
-    //   origin: "Canada",
-    // },
-    // {
-    //   id: 3,
-    //   name: "Cá ngừ đại dương",
-    //   price: 320000,
-    //   quantity: 3,
-    //   image: `${import.meta.env.BASE_URL}assets/cuacom.jpg`,
-    //   weight: "800g",
-    //   origin: "Nhật Bản",
-    // },
   ])
+  const [loading, setLoading] = useState(true);
 
-  // useEffect(() => {
-  //   localStorage.setItem("cart", JSON.stringify(cartItems));
-  // }, [cartItems]);
+  const loadUserCart = async () => {
+    try {
+      const response = await ApiService.getCart(); // 👉 API lấy giỏ hàng người dùng
+      setCartItems(response.data.items || []);
+    } catch (error) {
+      console.error("Lỗi tải giỏ hàng:", error);
+      toast.error("Không thể tải giỏ hàng từ server");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  useEffect(() => {
+  const loadLocalCart = () => {
     const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
     setCartItems(savedCart);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    const initCart = async () => {
+      if (token) {
+        try {
+          await ApiService.verifyToken();
+          await loadUserCart(); // ✅ Nếu token hợp lệ → lấy giỏ hàng từ server
+        } catch (err) {
+          console.warn("Token không hợp lệ → dùng giỏ hàng local");
+          loadLocalCart();
+        }
+      } else {
+        loadLocalCart(); // ✅ Nếu chưa đăng nhập → dùng giỏ hàng local
+      }
+    };
+
+    initCart();
   }, []);
+
+  if (loading) return <p>Đang tải giỏ hàng...</p>;
+
+  const updateQuantity = async (productId, newQuantity) => {
+    if (newQuantity < 0) return; 
+    const token = localStorage.getItem("token");
+
+    try {
+      if (token) {
+        await ApiService.verifyToken();
+        if (newQuantity === 0) {
+          await ApiService.deleteCartItem(productId);
+          toast.info("Đã xóa sản phẩm khỏi giỏ hàng");
+        } else {
+          await ApiService.updateCartItem(productId,newQuantity);
+          toast.success("Cập nhật giỏ hàng thành công");
+        }
+
+        const updatedCart = await ApiService.getCart();
+        setCartItems(updatedCart.data.items || []);
+      } else {
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const existing = cart.find((item) => item.productId === productId);
+        if (!existing) return;
+
+        if (newQuantity === 0) {
+          cart = cart.filter((item) => item.productId !== productId);
+          toast.info("Đã xóa sản phẩm khỏi giỏ hàng");
+        } else {
+          existing.quantity = newQuantity;
+          toast.success("Cập nhật giỏ hàng thành công");
+        }
+
+        localStorage.setItem("cart", JSON.stringify(cart));
+        setCartItems(cart);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Không thể cập nhật giỏ hàng");
+    }
+  };
+
 
 
   const handleCheckout = () => {
@@ -58,13 +113,13 @@ const CartPage = () => {
     navigate("/checkout");
   };
 
-  const updateQuantity = (id, newQuantity) => {
-    if (newQuantity === 0) {
-      setCartItems(cartItems.filter((item) => item.id !== id))
-    } else {
-      setCartItems(cartItems.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
-    }
-  }
+  // const updateQuantity = (id, newQuantity) => {
+  //   if (newQuantity === 0) {
+  //     setCartItems(cartItems.filter((item) => item.id !== id))
+  //   } else {
+  //     setCartItems(cartItems.map((item) => (item.id === id ? { ...item, quantity: newQuantity } : item)))
+  //   }
+  // }
 
   const getTotalPrice = () => {
     return cartItems.reduce((total, item) => total + item.price * item.quantity, 0)
@@ -118,7 +173,7 @@ const CartPage = () => {
 
                 <div className="divide-y divide-gray-200">
                   {cartItems.map((item) => (
-                    <div key={item.id} className="p-6 flex items-center gap-4">
+                    <div key={item.productId} className="p-6 flex items-center gap-4">
                       <img
                         src={item.images[0] || "/placeholder.svg"}
                         alt={item.name}
@@ -135,14 +190,14 @@ const CartPage = () => {
 
                       <div className="flex items-center gap-3">
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                           className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                         >
                           -
                         </button>
                         <span className="w-8 text-center font-medium">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                           className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
                         >
                           +
@@ -150,7 +205,7 @@ const CartPage = () => {
                       </div>
 
                       <button
-                        onClick={() => updateQuantity(item.id, 0)}
+                        onClick={() => updateQuantity(item.productId, 0)}
                         className="text-red-500 hover:text-red-700 p-2"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

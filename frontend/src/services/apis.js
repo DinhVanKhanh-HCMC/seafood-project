@@ -232,6 +232,46 @@ export default class ApiService{
         }
     }
 
+     //get cart
+    static async getCart() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/cart`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy giỏ hàng thất bại';
+        }
+    }
+
+    //add item to cart
+    static async updateCartItem(id, quantity) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/cart/update/${id}`,{quantity: quantity},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'update số lượng item giỏ hàng thất bại';
+        }
+    }
+
+    //add item to cart
+    static async deleteCartItem(id) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/cart/delete/${id}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'xoá item thất bại';
+        }
+    }
+
+
 //------------------------------------------
 
 

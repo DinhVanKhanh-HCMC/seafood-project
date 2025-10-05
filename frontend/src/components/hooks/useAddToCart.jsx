@@ -30,12 +30,22 @@ export const useAddToCart = () => {
       } else {
         // 🧱 Nếu chưa đăng nhập → lưu tạm vào localStorage
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
-        const existing = cart.find((item) => item.id === product.id);
+
+        // 🔁 Đổi chỗ so sánh và lưu key từ id → productId
+        const existing = cart.find((item) => item.productId === product.id);
 
         if (existing) {
           existing.quantity += quantity;
         } else {
-          cart.push({ ...product, quantity });
+          cart.push({
+            productId: product.id, // ✅ Dùng productId thay vì id
+            name: product.name,
+            price: product.price,
+            images: product.images,
+            weight: product.weight,
+            origin: product.origin,
+            quantity: quantity
+          });
         }
 
         localStorage.setItem("cart", JSON.stringify(cart));

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +50,9 @@ public class CartServiceImpl implements CartService {
                     p.getName(),
                     p.getPrice(),
                     i.getQuantity(),
-                    p.getPrice().multiply(BigDecimal.valueOf(i.getQuantity()))
+                    p.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())),
+                    p.getImages(),
+                    p.getOrigin()
             );
         }).toList();
 
@@ -91,10 +94,26 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ErrorException(ErrorCode.CART_NOT_FOUND));
 
-        cart.getItems().removeIf(i -> i.getProductId().equals(productId));
-        if (quantity > 0) {
-            cart.getItems().add(new CartItem(productId, quantity));
+        // Tìm item hiện có
+        Optional<CartItem> existingItem = cart.getItems().stream()
+                .filter(i -> i.getProductId().equals(productId))
+                .findFirst();
+
+        if (existingItem.isPresent()) {
+            if (quantity <= 0) {
+                // Xóa nếu số lượng <= 0
+                cart.getItems().remove(existingItem.get());
+            } else {
+                // Cập nhật nếu có sẵn
+                existingItem.get().setQuantity(quantity);
+            }
+        } else {
+            // Nếu chưa có thì thêm mới
+            if (quantity > 0) {
+                cart.getItems().add(new CartItem(productId, quantity));
+            }
         }
+
         cartRepository.save(cart);
     }
 

@@ -36,7 +36,10 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
 
     try {
       for (const item of localCart) {
-        await ApiService.addCartItem(item)
+        await ApiService.addCartItem({
+          productId: item.id,
+          quantity: item.quantity
+        })
       }
       localStorage.removeItem("cart");
       toast.success("Đã đồng bộ giỏ hàng của bạn!");
@@ -89,7 +92,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     try {
       const response = await ApiService.login(formData.email, formData.password)
       localStorage.setItem("token",response.data.token);
-      syncLocalCart()
+      await syncLocalCart()
       toast.success(response.message)
       const userLogin = {
         name: response.data.user?.fullName,

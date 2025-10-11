@@ -24,7 +24,7 @@ public class SecurityConfig {
         http.csrf().disable()
                 .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**","/api/otp/*","/api/category/**","/api/products/**","/api/products","/api/reviews","/api/reviews/product/**").permitAll()
+                        .requestMatchers("/api/auth/**","/api/otp/*","/api/category/**","/api/products/**","/api/products","/api/reviews","/api/reviews/product/**","/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(manager -> manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

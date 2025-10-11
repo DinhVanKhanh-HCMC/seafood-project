@@ -15,6 +15,7 @@ public enum ErrorCode {
     POST_NOT_FOUND(404, "Không tìm thấy bài viết", HttpStatus.NOT_FOUND),
     PAYMENT_NOT_FOUND(404, "Không tìm thấy payment", HttpStatus.NOT_FOUND),
     CATEGORY_NOT_FOUND(404, "Không tìm thấy danh mục", HttpStatus.NOT_FOUND),
+    LIVESTREAM_NOT_FOUND(404, "Không tìm thấy livestream", HttpStatus.NOT_FOUND),
     NOT_FOUND(404, "Không tìm thấy", HttpStatus.NOT_FOUND),
     PHONE_NUMBER_ALREADY_EXISTS(400, "Số điện thoại đã tồn tại", HttpStatus.BAD_REQUEST),
     EMAIL_ALREADY_EXISTS(409, "Email đã tồn tại", HttpStatus.CONFLICT),

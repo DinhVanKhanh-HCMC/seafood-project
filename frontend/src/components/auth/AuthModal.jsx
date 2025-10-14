@@ -19,6 +19,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     password: "",
     confirmPassword: "",
     phone: "",
+    dateOfBirth: "",
     agreeToTerms: false,
   })
   const [errors, setErrors] = useState({})
@@ -120,6 +121,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     if (!formData.phone) newErrors.phone = "Số điện thoại là bắt buộc"
     else if (!/^[0-9]{10,11}$/.test(formData.phone)) newErrors.phone = "Số điện thoại không hợp lệ"
     if (!formData.password) newErrors.password = "Mật khẩu là bắt buộc"
+    if (!formData.dateOfBirth) newErrors.dateOfBirth = "Ngày sinh là bắt buộc"
     else if (formData.password.length < 8) newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự"
     if (!formData.confirmPassword) newErrors.confirmPassword = "Xác nhận mật khẩu là bắt buộc"
     else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Mật khẩu không khớp"
@@ -134,11 +136,12 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
       const response = await ApiService.register(formData)
       toast.success(response.message)
       onClose()
-      setFormData({ name: "", email: "", password: "", confirmPassword: "", phone: "", agreeToTerms: false })
+      setFormData({ name: "", email: "", password: "", dateOfBirth: "",confirmPassword: "", phone: "", agreeToTerms: false })
       setAuthStep("main") // Reset về bước chính
     } catch(err) {
       const {message, errors} = err
-      toast.error(errors)
+      const errorMsg = errors || message || "Đã xảy ra lỗi, vui lòng thử lại sau"
+      toast.error(errorMsg)
     } finally {
       setIsLoading(false)
     }

@@ -38,6 +38,8 @@ public class User {
 
     private UserRole role;
 
+    private String gender;
+
     private LocalDate dateOfBirth;
 
     private String avatar;

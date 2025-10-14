@@ -23,6 +23,7 @@ public class UserResponse {
     private UserRole role;
     private String address;
     private LocalDate dateOfBirth;
+    private String gender;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String avatar;

@@ -14,6 +14,7 @@ public class UserMapper {
                 .phone(user.getPhone())
                 .address(user.getAddress())
                 .role(user.getRole())
+                .gender(user.getGender())
                 .dateOfBirth(user.getDateOfBirth())
                 .avatar(user.getAvatar())
                 .updatedAt(user.getUpdateAt())

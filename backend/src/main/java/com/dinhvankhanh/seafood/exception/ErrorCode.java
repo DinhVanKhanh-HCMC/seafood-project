@@ -22,6 +22,7 @@ public enum ErrorCode {
     CATEGORY_NAME_EXISTS(409, "Tên danh mục đã tồn tại", HttpStatus.CONFLICT),
     CART_IS_EMPTY(400, "Không có sản phẩm nào trong giỏ hàng", HttpStatus.BAD_REQUEST),
     BAD_REQUEST(400, "Số điện thoại hoặc mật khẩu không hợp lệ", HttpStatus.BAD_REQUEST),
+    DATEOFBIRTH_INVALID(400, "Người dùng phải 18 tuổi trở lên", HttpStatus.BAD_REQUEST),
     INTERNAL_SERVER_ERROR(500, "Đã xảy ra lỗi phía máy chủ", HttpStatus.INTERNAL_SERVER_ERROR),
     VALIDATION_ERROR(422, "Dữ liệu không hợp lệ", HttpStatus.UNPROCESSABLE_ENTITY),
     UNCATEGORIZED_EXCEPTION(9999, "Lỗi không xác định", HttpStatus.INTERNAL_SERVER_ERROR),

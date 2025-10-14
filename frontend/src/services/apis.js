@@ -24,7 +24,7 @@ export default class ApiService{
         try {
         const response = await axios.post(
             `${BASE_URL}/auth/register`,
-            {email: formData.email, password: formData.password, fullName: formData.name, phone: formData.phone}
+            {email: formData.email, password: formData.password, fullName: formData.name, phone: formData.phone, dateOfBirth: formData.dateOfBirth}
         );
         return response.data;
         } catch (error) {

@@ -25,4 +25,6 @@ public class UserUpdateRequest {
     private String address;
 
     private LocalDate dateOfBirth;
+
+    private String gender;
 }

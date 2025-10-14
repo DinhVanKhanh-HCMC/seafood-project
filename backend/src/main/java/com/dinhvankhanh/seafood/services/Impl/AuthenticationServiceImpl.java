@@ -21,6 +21,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Optional;
 
 @Service
@@ -45,10 +47,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new RuntimeException("Email đã được đăng ký");
         }
 
+        // ✅ Kiểm tra tuổi >= 18
+        LocalDate dateOfBirth = registerRequest.getDateOfBirth();
+
+        Period age = Period.between(dateOfBirth, LocalDate.now());
+        if (age.getYears() < 18) {
+            throw new ErrorException(ErrorCode.DATEOFBIRTH_INVALID);
+        }
+
+
         User user = User.builder()
                 .email(registerRequest.getEmail())
                 .password(passwordEncoder.encode(registerRequest.getPassword()))
                 .fullName(registerRequest.getFullName())
+                .dateOfBirth(dateOfBirth)
+                .gender("other")
                 .role(UserRole.CUSTOMER)
                 .phone(registerRequest.getPhone())
                 .build();

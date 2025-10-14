@@ -62,9 +62,10 @@ public class UserServiceImpl implements UserService {
 
         user.setEmail(userUpdateRequest.getEmail());
         user.setFullName(userUpdateRequest.getFullName());
-//        user.setAddress(userUpdateRequest.getAddress());
-//        user.setPhone(userUpdateRequest.getPhone());
-//        user.setDateOfBirth(userUpdateRequest.getDateOfBirth());
+        user.setAddress(userUpdateRequest.getAddress());
+        user.setPhone(userUpdateRequest.getPhone());
+        user.setDateOfBirth(userUpdateRequest.getDateOfBirth());
+        user.setGender(userUpdateRequest.getGender());
 
         if(avt != null) {
             String imageUrl = s3Service.saveImageToS3(avt);

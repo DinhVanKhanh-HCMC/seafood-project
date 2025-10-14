@@ -1,20 +1,39 @@
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import ApiService from "../../services/apis";
+import { User, Mail, Phone, Building, Calendar, Edit, Save, X, Camera, Shield, Clock } from 'lucide-react'
+
 
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile")
   const [isEditing, setIsEditing] = useState(false)
+  const [avatarFile, setAvatarFile] = useState(null);
   const [profileData, setProfileData] = useState({
-    name: "Nguyễn Văn An",
-    email: "nguyenvanan@email.com",
-    phone: "0123456789",
-    avatar: "https://seafood-project-1306.s3.ap-southeast-1.amazonaws.com/default-avt.png",
-    dateOfBirth: "1990-05-15",
-    gender: "male",
-    address: "123 Đường ABC, Quận 1, TP.HCM",
-    memberSince: "2022-03-15",
+    // name: "Nguyễn Văn An",
+    // email: "nguyenvanan@email.com",
+    // phone: "0123456789",
+    // avatar: "https://seafood-project-1306.s3.ap-southeast-1.amazonaws.com/default-avt.png",
+    // dateOfBirth: "1990-05-15",
+    // gender: "male",
+    // address: "123 Đường ABC, Quận 1, TP.HCM",
+    // memberSince: "2022-03-15",
   })
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        // gọi API lấy tất cả sản phẩm
+        const response = await ApiService.getCurrentUser();
+        setProfileData(response.data);
+
+      } catch (err) {
+        console.error("Lỗi khi fetch:", err);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   const [addresses, setAddresses] = useState([
     {
@@ -167,15 +186,41 @@ export default function ProfilePage() {
             <div className="bg-white rounded-2xl p-6 sticky top-8">
               {/* User Info */}
               <div className="text-center mb-6 pb-6 border-b border-neutral-200">
-                <img
-                  src={profileData.avatar || "/placeholder.svg"}
-                  alt={profileData.name}
-                  className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
-                />
-                <h3 className="font-semibold text-neutral-900">{profileData.name}</h3>
+                <div className="relative">
+                  <img
+                    src={profileData.avatar || "https://seafood-project-1306.s3.ap-southeast-1.amazonaws.com/default-avt.png"}
+                    alt={profileData.fullName}
+                    className="w-20 h-20 rounded-full mx-auto mb-3 object-cover"
+                  />
+                  {isEditing && (
+                    <>
+                      <button className="absolute bottom-0 right-0 bg-blue-600 text-white p-1 rounded-full hover:bg-blue-700" onClick={() => document.getElementById("avatarInput").click()}>
+                        <Camera className="h-4 w-4" />
+                      </button>
+                      <input
+                        type="file"
+                        id="avatarInput"
+                        accept="image/*"
+                        style={{ display: "none" }}
+                        onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (file) {
+                            setAvatarFile(file);
+                            const imageUrl = URL.createObjectURL(file);
+                            setProfileData(prev => ({
+                              ...prev,
+                              avatar: imageUrl, // cập nhật avatar để hiển thị preview
+                            }));
+                          }
+                        }}
+                      />
+                    </>
+                  )}
+                </div>
+                <h3 className="font-semibold text-neutral-900">{profileData.fullName}</h3>
                 <p className="text-sm text-neutral-600">{profileData.email}</p>
                 <p className="text-xs text-neutral-500 mt-1">
-                  Thành viên từ {new Date(profileData.memberSince).toLocaleDateString("vi-VN")}
+                  Thành viên từ {new Date(profileData.createdAt).toLocaleDateString("vi-VN")}
                 </p>
               </div>
 
@@ -221,7 +266,7 @@ export default function ProfilePage() {
                         <label className="block text-sm font-medium text-neutral-700 mb-2">Họ và tên</label>
                         <input
                           type="text"
-                          value={profileData.name}
+                          value={profileData.fullName}
                           onChange={(e) => handleInputChange("name", e.target.value)}
                           disabled={!isEditing}
                           className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-neutral-50"

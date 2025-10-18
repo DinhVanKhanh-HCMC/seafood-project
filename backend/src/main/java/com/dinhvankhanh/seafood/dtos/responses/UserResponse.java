@@ -21,7 +21,6 @@ public class UserResponse {
     private String fullName;
     private String phone;
     private UserRole role;
-    private String address;
     private LocalDate dateOfBirth;
     private String gender;
     private LocalDateTime createdAt;

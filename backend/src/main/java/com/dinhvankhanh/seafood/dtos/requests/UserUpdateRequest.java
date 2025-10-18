@@ -2,6 +2,7 @@ package com.dinhvankhanh.seafood.dtos.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,8 +23,7 @@ public class UserUpdateRequest {
 
     private String phone;
 
-    private String address;
-
+    @NotNull(message = "Ngày sinh không được để trống")
     private LocalDate dateOfBirth;
 
     private String gender;

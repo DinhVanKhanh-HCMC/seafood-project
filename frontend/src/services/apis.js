@@ -1,5 +1,6 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:8080/api";
+const URL_PROVINCE = 'https://provinces.open-api.vn/api';
 
 export default class ApiService{
 
@@ -44,7 +45,7 @@ export default class ApiService{
         }
     }
 
-    //login
+    //logout
     static async logout() {
         try {
         const response = await axios.post(
@@ -119,6 +120,21 @@ export default class ApiService{
         throw error.response?.data?.message || 'lấy user hiện tại thất bại';
         }
     }
+
+    //update user
+    static async updateUser(id,data) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/users/update/${id}`,data,
+            {headers: this.getHeader(true)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'update user thất bại';
+        }
+    }
+
+
 
 
 //------------------------------------------
@@ -276,7 +292,177 @@ export default class ApiService{
 
 
 
+//-------------OPEN API VN PROVINCE-----------------------
 
 
+  static async getAllProvinces() {
+    try {
+      const response = await axios.get(`${URL_PROVINCE}/p/`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || 'Lấy danh sách tỉnh/thành thất bại';
+    }
+  }
+
+  static async getDistrictsByProvince(provinceCode) {
+    try {
+      const response = await axios.get(`${URL_PROVINCE}/p/${provinceCode}?depth=2`);
+      return response.data.districts || [];
+    } catch (error) {
+      throw error.response?.data?.message || 'Lấy danh sách quận/huyện thất bại';
+    }
+  }
+
+  static async getWardsByDistrict(districtCode) {
+    try {
+      const response = await axios.get(`${URL_PROVINCE}/d/${districtCode}?depth=2`);
+      return response.data.wards || [];
+    } catch (error) {
+      throw error.response?.data?.message || 'Lấy danh sách phường/xã thất bại';
+    }
+  }
+
+  static async findProvinceCodeByName(provinceName) {
+    try {
+        const provinces = await this.getAllProvinces();
+        const province = provinces.find(p => 
+        p.name === provinceName || 
+        p.name.replace('Tỉnh ', '').replace('Thành phố ', '') === provinceName ||
+        p.name.includes(provinceName)
+        );
+        return province ? province.code : null;
+    } catch (error) {
+        console.error('Error finding province:', error);
+        return null;
+    }
+    }
+
+    static async findDistrictCodeByName(provinceCode, districtName) {
+    try {
+        const districts = await this.getDistrictsByProvince(provinceCode);
+        const district = districts.find(d => 
+        d.name === districtName || 
+        d.name.replace('Quận ', '').replace('Huyện ', '').replace('Thành phố ', '') === districtName ||
+        d.name.includes(districtName)
+        );
+        return district ? district.code : null;
+    } catch (error) {
+        console.error('Error finding district:', error);
+        return null;
+    }
+    }
+
+    static async findWardCodeByName(districtCode, wardName) {
+    try {
+        const wards = await this.getWardsByDistrict(districtCode);
+        const ward = wards.find(w => 
+        w.name === wardName || 
+        w.name.replace('Phường ', '').replace('Xã ', '').replace('Thị trấn ', '') === wardName ||
+        w.name.includes(wardName)
+        );
+        return ward ? ward.code : null;
+    } catch (error) {
+        console.error('Error finding ward:', error);
+        return null;
+    }
+    }
+
+    static async parseAddressToCodes(fullAddress) {
+        const parts = fullAddress.split(', ');
+        
+        const street = parts[0] || '';
+        const wardName = parts[1] || '';
+        const districtName = parts[2] || '';
+        const provinceName = parts[3] || '';
+
+        let provinceCode = null;
+        let districtCode = null;
+        let wardCode = null;
+
+        // Tìm province code
+        if (provinceName) {
+            provinceCode = await this.findProvinceCodeByName(provinceName);
+        }
+
+        // Tìm district code (cần có province code trước)
+        if (provinceCode && districtName) {
+            districtCode = await this.findDistrictCodeByName(provinceCode, districtName);
+        }
+
+        // Tìm ward code (cần có district code trước)
+        if (districtCode && wardName) {
+            wardCode = await this.findWardCodeByName(districtCode, wardName);
+        }
+
+        return {
+            street,
+            wardName,
+            wardCode,
+            districtName, 
+            districtCode,
+            provinceName,
+            provinceCode,
+            success: !!(provinceCode && districtCode && wardCode) // true nếu tìm được cả 3
+        };
+    }
+
+
+//------------------------------------------
+
+
+//-------------ADDRESS-----------------------
+
+    static async getAddressByUserId(userId) {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/address/${userId}`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy danh sách địa chỉ thất bại';
+        }
+    }
+
+    //add address
+    static async addAddress(data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/address/add`,data,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'thêm địa chỉ thất bại';
+        }
+    }
+
+    //add address
+    static async updateAddress(id,data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/address/update/${id}`,data,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Cập nhật địa chỉ thất bại';
+        }
+    }
+
+    //delete address
+    static async deleteAddress(id) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/address/delete/${id}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'xoá địa chỉ thất bại';
+        }
+    }
+
+//------------------------------------------
 
 }

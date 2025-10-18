@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -33,8 +34,6 @@ public class User {
     private String fullName;
 
     private String phone;
-
-    private String address;
 
     private UserRole role;
 

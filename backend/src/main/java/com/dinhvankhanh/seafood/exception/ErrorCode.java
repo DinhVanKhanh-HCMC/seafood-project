@@ -11,6 +11,7 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(404, "Không tìm thấy sản phẩm", HttpStatus.NOT_FOUND),
     REVIEW_NOT_FOUND(404, "Không tìm thấy đánh giá", HttpStatus.NOT_FOUND),
     CART_NOT_FOUND(404, "Không tìm thấy giỏ hàng", HttpStatus.NOT_FOUND),
+    ADDRESS_NOT_FOUND(404, "Không tìm thấy địa chỉ", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(404, "Không tìm thấy đơn hàng", HttpStatus.NOT_FOUND),
     POST_NOT_FOUND(404, "Không tìm thấy bài viết", HttpStatus.NOT_FOUND),
     PAYMENT_NOT_FOUND(404, "Không tìm thấy payment", HttpStatus.NOT_FOUND),
@@ -33,7 +34,10 @@ public enum ErrorCode {
     PASSWORD_NOT_MATCH(401, "Mật khẩu xác nhận không khớp", HttpStatus.UNAUTHORIZED),
     FORBIDDEN(403,"Không có quyền truy cập",HttpStatus.FORBIDDEN),
     EXPIRED(410, "Mã OTP đã hết hạn hoặc không tồn tại", HttpStatus.GONE),
+    CANNOT_DELETE_LAST_ADDRESS(400, "Không thể xoá địa chỉ cuối cùng", HttpStatus.BAD_REQUEST),
+    CANNOT_REMOVE_DEFAULT_ADDRESS(400, "Không thể bỏ mặc định địa chỉ duy nhất", HttpStatus.BAD_REQUEST),
     INVALID(401, "Mã OTP không đúng", HttpStatus.UNAUTHORIZED);
+
 
 
 

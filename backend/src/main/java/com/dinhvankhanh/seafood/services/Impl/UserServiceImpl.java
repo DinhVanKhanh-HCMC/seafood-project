@@ -18,7 +18,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,11 +62,17 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));
 
+        LocalDate dateOfBirth = userUpdateRequest.getDateOfBirth();
+
+        Period age = Period.between(dateOfBirth, LocalDate.now());
+        if (age.getYears() < 18) {
+            throw new ErrorException(ErrorCode.DATEOFBIRTH_INVALID);
+        }
+
         user.setEmail(userUpdateRequest.getEmail());
         user.setFullName(userUpdateRequest.getFullName());
-        user.setAddress(userUpdateRequest.getAddress());
         user.setPhone(userUpdateRequest.getPhone());
-        user.setDateOfBirth(userUpdateRequest.getDateOfBirth());
+        user.setDateOfBirth(dateOfBirth);
         user.setGender(userUpdateRequest.getGender());
 
         if(avt != null) {
@@ -94,7 +102,6 @@ public class UserServiceImpl implements UserService {
                             .phone(user.getPhone())
                             .role(user.getRole())
                             .avatar(avatarUrl)
-                            .address(user.getAddress())
                             .dateOfBirth(user.getDateOfBirth())
                             .build();
                 })

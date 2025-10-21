@@ -21,6 +21,8 @@ export default function ProfilePage() {
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const [changePasswordPopupOpen, setChangePasswordPopupOpen] = useState(false);
+  const [errors, setErrors] = useState([])
   const [profileData, setProfileData] = useState({
     // name: "Nguyễn Văn An",
     // email: "nguyenvanan@email.com",
@@ -31,6 +33,11 @@ export default function ProfilePage() {
     // address: "123 Đường ABC, Quận 1, TP.HCM",
     // memberSince: "2022-03-15",
   })
+  const [changePasswordData, setChangePasswordData] = useState({
+    oldPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
   const [isLoading, setIsLoading] = useState(false)
 
 
@@ -270,6 +277,35 @@ export default function ProfilePage() {
     }
   }
 
+  const handleChangePassword = async (e) => {
+    e.preventDefault()
+    
+    const newErrors = {}
+    if (!changePasswordData.oldPassword) newErrors.oldPassword = "Vui lòng nhập mật khẩu cũ"
+    if (!changePasswordData.newPassword) newErrors.newPassword = "Vui lòng nhập mật khẩu mới"
+    else if (changePasswordData.newPassword.length < 8) newErrors.newPassword = "Mật khẩu phải có ít nhất 8 ký tự"
+    if (!changePasswordData.confirmPassword) newErrors.confirmPassword = "Xác nhận mật khẩu là bắt buộc"
+    else if (changePasswordData.newPassword !== changePasswordData.confirmPassword) newErrors.confirmPassword = "Mật khẩu không khớp"
+
+    setErrors(newErrors)
+    if (Object.keys(newErrors).length > 0) return
+    
+    setIsLoading(true)
+    
+    try {
+      const response = await ApiService.changePassword(changePasswordData);
+      toast.success(response.message)
+      setChangePasswordPopupOpen(false)
+      setChangePasswordData({oldPassword: "",newPassword: "", confirmPassword: "" })
+    } catch(error) {
+      const { message, errors } = error;
+      const errorMsg = error || errors || message || "Đổi mật khẩu thất bại";
+      toast.error(errorMsg);
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const orders = [
     {
       id: "DH001",
@@ -378,6 +414,14 @@ export default function ProfilePage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setProfileData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handlePasswordChange = (e) =>{
+    const { name, value } = e.target
+    setChangePasswordData(prev => ({
       ...prev,
       [name]: value
     }))
@@ -931,9 +975,96 @@ export default function ProfilePage() {
                             <h4 className="font-medium text-neutral-900">Đổi mật khẩu</h4>
                             <p className="text-sm text-neutral-600">Cập nhật mật khẩu để bảo mật tài khoản</p>
                           </div>
-                          <button className="border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 transition-colors">
+                          <button
+                           onClick={() => setChangePasswordPopupOpen(true)}
+                           className="border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg font-medium hover:bg-neutral-50 transition-colors">
                             Đổi mật khẩu
                           </button>
+
+                          {/* Popup */}
+                          {changePasswordPopupOpen && (
+                            <div className="fixed inset-0 flex items-center justify-center  backdrop-blur-sm bg-black/30 bg-opacity-40 z-50">
+                              <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-6 relative animate-fadeIn">
+                                {/* Nút đóng */}
+                                <button
+                                  onClick={() => {
+                                    setChangePasswordPopupOpen(false),
+                                    setChangePasswordData({oldPassword: "",newPassword: "", confirmPassword: "" })
+                                    }}
+                                  className="absolute top-3 right-4 text-gray-500 hover:text-gray-700 text-2xl"
+                                >
+                                  ×
+                                </button>
+
+                                <form onSubmit={handleChangePassword} className="space-y-4">
+                                  <div className="text-center mb-6">
+                                    <h2 className="text-2xl font-bold text-neutral-800">
+                                      Đổi mật khẩu
+                                    </h2>
+                                    <p className="text-neutral-600 mt-2">
+                                      Vui lòng nhập mật khẩu cũ và mật khẩu mới
+                                    </p>
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                      Mật khẩu cũ *
+                                    </label>
+                                    <input
+                                      type="password"
+                                      name="oldPassword"
+                                      value={changePasswordData.oldPassword}
+                                      onChange={handlePasswordChange}
+                                      className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500`}
+                                      placeholder="Nhập mật khẩu cũ"
+                                      required
+                                    />
+                                    {errors.oldPassword && <p className="text-red-500 text-sm mt-1">{errors.oldPassword}</p>}
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                      Mật khẩu mới *
+                                    </label>
+                                    <input
+                                      type="password"
+                                      name="newPassword"
+                                      value={changePasswordData.newPassword}
+                                      onChange={handlePasswordChange}
+                                      className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500`}
+                                      placeholder="Nhập mật khẩu mới"
+                                      required
+                                    />
+                                    {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
+                              
+                                  </div>
+
+                                  <div>
+                                    <label className="block text-sm font-medium text-neutral-700 mb-2">
+                                      Xác nhận mật khẩu *
+                                    </label>
+                                    <input
+                                      type="password"
+                                      name="confirmPassword"
+                                      value={changePasswordData.confirmPassword}
+                                      onChange={handlePasswordChange}
+                                      className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500`}
+                                      placeholder="Nhập lại mật khẩu mới"
+                                    />
+                                    {errors.confirmPassword && <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>}
+                                  </div>
+
+                                  <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full bg-amber-600 text-white py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isLoading ? "Đang xử lý..." : "Đổi mật khẩu"}
+                                  </button>
+                                </form>
+                              </div>
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center justify-between p-4 border border-neutral-200 rounded-lg">
                           <div>

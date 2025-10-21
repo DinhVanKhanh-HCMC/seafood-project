@@ -1,6 +1,7 @@
 package com.dinhvankhanh.seafood.controllers;
 
 import com.dinhvankhanh.seafood.dtos.requests.ApiResource;
+import com.dinhvankhanh.seafood.dtos.requests.ChangePasswordRequest;
 import com.dinhvankhanh.seafood.dtos.requests.UserUpdateRequest;
 import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.services.UserService;
@@ -47,4 +48,11 @@ public class UserController {
         userService.deleteUser(id);
         return ApiResource.ok("Xoá user "+id+" thành công", "SUCCESS");
     }
+
+    @PostMapping("/change-password")
+    public ApiResource<String> changePassword(@Valid @RequestBody ChangePasswordRequest changePasswordRequest){
+        userService.changePassword(changePasswordRequest);
+        return ApiResource.ok("Thay đổi mật khẩu thành công", "Thay đổi mật khẩu thành công");
+    }
+
 }

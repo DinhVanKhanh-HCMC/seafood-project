@@ -1,5 +1,6 @@
 package com.dinhvankhanh.seafood.services.Impl;
 
+import com.dinhvankhanh.seafood.dtos.requests.ChangePasswordRequest;
 import com.dinhvankhanh.seafood.dtos.requests.UserUpdateRequest;
 import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.exception.ErrorCode;
@@ -15,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,6 +37,8 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     private final S3Service s3Service;
+
+    private final PasswordEncoder passwordEncoder;
 
 
 
@@ -126,6 +130,24 @@ public class UserServiceImpl implements UserService {
         String email = authentication.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND, "User not found"));
+    }
+
+    @Override
+    public boolean changePassword(ChangePasswordRequest changePasswordRequest) {
+        User user = getUserLogin();
+
+        // So sánh mật khẩu cũ
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword())) {
+            throw new ErrorException(ErrorCode.INVALID_CREDENTIALS); // Sai mật khẩu cũ
+        }
+
+        if (!changePasswordRequest.getNewPassword().equals(changePasswordRequest.getConfirmPassword())) {
+            throw new ErrorException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+        // Mã hóa mật khẩu mới
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        userRepository.save(user);
+        return true;
     }
 
 

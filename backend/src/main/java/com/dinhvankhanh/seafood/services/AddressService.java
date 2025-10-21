@@ -11,7 +11,7 @@ public interface AddressService {
 
     void setDefaultAddress(String userId, String newDefaultAddressId);
 
-    List<AddressResponse> getAddressByUserId(String userId);
+    List<AddressResponse> getAddressUserLogin();
 
     void deleteAddress(String id);
 

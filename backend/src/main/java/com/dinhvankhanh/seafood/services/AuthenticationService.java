@@ -1,5 +1,6 @@
 package com.dinhvankhanh.seafood.services;
 
+import com.dinhvankhanh.seafood.dtos.requests.ChangePasswordRequest;
 import com.dinhvankhanh.seafood.dtos.requests.LoginRequest;
 import com.dinhvankhanh.seafood.dtos.requests.RegisterRequest;
 import com.dinhvankhanh.seafood.dtos.requests.ResetPassRequest;
@@ -12,5 +13,7 @@ public interface AuthenticationService {
     AuthResponse login(LoginRequest loginRequest);
 
     boolean resetPassword(ResetPassRequest resetPassRequest);
+
+
 
 }

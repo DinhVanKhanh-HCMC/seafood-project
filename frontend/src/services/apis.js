@@ -71,6 +71,19 @@ export default class ApiService{
         }
     }
 
+    //reset password
+    static async resetPassword(data) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/auth/reset-password`,
+            data
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy lại mật khẩu thất bại';
+        }
+    }
+
 
 
 //---------------------------------------
@@ -131,6 +144,19 @@ export default class ApiService{
         return response.data;
         } catch (error) {
         throw error.response?.data?.message || 'update user thất bại';
+        }
+    }
+
+    //update user
+    static async changePassword(data) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/users/change-password`,data,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Đổi mật khẩu thất bại';
         }
     }
 
@@ -412,10 +438,10 @@ export default class ApiService{
 
 //-------------ADDRESS-----------------------
 
-    static async getAddressByUserId(userId) {
+    static async getAddressUserLogin() {
         try {
         const response = await axios.get(
-            `${BASE_URL}/address/${userId}`,
+            `${BASE_URL}/address`,
             {headers: this.getHeader(false)}
         );
         return response.data;

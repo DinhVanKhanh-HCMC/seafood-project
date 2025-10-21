@@ -22,6 +22,20 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     dateOfBirth: "",
     agreeToTerms: false,
   })
+
+  const [resetPassword, setResetPassword] = useState({
+    email: "",
+    newPassword: "",
+    confirmPassword: ""
+  })
+
+  const handleResetPasswordChange = (e) => {
+    const { name, value } = e.target
+    setResetPassword(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
   const [errors, setErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
 
@@ -79,7 +93,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
       setAuthStep("register")
     } else {
       // Chuyển sang form đặt lại mật khẩu
-      setFormData(prev => ({ ...prev, email, password: "", confirmPassword: "" }))
+      setResetPassword(prev => ({ ...prev, email, newPassword: "", confirmPassword: "" }))
       setAuthStep("resetPassword")
     }
   }
@@ -151,24 +165,24 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     e.preventDefault()
     
     const newErrors = {}
-    if (!formData.password) newErrors.password = "Mật khẩu là bắt buộc"
-    else if (formData.password.length < 8) newErrors.password = "Mật khẩu phải có ít nhất 8 ký tự"
-    if (!formData.confirmPassword) newErrors.confirmPassword = "Xác nhận mật khẩu là bắt buộc"
-    else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Mật khẩu không khớp"
+    if (!resetPassword.newPassword) newErrors.newPassword = "Mật khẩu là bắt buộc"
+    else if (resetPassword.newPassword.length < 8) newErrors.newPassword = "Mật khẩu phải có ít nhất 8 ký tự"
+    if (!resetPassword.confirmPassword) newErrors.confirmPassword = "Xác nhận mật khẩu là bắt buộc"
+    else if (resetPassword.newPassword !== resetPassword.confirmPassword) newErrors.confirmPassword = "Mật khẩu không khớp"
 
     setErrors(newErrors)
     if (Object.keys(newErrors).length > 0) return
     
     setIsLoading(true)
-    
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      alert("Đặt lại mật khẩu thành công!")
+      const response = await ApiService.resetPassword(resetPassword)
+      toast.success(response.message)
       onClose()
-      setFormData({ name: "", email: "", password: "", confirmPassword: "", phone: "", agreeToTerms: false })
+      setResetPassword({ email: "", newPassword: "", confirmPassword: ""})
       setAuthStep("main")
-    } catch {
-      alert("Có lỗi xảy ra. Vui lòng thử lại!")
+    } catch (err){
+      toast.error(err)
     } finally {
       setIsLoading(false)
     }
@@ -245,8 +259,8 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
               onSubmit={handleResetPassword}
               isLoading={isLoading}
               errors={errors}
-              formData={formData}
-              handleInputChange={handleInputChange}
+              formData={resetPassword}
+              handleInputChange={handleResetPasswordChange}
               onBack={handleBackFromResetPassword}
             />
           ) : (

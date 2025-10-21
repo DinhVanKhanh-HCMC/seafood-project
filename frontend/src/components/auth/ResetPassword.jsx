@@ -24,15 +24,15 @@ const ResetPasswordForm = ({ onSubmit, isLoading, errors, formData, handleInputC
         <label className="block text-sm font-medium text-neutral-700 mb-2">Mật khẩu mới *</label>
         <input
           type="password"
-          name="password"
-          value={formData.password}
+          name="newPassword"
+          value={formData.newPassword}
           onChange={handleInputChange}
           className={`w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 ${
-            errors.password ? "border-red-500" : "border-neutral-300"
+            errors.newPassword ? "border-red-500" : "border-neutral-300"
           }`}
           placeholder="Nhập mật khẩu mới"
         />
-        {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+        {errors.newPassword && <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>}
       </div>
 
       <div>

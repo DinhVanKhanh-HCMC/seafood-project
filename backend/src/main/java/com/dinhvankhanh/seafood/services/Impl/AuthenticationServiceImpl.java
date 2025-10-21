@@ -1,5 +1,6 @@
 package com.dinhvankhanh.seafood.services.Impl;
 
+import com.dinhvankhanh.seafood.dtos.requests.ChangePasswordRequest;
 import com.dinhvankhanh.seafood.dtos.requests.LoginRequest;
 import com.dinhvankhanh.seafood.dtos.requests.RegisterRequest;
 import com.dinhvankhanh.seafood.dtos.requests.ResetPassRequest;
@@ -106,4 +107,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
         return true;
     }
+
 }

@@ -55,9 +55,9 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ApiResource<Void> resetPassword(@Valid @RequestBody ResetPassRequest resetPassRequest){
+    public ApiResource<String> resetPassword(@Valid @RequestBody ResetPassRequest resetPassRequest){
         boolean result = authenticationService.resetPassword(resetPassRequest);
-        return ApiResource.ok(null, "Lấy lại mật khẩu thành công");
+        return ApiResource.ok("Lấy lại mật khẩu thành công", "Lấy lại mật khẩu thành công");
     }
 
 

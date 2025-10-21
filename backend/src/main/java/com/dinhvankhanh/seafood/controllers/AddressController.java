@@ -41,9 +41,9 @@ public class AddressController {
         return ApiResource.ok("Thay đổi địa chỉ mặc định thành công","Thay đổi địa chỉ mặc định thành công");
     }
 
-    @GetMapping("/{userId}")
-    public ApiResource<List<AddressResponse>> getAddressByUserId(@PathVariable String userId){
-        List<AddressResponse> listAddressOfUser = addressService.getAddressByUserId(userId);
+    @GetMapping
+    public ApiResource<List<AddressResponse>> getAddressUserLogin(){
+        List<AddressResponse> listAddressOfUser = addressService.getAddressUserLogin();
         return ApiResource.ok(listAddressOfUser,"Lấy địa chỉ của user thành công");
     }
 

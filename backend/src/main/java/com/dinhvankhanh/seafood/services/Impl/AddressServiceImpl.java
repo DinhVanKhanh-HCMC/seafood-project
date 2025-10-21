@@ -11,6 +11,7 @@ import com.dinhvankhanh.seafood.models.User;
 import com.dinhvankhanh.seafood.repositories.AddressRepository;
 import com.dinhvankhanh.seafood.repositories.UserRepository;
 import com.dinhvankhanh.seafood.services.AddressService;
+import com.dinhvankhanh.seafood.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,8 @@ public class AddressServiceImpl implements AddressService {
     private final AddressRepository addressRepository;
 
     private final AddressMapper addressMapper;
+
+    private final UserService userService;
 
     @Override
     public AddressResponse addAddress(AddAddressRequest addAddressRequest) {
@@ -94,8 +97,9 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public List<AddressResponse> getAddressByUserId(String userId) {
-        List<Address> listAddress = addressRepository.findByUserId(userId);
+    public List<AddressResponse> getAddressUserLogin() {
+        User user = userService.getUserLogin();
+        List<Address> listAddress = addressRepository.findByUserId(user.getId());
 
         return listAddress.stream()
                 .map(address -> {

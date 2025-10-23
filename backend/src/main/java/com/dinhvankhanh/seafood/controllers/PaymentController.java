@@ -17,9 +17,9 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("/create")
-    public ApiResource<PaymentResponse> createPayment(String id, PaymentMethod method){
-        PaymentResponse response = paymentService.createPayment(id, method);
+    @PostMapping("/create/{orderId}")
+    public ApiResource<PaymentResponse> createPayment( @PathVariable String orderId, @RequestParam PaymentMethod method){
+        PaymentResponse response = paymentService.createPayment(orderId, method);
         return ApiResource.ok(response,"Tạo payment thành công");
     }
 
@@ -28,6 +28,13 @@ public class PaymentController {
         PaymentResponse response = paymentService.getPaymentByOrder(orderId);
         return ApiResource.ok(response,"SUCCESS");
     }
+
+    @PostMapping("/stripe/callback")
+    public ApiResource<PaymentResponse> handleStripeCallback(@RequestParam String session_id) {
+        PaymentResponse response = paymentService.handleStripeCallback(session_id);
+        return ApiResource.ok(response,"SUCCESS");
+    }
+
 
     @PostMapping("/update-status/{id}")
     public ApiResource<PaymentResponse> updateStatus(@PathVariable String id, PaymentStatus status){

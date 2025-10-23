@@ -28,6 +28,7 @@ public class OrderResponse {
     private List<OrderProduct> items; // tái sử dụng từ Cart
     private BigDecimal totalPrice;
     private OrderStatus status; // PENDING, PAID, SHIPPED, COMPLETED, CANCELED
+    private String orderNumber;
 
     private LocalDateTime createdAt;
 }

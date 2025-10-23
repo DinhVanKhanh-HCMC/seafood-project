@@ -29,6 +29,7 @@ public class Payment {
 
     private PaymentMethod method;
     private PaymentStatus status;
+    private String stripeSessionId;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

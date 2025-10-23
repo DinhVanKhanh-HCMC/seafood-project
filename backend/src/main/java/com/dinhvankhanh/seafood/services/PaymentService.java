@@ -8,4 +8,5 @@ public interface PaymentService {
     public PaymentResponse createPayment(String orderId, PaymentMethod method);
     public PaymentResponse getPaymentByOrder(String orderId);
     public PaymentResponse updateStatus(String paymentId, PaymentStatus status);
+    public PaymentResponse handleStripeCallback(String stripeSessionId);
 }

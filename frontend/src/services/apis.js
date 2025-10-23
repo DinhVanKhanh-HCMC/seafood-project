@@ -226,6 +226,61 @@ export default class ApiService{
 
 //------------------------------------------
 
+//-------------ORDER-----------------------
+
+    //write review
+    static async createOrder() {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/order/create`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Tạo đơn hàng thất bại';
+        }
+    }
+
+
+
+
+//------------------------------------------
+
+
+//-------------PAYMENT-----------------------
+
+    //write review
+    static async createPayment(orderId, paymentMethod) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/payment/create/${orderId}?method=${paymentMethod}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Tạo thanh toán thất bại';
+        }
+    }
+
+    // services/apis.js
+    static async verifyStripePayment(sessionId) {
+    try {
+        const response = await axios.post(
+        `${BASE_URL}/payment/stripe/callback?session_id=${sessionId}`,
+        {},
+        { headers: this.getHeader() }
+        );
+        return response.data;
+    } catch (error) {
+        throw error.response?.data || 'Xác thực thanh toán thất bại';
+    }
+    }
+
+
+
+//------------------------------------------
+
+
 //-------------REVIEW-----------------------
 
     //get all review of product id

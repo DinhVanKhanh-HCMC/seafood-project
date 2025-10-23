@@ -10,6 +10,7 @@ import com.dinhvankhanh.seafood.models.*;
 import com.dinhvankhanh.seafood.repositories.CartRepository;
 import com.dinhvankhanh.seafood.repositories.OrderRepository;
 import com.dinhvankhanh.seafood.repositories.ProductRepository;
+import com.dinhvankhanh.seafood.services.CartService;
 import com.dinhvankhanh.seafood.services.OrderService;
 import com.dinhvankhanh.seafood.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
 
     private final OrderMapper orderMapper;
+    
 
 
     @Override
@@ -46,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
 
         List<OrderProduct> orderProducts = new ArrayList<>();
         BigDecimal totalPrice = BigDecimal.ZERO;
+        String orderNumber = generateOrderNumber();
 
         for (CartItem cartItem : cart.getItems()) {
             Product product = productRepository.findById(cartItem.getProductId())
@@ -66,8 +69,10 @@ public class OrderServiceImpl implements OrderService {
                 .userId(user.getId())
                 .items(orderProducts)
                 .totalPrice(totalPrice)
+                .orderNumber(orderNumber)
                 .status(OrderStatus.PENDING)
                 .build();
+
 
         orderRepository.save(order);
 
@@ -141,4 +146,10 @@ public class OrderServiceImpl implements OrderService {
 
         return orderMapper.mapperToOrderResponse(order);
     }
+
+    private String generateOrderNumber() {
+        long totalOrders = orderRepository.count();
+        return String.format("%04d", totalOrders + 1);
+    }
 }
+

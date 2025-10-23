@@ -5,6 +5,8 @@ import AuthModal from "../auth/AuthModal";
 import ApiService from "../../services/apis";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { authEvents } from "../../utils/authEvents";
+
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -30,6 +32,15 @@ const Navigation = () => {
         })
     }
   }, [])
+
+  useEffect(() => {
+    // Lắng nghe event mở modal
+    const handleOpenModal = () => setIsAuthModalOpen(true);
+    
+    authEvents.onOpen(handleOpenModal);
+    
+    return () => authEvents.offOpen(handleOpenModal);
+  }, []);
 
   const handleLogout = async () =>{
     try {
@@ -201,6 +212,7 @@ const Navigation = () => {
       setUser(userData)
       console.log(userData)     // Lưu user vào state
       setIsAuthModalOpen(false)
+      window.dispatchEvent(new CustomEvent('authLoginSuccess'));
     }} />
     </>
   )

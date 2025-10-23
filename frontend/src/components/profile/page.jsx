@@ -58,7 +58,7 @@ export default function ProfilePage() {
 
   const fetchAddress = async () => {
     try {
-      const response = await ApiService.getAddressByUserId(profileData.id);
+      const response = await ApiService.getAddressUserLogin();
       setAddresses(response.data);
     } catch (err) {
       console.error("Lỗi khi fetch:", err);

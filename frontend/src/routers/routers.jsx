@@ -15,6 +15,11 @@ const ProductDetail = lazy(() => import("../components/products/productDetail.js
 const NewsDetail = lazy(() => import("../components/news/NewDetail.jsx"))
 const Cart = lazy(() => import("../components/cart/page.jsx"))
 const Profile = lazy(() => import("../components/profile/page.jsx"))
+const OrderSuccessPage = lazy(() => import("../components/cart/OrderSuccessPage.jsx"))
+const PaymentSuccess = lazy(() => import("../components/cart/PaymentSuccess.jsx"))
+const PaymentCanceled = lazy(() => import("../components/cart/PaymentCanceled.jsx"))
+const PaymentFailed = lazy(() => import("../components/cart/PaymentFailed.jsx"))
+const OrderDetail = lazy(() => import("../components/order/OrderDetail.jsx"))
 
 
 
@@ -36,6 +41,37 @@ const routers = [
             { path: "profile", component: () => (
                 <RequireAuth>
                     <Profile />
+                </RequireAuth>
+                ),
+            },
+            { path: "order-success", component: () => (
+                <RequireAuth>
+                    <OrderSuccessPage />
+                </RequireAuth>
+                ),
+            },
+            { path: "payment-success", component: () => (
+                <RequireAuth>
+                    <PaymentSuccess />
+                </RequireAuth>
+                ),
+            },
+            { path: "payment-canceled", component: () => (
+                <RequireAuth>
+                    <PaymentCanceled />
+                </RequireAuth>
+                ),
+            },
+            { path: "payment-failed", component: () => (
+                <RequireAuth>
+                    <PaymentFailed />
+                </RequireAuth>
+                ),
+            },
+
+            { path: "order-detail/:id", component: () => (
+                <RequireAuth>
+                    <OrderDetail />
                 </RequireAuth>
                 ),
             },

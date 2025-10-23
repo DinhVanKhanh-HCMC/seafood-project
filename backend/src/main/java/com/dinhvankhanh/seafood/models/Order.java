@@ -30,6 +30,7 @@ public class Order {
     private BigDecimal totalPrice;
     private OrderStatus status; // PENDING, PAID, SHIPPED, COMPLETED, CANCELED
     private String addressId;
+    private String orderNumber;
     private PaymentMethod paymentMethod;
 
     @Builder.Default

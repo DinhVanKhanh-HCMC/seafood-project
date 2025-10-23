@@ -27,4 +27,9 @@ public class PaymentResponse {
     private PaymentMethod method;
     private PaymentStatus status;
     private LocalDateTime createdAt;
+    private String sessionUrl;  // URL thanh toán Stripe
+    private String stripeSessionId; // ID session từ Stripe
+    private Boolean success;
+    private String message;
+    private String orderNumber;
 }

@@ -3,13 +3,14 @@ import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import ApiService from "../../services/apis";
 import AuthModal from "../auth/AuthModal";
+import {authEvents} from "../../utils/authEvents"
 
 const CartPage = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cash");
+  const [paymentMethod, setPaymentMethod] = useState("CASH");
   const [loading, setLoading] = useState(true);
   const [cartLoading, setCartLoading] = useState(true);
   const [addressLoading, setAddressLoading] = useState(true);
@@ -46,6 +47,23 @@ const CartPage = () => {
     } finally {
       setAddressLoading(false);
     }
+  };
+
+  const handleLoginToPayment = () => {
+    if (!user) {
+      authEvents.openModal();
+      
+      const handleLoginSuccess = () => {
+        loadUserCart();
+        loadUserAddresses();
+        // Xóa listener sau khi dùng
+        window.removeEventListener('authLoginSuccess', handleLoginSuccess);
+      };
+      
+      window.addEventListener('authLoginSuccess', handleLoginSuccess);
+      return;
+    }
+    // Tiến hành thanh toán...
   };
 
   const loadLocalCart = () => {
@@ -115,6 +133,19 @@ const CartPage = () => {
     }
   };
 
+  
+  const createOrder = async () => {
+    try {
+      const response = await ApiService.createOrder();
+      if (response.code===200) {
+        return response.data; // OrderResponse với orderId
+      }
+    } catch (error) {
+      toast.error("Tạo đơn hàng thất bại");
+      throw error;
+    }
+  };
+
   const handleCheckout = async () => {
     const token = localStorage.getItem("token");
 
@@ -135,36 +166,47 @@ const CartPage = () => {
     }
 
     try {
-      const orderData = {
-        addressId: selectedAddress,
-        paymentMethod: paymentMethod,
-        note: ""
-      };
+      await ApiService.verifyToken();
 
-      const response = await ApiService.createOrder(orderData);
-      toast.success("Đặt hàng thành công!");
-      
-      // Clear giỏ hàng sau khi đặt hàng thành công
-      if (token) {
-        // Clear cart từ server
-        await ApiService.clearCart();
-      } else {
-        // Clear cart local
-        localStorage.removeItem("cart");
-      }
-      setCartItems([]);
-      
-      // Chuyển đến trang thành công
-      navigate("/order-success", { 
-        state: { 
-          orderId: response.data.id,
-          orderNumber: response.data.orderNumber 
+      const responseOrder = await createOrder();
+      const orderId = responseOrder.id;
+
+      const paymentResponse = await ApiService.createPayment(orderId,paymentMethod);
+      if (paymentResponse.data.success) {
+        if (paymentMethod === "CASH") {
+          // Xử lý CASH - chuyển trang success ngay
+          toast.success("Đặt hàng thành công!");
+          
+          localStorage.removeItem("cart");
+          setCartItems([]);
+          
+          navigate("/order-success", { 
+            state: { 
+              orderId: orderId,
+              orderNumber: responseOrder.orderNumber 
+            }
+          });
+          
+        } else if (paymentMethod === "CARD") {
+
+          setLoading(true)
+          
+          // Xử lý CREDIT_CARD - redirect đến Stripe
+          if (paymentResponse.data.sessionUrl) {
+            window.location.href = paymentResponse.data.sessionUrl;
+          } else {
+            toast.error("Không thể chuyển hướng đến trang thanh toán");
+          }
         }
-      });
+      } else {
+        toast.error(paymentResponse.message || "Tạo thanh toán thất bại");
+      }
       
     } catch (error) {
-      const errorMsg = error.message || "Đặt hàng thất bại";
+      const errorMsg = error || "Đặt hàng thất bại";
       toast.error(errorMsg);
+    }finally{
+      setLoading(false)
     }
   };
 
@@ -349,13 +391,13 @@ const CartPage = () => {
                         type="radio"
                         id="cash"
                         name="payment"
-                        value="cash"
-                        checked={paymentMethod === "cash"}
+                        value="CASH"
+                        checked={paymentMethod === "CASH"}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="mt-1 text-amber-600 focus:ring-amber-500"
                       />
                       <label htmlFor="cash" className="flex-1 cursor-pointer">
-                        <div className={`border rounded-lg p-4 ${paymentMethod === "cash" ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}>
+                        <div className={`border rounded-lg p-4 ${paymentMethod === "CASH" ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-6 bg-green-100 rounded flex items-center justify-center">
                               <span className="text-green-800 text-sm font-bold">COD</span>
@@ -374,13 +416,13 @@ const CartPage = () => {
                         type="radio"
                         id="card"
                         name="payment"
-                        value="card"
-                        checked={paymentMethod === "card"}
+                        value="CARD"
+                        checked={paymentMethod === "CARD"}
                         onChange={(e) => setPaymentMethod(e.target.value)}
                         className="mt-1 text-amber-600 focus:ring-amber-500"
                       />
                       <label htmlFor="card" className="flex-1 cursor-pointer">
-                        <div className={`border rounded-lg p-4 ${paymentMethod === "card" ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}>
+                        <div className={`border rounded-lg p-4 ${paymentMethod === "CARD" ? 'border-amber-500 bg-amber-50' : 'border-gray-200'}`}>
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-6 bg-blue-100 rounded flex items-center justify-center">
                               <span className="text-blue-800 text-sm font-bold">VN</span>
@@ -449,34 +491,24 @@ const CartPage = () => {
                 {localStorage.getItem("token") ? (
                   <button
                     onClick={handleCheckout}
-                    disabled={addresses.length === 0 || !selectedAddress}
+                    disabled={addresses.length === 0 || !selectedAddress || loading}
                     className={`w-full py-3 rounded-lg font-medium transition-colors mb-3 ${
                       addresses.length === 0 || !selectedAddress
                         ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                         : "bg-amber-600 text-white hover:bg-amber-700"
                     }`}
                   >
-                    {paymentMethod === "cash" ? "Xác nhận đặt hàng" : "Tiến hành thanh toán"}
+                    {paymentMethod === "CASH" ? "Xác nhận đặt hàng" : (loading? "Đang xử lý..." : "Tiến hành thanh toán")}
                   </button>
                 ) : (
                   <div>
                   <button
-                    onClick={() => setIsAuthModalOpen(true)} 
+                    onClick={handleLoginToPayment} 
                     className="w-full bg-amber-600 text-white py-3 rounded-lg font-medium hover:bg-amber-700 transition-colors mb-3"
                   >
                     Đăng nhập để thanh toán
                   </button>
-                  <AuthModal 
-                    isOpen={isAuthModalOpen} 
-                    onClose={() => setIsAuthModalOpen(false)} 
-                    onLoginSuccess={(userData) => {
-                      setUser(userData);
-                      setIsAuthModalOpen(false);
-                      // Load lại giỏ hàng và địa chỉ
-                      loadUserCart();
-                      loadUserAddresses();
-                    }} 
-                  />
+                  
                   </div>
                 )}
 

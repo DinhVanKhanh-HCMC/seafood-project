@@ -228,11 +228,11 @@ export default class ApiService{
 
 //-------------ORDER-----------------------
 
-    //write review
-    static async createOrder() {
+    //create order 
+    static async createOrder(address,paymentMethod) {
         try {
             const response = await axios.post(
-                `${BASE_URL}/order/create`,{},
+                `${BASE_URL}/order/create`,{addressId: address, paymentMethod: paymentMethod},
                 {headers: this.getHeader(false)}
             );
             return response.data;
@@ -241,8 +241,44 @@ export default class ApiService{
         }
     }
 
+    //get order by id
+    static async getOrderById(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/order/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy đơn hàng theo id thất bại';
+        }
+    }
 
+    //get order by id
+    static async getMyOrder() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/order/my-orders`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy danh sách đơn hàng thất bại';
+        }
+    }
 
+    //cancel order
+    static async cancelOrder(id) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/order/cancel/${id}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Huỷ đơn hàng thất bại';
+        }
+    }
 
 //------------------------------------------
 

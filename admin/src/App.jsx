@@ -2,6 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { routers } from "./routers/routers";
 import { Suspense } from "react";
 import "./App.css"
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 function renderRoutes(routes) {
   return routes.map((route, index) => {
@@ -33,13 +36,26 @@ function App() {
   
 
   return (
-    <BrowserRouter>
-      <Suspense fallback={<div>Loading ...</div>}>
-        <Routes>
-          {renderRoutes(routers)}
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <>
+      <BrowserRouter>
+        <Suspense fallback={<div>Loading ...</div>}>
+          <Routes>
+            {renderRoutes(routers)}
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
+
+      <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="light"
+        />
+      </>
   );
 }
 

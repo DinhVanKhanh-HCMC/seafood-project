@@ -29,6 +29,10 @@ public class OrderResponse {
     private BigDecimal totalPrice;
     private OrderStatus status; // PENDING, PAID, SHIPPED, COMPLETED, CANCELED
     private String orderNumber;
+    private String paymentMethod;
+    private String address;
+    private String customer;
+    private String phoneNumber;
 
     private LocalDateTime createdAt;
 }

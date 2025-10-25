@@ -16,4 +16,7 @@ public class OrderProduct {
     private String name;       // snapshot tên
     private BigDecimal price;  // snapshot giá
     private int quantity;
+    private String image;
+    private String origin;
+    private String weight;
 }

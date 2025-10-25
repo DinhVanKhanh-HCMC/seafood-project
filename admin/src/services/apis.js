@@ -61,4 +61,35 @@ export default class ApiService {
 
 //-----------------------------------------------------------------------------------
 
+
+//-------ORDER------------------------------------------------------------------------
+
+    //get all
+    static async getAllOrder() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/order`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy danh sách tất cả đơn hàng thất bại';
+        }
+    }
+
+    //update status
+    static async updateStatusOrder(id,newStatus) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/order/update-status/${id}?status=${newStatus}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'cập nhật trạng thái đơn hàng thất bại';
+        }
+    }
+
+
+//-----------------------------------------------------------------------------------
 }

@@ -286,7 +286,6 @@ export default function ProductsPage() {
                       <div className="flex flex-col">
                         <span 
                           className="text-xl font-bold text-orange-600 cursor-pointer hover:scale-105 transition-transform"
-                          onClick={() => handlePriceClick(product.id)}
                         >
                           {formatPrice(product.price)}
                         </span>
@@ -298,7 +297,10 @@ export default function ProductsPage() {
                       </div>
                       
                       <button
-                        onClick={() => addToCart(product)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addToCart(product,1);
+                        }}
                         disabled={!product?.inStock || loading}
                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all transform active:scale-95 ${
                           product.inStock

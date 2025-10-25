@@ -17,6 +17,9 @@ import CreateAuction from './AuctionManagement/CreateAuction';
 import AuctionView from './AuctionManagement/AuctionView';
 import AddUser from './UserManagement/AddUser';
 import AddProduct from './ProductManagement/AddProduct';
+import {toast} from "react-toastify"
+import ApiService from '../services/apis';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -26,6 +29,8 @@ const AdminInterface = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const videoRef = useRef(null);
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const navigate = useNavigate();
 
   const openModal = (type) => {
     setModalType(type);
@@ -80,6 +85,18 @@ const AdminInterface = () => {
 
     return <div>Chức năng đang phát triển...</div>;
   };
+
+  const handleLogout = async () =>{
+    try {
+      const response = await ApiService.logout()
+      localStorage.removeItem("token")
+      toast.success(response.message)
+      setIsProfileOpen(false)
+      navigate("/login")
+    } catch (error) {
+      toast.error(error)
+    }
+  }
 
   const renderModal = () => {
     if (!showModal) return null;
@@ -143,10 +160,29 @@ const AdminInterface = () => {
                 />
                 <Search size={20} className="absolute left-3 top-2.5 text-gray-400" />
               </div>
-              
-              <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
-                A
+              <div className='relative'>
+                <button
+                  onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-medium">
+                    A
+                  </button>
+
+                  {isProfileOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white shadow-lg rounded-lg border border-gray-200 z-50">
+                      <ul className="py-1">
+                        <li>
+                          <button 
+                            className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 text-red-600"
+                            onClick={handleLogout}
+                          >
+                            Đăng xuất
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  )}
               </div>
+                            
             </div>
           </div>
         </div>

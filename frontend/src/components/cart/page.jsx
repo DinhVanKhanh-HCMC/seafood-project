@@ -136,7 +136,7 @@ const CartPage = () => {
   
   const createOrder = async () => {
     try {
-      const response = await ApiService.createOrder();
+      const response = await ApiService.createOrder(selectedAddress,paymentMethod);
       if (response.code===200) {
         return response.data; // OrderResponse với orderId
       }

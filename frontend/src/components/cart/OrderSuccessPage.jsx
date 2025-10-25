@@ -18,6 +18,8 @@ const OrderSuccessPage = () => {
     return null;
   }
 
+  console.log(orderId)
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -60,7 +62,7 @@ const OrderSuccessPage = () => {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/orders"
+              to={`/order-detail/${orderId}`}
               className="bg-amber-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition-colors"
             >
               Theo dõi đơn hàng

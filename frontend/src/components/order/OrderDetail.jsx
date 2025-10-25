@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import ApiService from "../../services/apis";
 
+
 const OrderDetail = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
@@ -10,10 +11,14 @@ const OrderDetail = () => {
   const [loading, setLoading] = useState(true);
   const [canceling, setCanceling] = useState(false);
 
+  console.log("🔍 orderId từ useParams:", orderId);
+
   const fetchOrderDetail = async () => {
     try {
+      console.log("🔄 Đang gọi API với orderId:", orderId);
       const response = await ApiService.getOrderById(orderId);
-      setOrder(response.data.data);
+      console.log("✅ API Response:", response);
+      setOrder(response.data);
     } catch (error) {
       toast.error("Không thể tải thông tin đơn hàng");
       console.error(error);
@@ -36,7 +41,7 @@ const OrderDetail = () => {
     setCanceling(true);
     try {
       const response = await ApiService.cancelOrder(orderId);
-      toast.success("Hủy đơn hàng thành công");
+      toast.success(response.message);
       fetchOrderDetail(); // Refresh data
     } catch (error) {
       toast.error(error.message || "Hủy đơn hàng thất bại");
@@ -108,12 +113,12 @@ const OrderDetail = () => {
           </div>
           <h3 className="text-xl font-medium text-gray-900 mb-2">Không tìm thấy đơn hàng</h3>
           <p className="text-gray-500 mb-6">Đơn hàng bạn tìm kiếm không tồn tại hoặc đã bị xóa</p>
-          <Link
-            to="/orders"
+          <button
+            onClick={() => navigate(-1)}
             className="bg-amber-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition-colors"
           >
-            Quay lại danh sách đơn hàng
-          </Link>
+            Quay lại
+          </button>
         </div>
       </div>
     );
@@ -129,18 +134,18 @@ const OrderDetail = () => {
               <h1 className="text-3xl font-bold text-gray-900 mb-2">Chi tiết đơn hàng</h1>
               <p className="text-gray-600">Mã đơn hàng: <span className="font-semibold">{order.orderNumber}</span></p>
             </div>
-            <Link
-              to="/orders"
+            <button
+              onClick={() => navigate(-1) }
               className="text-amber-600 hover:text-amber-700 font-medium"
             >
-              ← Quay lại danh sách
-            </Link>
+              ← Quay lại
+            </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-3 space-y-6">
             {/* Order Status */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
@@ -201,7 +206,7 @@ const OrderDetail = () => {
           </div>
 
           {/* Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 lg:col-span-2">
             {/* Order Summary */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Tóm tắt đơn hàng</h2>
@@ -248,7 +253,7 @@ const OrderDetail = () => {
                 {/* Có thể thêm thông tin địa chỉ giao hàng nếu có */}
                 <div className="pt-3 border-t border-gray-200">
                   <p className="font-medium text-gray-900">Địa chỉ giao hàng</p>
-                  <p className="mt-1">Thông tin địa chỉ sẽ được hiển thị ở đây</p>
+                  <p className="mt-1">{order.address}</p>
                 </div>
               </div>
             </div>

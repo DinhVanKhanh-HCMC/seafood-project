@@ -1,5 +1,6 @@
 package com.dinhvankhanh.seafood.services.Impl;
 
+import com.dinhvankhanh.seafood.dtos.requests.CreateOrderRequest;
 import com.dinhvankhanh.seafood.dtos.responses.OrderResponse;
 import com.dinhvankhanh.seafood.enums.OrderStatus;
 import com.dinhvankhanh.seafood.enums.UserRole;
@@ -7,6 +8,7 @@ import com.dinhvankhanh.seafood.exception.ErrorCode;
 import com.dinhvankhanh.seafood.exception.ErrorException;
 import com.dinhvankhanh.seafood.mappers.OrderMapper;
 import com.dinhvankhanh.seafood.models.*;
+import com.dinhvankhanh.seafood.repositories.AddressRepository;
 import com.dinhvankhanh.seafood.repositories.CartRepository;
 import com.dinhvankhanh.seafood.repositories.OrderRepository;
 import com.dinhvankhanh.seafood.repositories.ProductRepository;
@@ -32,15 +34,21 @@ public class OrderServiceImpl implements OrderService {
     private final ProductRepository productRepository;
 
     private final OrderMapper orderMapper;
-    
+
+    private final AddressRepository addressRepository;
+
 
 
     @Override
-    public OrderResponse createOrder() {
+    public OrderResponse createOrder(CreateOrderRequest createOrderRequest) {
         User user = userService.getUserLogin();
 
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ErrorException(ErrorCode.CART_NOT_FOUND));
+
+        Address address = addressRepository.findById(createOrderRequest.getAddressId())
+                .orElseThrow(() -> new ErrorException(ErrorCode.ADDRESS_NOT_FOUND));
+
 
         if (cart.getItems().isEmpty()) {
             throw new ErrorException(ErrorCode.CART_IS_EMPTY);
@@ -62,6 +70,9 @@ public class OrderServiceImpl implements OrderService {
                     .name(product.getName())
                     .price(product.getPrice())
                     .quantity(cartItem.getQuantity())
+                    .image(product.getImages().get(0))
+                    .weight(product.getWeight())
+                    .origin(product.getOrigin())
                     .build());
         }
 
@@ -71,6 +82,9 @@ public class OrderServiceImpl implements OrderService {
                 .totalPrice(totalPrice)
                 .orderNumber(orderNumber)
                 .status(OrderStatus.PENDING)
+                .address(address.getAddress())
+                .phoneNumber(address.getPhoneAddress())
+                .paymentMethod(createOrderRequest.getPaymentMethod())
                 .build();
 
 
@@ -111,7 +125,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ErrorException(ErrorCode.BAD_REQUEST, "Đơn hàng ở trạng thái PENDING mới hủy được");
         }
 
-        order.setStatus(OrderStatus.CANCELED);
+        order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
         return orderMapper.mapperToOrderResponse(order);
     }

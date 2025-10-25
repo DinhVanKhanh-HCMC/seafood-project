@@ -9,6 +9,7 @@ import "swiper/css";
 import { Navigation, Autoplay } from "swiper/modules"
 import "swiper/css/navigation"
 import { toast } from "react-toastify";
+import { useAddToCart } from "../hooks/useAddToCart";
 
 
 
@@ -23,6 +24,7 @@ export default function ProductDetailPage() {
   const [ratingsCount, setRatingsCount] = useState({ 5:0,4:0,3:0,2:0,1:0 });
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [refreshReviews, setRefreshReviews] = useState(0)
+  const { addToCart, loading } = useAddToCart();
 
   const fetchAllData = async (productId) => {
     try {
@@ -57,99 +59,6 @@ export default function ProductDetailPage() {
     if (!id) return;
     fetchAllData(id);
   }, [id, refreshReviews]);
-
-
-  // Mock product data - in real app, fetch by ID
-  // const product = {
-  //   id: 1,
-  //   name: "Cá Hồi Atlantic Phi Lê",
-  //   category: "salmon",
-  //   price: 599000,
-  //   originalPrice: 719000,
-  //   images: [
-  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-  //     `${import.meta.env.BASE_URL}assets/cuagach.jpg`,
-  //   ],
-  //   rating: 4.8,
-  //   reviews: 124,
-  //   inStock: true,
-  //   weight: "1 kg",
-  //   origin: "Na Uy",
-  //   description:
-  //     "Cá hồi Atlantic cao cấp, nuôi bền vững từ vùng biển lạnh Na Uy. Thịt cá chắc, ngọt tự nhiên, giàu Omega-3.",
-  //   specifications: {
-  //     "Loại sản phẩm": "Phi lê cá hồi tươi",
-  //     "Xuất xứ": "Na Uy",
-  //     "Trọng lượng": "1 kg",
-  //     "Bảo quản": "Nhiệt độ 0-4°C",
-  //     "Hạn sử dụng": "3 ngày kể từ ngày mua",
-  //     "Chứng nhận": "ASC - Nuôi trồng thủy sản bền vững",
-  //   },
-  //   nutritionFacts: {
-  //     Calories: "208 kcal/100g",
-  //     Protein: "25.4g",
-  //     "Chất béo": "11g",
-  //     "Omega-3": "2.3g",
-  //     "Vitamin D": "526 IU",
-  //   },
-  // }
-
-  // const reviews = [
-  //   {
-  //     id: 1,
-  //     user: "Nguyễn Minh Anh",
-  //     rating: 5,
-  //     date: "2024-01-15",
-  //     comment: "Cá hồi rất tươi ngon, thịt chắc và ngọt. Đóng gói cẩn thận, giao hàng nhanh. Sẽ mua lại!",
-  //     helpful: 12,
-  //   },
-  //   {
-  //     id: 2,
-  //     user: "Trần Văn Hùng",
-  //     rating: 4,
-  //     date: "2024-01-10",
-  //     comment: "Chất lượng tốt, giá hợp lý. Làm sashimi rất ngon. Chỉ có điều muốn có thêm size nhỏ hơn.",
-  //     helpful: 8,
-  //   },
-  //   {
-  //     id: 3,
-  //     user: "Lê Thị Mai",
-  //     rating: 5,
-  //     date: "2024-01-08",
-  //     comment: "Cá tươi, không tanh. Nướng lên thơm lắm. Shop đóng gói kỹ, có đá khô giữ lạnh.",
-  //     helpful: 15,
-  //   },
-  // ]
-
-  // const relatedProducts = [
-  //   {
-  //     id: 2,
-  //     name: "Tôm Hùm Maine",
-  //     price: 1099000,
-  //     image: "/fresh-maine-lobster.png",
-  //     rating: 4.9,
-  //   },
-  //   {
-  //     id: 4,
-  //     name: "Bít Tết Cá Ngừ Tươi",
-  //     price: 789000,
-  //     image: "/fresh-tuna-steak.png",
-  //     rating: 4.8,
-  //   },
-  //   {
-  //     id: 8,
-  //     name: "Phi Lê Cá Chẽm",
-  //     price: 549000,
-  //     image: "/fresh-sea-bass-fillet.png",
-  //     rating: 4.5,
-  //   },
-  // ]
-
-  const handleAddToCart = () => {
-    // Add to cart logic
-    alert(`Đã thêm ${quantity} ${product?.name} vào giỏ hàng`)
-  }
 
   const handleSubmitReview = async (e) => {
     e.preventDefault()
@@ -285,19 +194,11 @@ export default function ProductDetailPage() {
                 </button>
               </div>
               <button
-                onClick={handleAddToCart}
+                onClick={() => addToCart(product,quantity)}
+                disabled={loading}
                 className="flex-1 bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors"
               >
-                Thêm vào giỏ hàng
-              </button>
-            </div>
-
-            <div className="flex space-x-4">
-              <button className="flex-1 border border-neutral-300 text-neutral-700 px-6 py-3 rounded-lg font-semibold hover:bg-neutral-50 transition-colors">
-                Mua ngay
-              </button>
-              <button className="px-6 py-3 border border-neutral-300 rounded-lg hover:bg-neutral-50 transition-colors">
-                ♡
+                {loading? "Đang thêm..." : "Thêm vào giỏ hàng"}
               </button>
             </div>
           </div>

@@ -6,7 +6,7 @@ import ApiService from "../../services/apis";
 export const useAddToCart = () => {
   const [loading, setLoading] = useState(false);
 
-  const addToCart = async (product, quantity = 1) => {
+  const addToCart = async (product, quantity) => {
     if (!product || !product.id) {
       toast.error("Không tìm thấy sản phẩm hợp lệ");
       return;

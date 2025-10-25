@@ -1,9 +1,11 @@
 package com.dinhvankhanh.seafood.controllers;
 
 import com.dinhvankhanh.seafood.dtos.requests.ApiResource;
+import com.dinhvankhanh.seafood.dtos.requests.CreateOrderRequest;
 import com.dinhvankhanh.seafood.dtos.responses.OrderResponse;
 import com.dinhvankhanh.seafood.enums.OrderStatus;
 import com.dinhvankhanh.seafood.services.OrderService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -19,8 +21,8 @@ public class OrderController {
     private OrderService orderService;
 
     @PostMapping("/create")
-    public ApiResource<OrderResponse> createOrder(){
-        OrderResponse response = orderService.createOrder();
+    public ApiResource<OrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest createOrderRequest){
+        OrderResponse response = orderService.createOrder(createOrderRequest);
         return ApiResource.ok(response,"Tạo đơn hàng thành công");
     }
 
@@ -49,7 +51,7 @@ public class OrderController {
     }
 
     @PostMapping("/update-status/{id}")
-    public ApiResource<OrderResponse> updateOrderStatus(@PathVariable String id, OrderStatus status){
+    public ApiResource<OrderResponse> updateOrderStatus(@PathVariable String id,@RequestParam OrderStatus status){
         OrderResponse response = orderService.updateOrderStatus(id,status);
         return ApiResource.ok(response,"Cập nhật trạng thái đơn hàng thành công");
     }

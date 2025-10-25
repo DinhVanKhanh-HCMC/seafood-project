@@ -32,6 +32,8 @@ public class Order {
     private String addressId;
     private String orderNumber;
     private PaymentMethod paymentMethod;
+    private String address;
+    private String phoneNumber;
 
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();

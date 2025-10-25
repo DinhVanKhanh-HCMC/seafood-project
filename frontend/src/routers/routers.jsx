@@ -69,7 +69,7 @@ const routers = [
                 ),
             },
 
-            { path: "order-detail/:id", component: () => (
+            { path: "order-detail/:orderId", component: () => (
                 <RequireAuth>
                     <OrderDetail />
                 </RequireAuth>

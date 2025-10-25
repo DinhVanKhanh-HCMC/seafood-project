@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import ApiService from "../../services/apis";
 import { User, Mail, Phone, Building, Calendar, Edit, Save, X, Camera, Shield, Clock } from 'lucide-react'
 import { toast } from "react-toastify"
+import { Navigate, useNavigate } from "react-router-dom";
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState("profile")
@@ -12,6 +13,7 @@ export default function ProfilePage() {
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
   const [selectedWard, setSelectedWard] = useState('');
@@ -21,6 +23,7 @@ export default function ProfilePage() {
   const [isDefaultAddress, setIsDefaultAddress] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
+  const navigate = useNavigate();
   const [changePasswordPopupOpen, setChangePasswordPopupOpen] = useState(false);
   const [errors, setErrors] = useState([])
   const [profileData, setProfileData] = useState({
@@ -306,32 +309,57 @@ export default function ProfilePage() {
     }
   }
 
-  const orders = [
-    {
-      id: "DH001",
-      date: "2024-01-15",
-      status: "Đã giao",
-      total: 2500000,
-      items: [
-        { name: "Cá Hồi Atlantic 2kg", quantity: 1, price: 1200000 },
-        { name: "Tôm Hùm Maine 1kg", quantity: 1, price: 1300000 },
-      ],
-    },
-    {
-      id: "DH002",
-      date: "2024-01-10",
-      status: "Đang vận chuyển",
-      total: 1800000,
-      items: [{ name: "Cá Ngừ Vây Xanh 1.5kg", quantity: 1, price: 1800000 }],
-    },
-    {
-      id: "DH003",
-      date: "2024-01-05",
-      status: "Đã hủy",
-      total: 950000,
-      items: [{ name: "Cua Hoàng Đế 1kg", quantity: 1, price: 950000 }],
-    },
-  ]
+  // const orders = [
+  //   {
+  //     id: "DH001",
+  //     date: "2024-01-15",
+  //     status: "Đã giao",
+  //     total: 2500000,
+  //     items: [
+  //       { name: "Cá Hồi Atlantic 2kg", quantity: 1, price: 1200000 },
+  //       { name: "Tôm Hùm Maine 1kg", quantity: 1, price: 1300000 },
+  //     ],
+  //   },
+  //   {
+  //     id: "DH002",
+  //     date: "2024-01-10",
+  //     status: "Đang vận chuyển",
+  //     total: 1800000,
+  //     items: [{ name: "Cá Ngừ Vây Xanh 1.5kg", quantity: 1, price: 1800000 }],
+  //   },
+  //   {
+  //     id: "DH003",
+  //     date: "2024-01-05",
+  //     status: "Đã hủy",
+  //     total: 950000,
+  //     items: [{ name: "Cua Hoàng Đế 1kg", quantity: 1, price: 950000 }],
+  //   },
+  // ]
+
+  // Load provinces khi component mount
+  useEffect(() => {
+    const fetchMyOrders = async () => {
+      try {
+        const response = await ApiService.getMyOrder();
+        setOrders(response.data);
+      } catch (error) {
+        console.error('Error loading your orders:', error);
+      }
+    };
+    fetchMyOrders();
+  }, []);
+
+  const getStatusText = (status) => {
+    const texts = {
+      PENDING: "Đang chờ xác nhận",
+      CONFIRMED: "Đã xác nhận",
+      PAID: "Đã thanh toán",
+      SHIPPING: "Đang giao hàng",
+      COMPLETED: "Đã hoàn thành",
+      CANCELLED: "Đã hủy",
+    };
+    return texts[status] || status;
+  };
 
   const auctionHistory = [
     {
@@ -429,20 +457,26 @@ export default function ProfilePage() {
 
 
   const getStatusColor = (status) => {
-    switch (status) {
-      case "Đã giao":
-      case "Thắng":
-        return "bg-green-100 text-green-800"
-      case "Đang vận chuyển":
-      case "Đang đấu giá":
-        return "bg-blue-100 text-blue-800"
-      case "Đã hủy":
-      case "Thua":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-neutral-100 text-neutral-800"
-    }
-  }
+    const colors = {
+      PENDING: "bg-yellow-100 text-yellow-800",
+      CONFIRMED: "bg-blue-100 text-blue-800",
+      PAID: "bg-green-100 text-green-800",
+      SHIPPING: "bg-purple-100 text-purple-800",
+      COMPLETED: "bg-green-100 text-green-800",
+      CANCELLED: "bg-red-100 text-red-800",
+    };
+    return colors[status] || "bg-gray-100 text-gray-800";
+  };
+
+  const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-neutral-50">
@@ -600,18 +634,6 @@ export default function ProfilePage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium text-neutral-700 mb-2">Địa chỉ</label>
-                      <textarea
-                        value={profileData.address}
-                        name="address"
-                        onChange={handleInputChange}
-                        disabled={!isEditing}
-                        rows={3}
-                        className="w-full border border-neutral-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-amber-500 disabled:bg-neutral-50"
-                      />
-                    </div>
-
                     {isEditing && (
                       <div className="flex space-x-4">
                         <button
@@ -643,16 +665,16 @@ export default function ProfilePage() {
                       <div key={order.id} className="border border-neutral-200 rounded-xl p-6">
                         <div className="flex items-center justify-between mb-4">
                           <div>
-                            <h3 className="font-semibold text-neutral-900">Đơn hàng #{order.id}</h3>
-                            <p className="text-sm text-neutral-600">{order.date}</p>
+                            <h3 className="font-semibold text-neutral-900">Đơn hàng #{order.orderNumber}</h3>
+                            <p className="text-sm text-neutral-600">{formatDate(order.createdAt)}</p>
                           </div>
                           <div className="text-right">
                             <span
                               className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(order.status)}`}
                             >
-                              {order.status}
+                              {getStatusText(order.status)}
                             </span>
-                            <p className="text-lg font-bold text-neutral-900 mt-1">{order.total.toLocaleString()}₫</p>
+                            <p className="text-lg font-bold text-neutral-900 mt-1">{order.totalPrice.toLocaleString()}₫</p>
                           </div>
                         </div>
                         <div className="space-y-2">
@@ -666,7 +688,9 @@ export default function ProfilePage() {
                           ))}
                         </div>
                         <div className="flex space-x-3 mt-4">
-                          <button className="border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">
+                          <button 
+                          onClick={() => navigate(`/order-detail/${order.id}`)}
+                          className="border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">
                             Xem chi tiết
                           </button>
                           {order.status === "Đã giao" && (

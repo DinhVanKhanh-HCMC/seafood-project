@@ -5,10 +5,11 @@ import {
   Filter, Save, X, Play, Pause, Camera,
   MessageSquare, Heart, Share, Gift
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AuctionView = ({closeModal}) => {
     const [auctionTime, setAuctionTime] = useState(300);
-    
+    const navigate = useNavigate()
 
     const [auctionBids, setAuctionBids] = useState([
         { id: 1, user: 'Nguyễn Đê La Thành', amount: '28.000.000', time: '14:10' },
@@ -38,7 +39,7 @@ const AuctionView = ({closeModal}) => {
         <div className="flex-1 p-6">
             <div className="flex justify-between items-center mb-6">
             <h3 className="text-2xl font-bold">Phiên đấu giá: iPhone 15 Pro Max</h3>
-            <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+            <button onClick={() => navigate("/auctions")} className="text-gray-500 hover:text-gray-700">
                 <X size={24} />
             </button>
             </div>

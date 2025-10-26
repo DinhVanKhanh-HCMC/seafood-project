@@ -33,6 +33,7 @@ public class OrderResponse {
     private String address;
     private String customer;
     private String phoneNumber;
+    private String emailCustomer;
 
     private LocalDateTime createdAt;
 }

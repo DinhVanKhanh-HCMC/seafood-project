@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { X, Play, Pause, MessageCircle, Eye } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -20,6 +21,7 @@ const StreamerView = ({ closeModal, streamId = "1", title, description }) => {
   const pendingViewers = useRef(new Set())
   const currentStreamId = useRef(streamId)
   const hasConnected = useRef(false)
+  const navigate = useNavigate();
 
   const iceServers = {
     iceServers: [{ urls: "stun:stun.l.google.com:19302" }, { urls: "stun:stun1.l.google.com:19302" }],
@@ -328,7 +330,7 @@ const StreamerView = ({ closeModal, streamId = "1", title, description }) => {
         <div className="flex-1 relative bg-gray-900">
           <div className="absolute top-4 left-4 z-10 flex gap-4 flex-wrap">
             <button
-              onClick={closeModal}
+              onClick={() => navigate("/livestreams")}
               className="bg-black bg-opacity-50 text-white p-2 rounded-lg hover:bg-opacity-70 transition-all"
             >
               <X size={24} />

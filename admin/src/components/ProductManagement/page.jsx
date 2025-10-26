@@ -1,18 +1,19 @@
 import React,{ useState }  from "react";
 import { Plus, Edit, Trash2, Eye } from "lucide-react";
-
+import { useNavigate } from "react-router-dom";
 
 const ProductsTab = ({openModal}) => {
     const [products] = useState([
         { id: 1, name: 'iPhone 15 Pro', category: 'Điện thoại', price: '29.990.000', stock: 50, status: 'Còn hàng' },
         { id: 2, name: 'MacBook Air M2', category: 'Laptop', price: '25.990.000', stock: 20, status: 'Còn hàng' },
     ]);
+    const navigate = useNavigate();
   return (
     <div className="space-y-6">
         <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Quản lý sản phẩm</h2>
         <button 
-            onClick={() => openModal('add-product')}
+            onClick={() => navigate("/add-product")}
             className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
             <Plus size={20} /> Thêm sản phẩm

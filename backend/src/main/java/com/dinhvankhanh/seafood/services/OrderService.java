@@ -11,6 +11,8 @@ public interface OrderService {
     public OrderResponse createOrder(CreateOrderRequest createOrderRequest);
     public List<OrderResponse> getMyOrders();
     public OrderResponse getOrderById(String orderId);
+
+    public OrderResponse orderDetailForAdmin(String orderId);
     public OrderResponse cancelOrder(String orderId);
 
     public List<OrderResponse> getAllOrders();

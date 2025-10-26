@@ -46,6 +46,7 @@ public class OrderMapper {
                 .address(order.getAddress())
                 .customer(user.getFullName())
                 .phoneNumber(order.getPhoneNumber())
+                .emailCustomer(user.getEmail())
                 .build();
     }
 }

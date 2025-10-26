@@ -90,6 +90,19 @@ export default class ApiService {
         }
     }
 
+    //get order by id
+    static async getOrderDetail(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/order/admin/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy đơn hàng theo id thất bại';
+        }
+    }
+
 
 //-----------------------------------------------------------------------------------
 }

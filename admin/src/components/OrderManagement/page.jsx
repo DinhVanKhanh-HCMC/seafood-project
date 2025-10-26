@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Plus, Eye, Edit, Trash2, Filter } from "lucide-react";
 import ApiService from "../../services/apis";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const OrdersTab = ({ openModal }) => {
   const [orders, setOrders] = useState([]);
@@ -9,6 +10,7 @@ const OrdersTab = ({ openModal }) => {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [editingOrder, setEditingOrder] = useState(null);
   const [newStatus, setNewStatus] = useState("");
+  const navigate = useNavigate();
 
   const statusOptions = [
     { value: "ALL", label: "Tất cả trạng thái" },
@@ -135,6 +137,10 @@ const OrdersTab = ({ openModal }) => {
     }
   };
 
+  const handleViewDetail = (id) => {
+    navigate(`/orders/${id}`);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header với nút thêm và bộ lọc */}
@@ -205,6 +211,13 @@ const OrdersTab = ({ openModal }) => {
                 </td>
                 <td className="px-6 py-4 text-sm">
                   <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleViewDetail(order.id)}
+                      className="text-blue-600 hover:text-blue-800 transition-colors"
+                      title="Xem chi tiết"
+                    >
+                      <Eye size={16} />
+                    </button>
                     <button 
                       onClick={() => handleEditStatus(order)}
                       className="text-blue-600 hover:text-blue-800 transition-colors"

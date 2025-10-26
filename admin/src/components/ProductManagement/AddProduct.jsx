@@ -5,14 +5,16 @@ import {
   Filter, Save, X, Play, Pause, Camera,
   MessageSquare, Heart, Share, Gift
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const AddProduct = ({closeModal}) => {
+    const navigate = useNavigate();
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-5/6 overflow-y-auto">
         <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold">Thêm sản phẩm mới</h3>
-            <button onClick={closeModal} className="text-gray-500 hover:text-gray-700">
+            <button onClick={() => navigate(-1)} className="text-gray-500 hover:text-gray-700">
             <X size={24} />
             </button>
         </div>
@@ -80,7 +82,7 @@ const AddProduct = ({closeModal}) => {
             Thêm sản phẩm
             </button>
             <button 
-            onClick={closeModal}
+            onClick={() => navigate(-1)}
             className="flex-1 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg"
             >
             Hủy

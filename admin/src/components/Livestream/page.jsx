@@ -2,6 +2,7 @@
 
 import { useState } from "react"
 import { Eye, Trash2, Video } from "lucide-react"
+import { useNavigate } from "react-router-dom"
 
 
 const LivestreamsTab = ({ openModal }) => {
@@ -10,12 +11,14 @@ const LivestreamsTab = ({ openModal }) => {
     { id: 2, title: "Review sản phẩm mới", viewers: 850, status: "Đã kết thúc", startTime: "10:00" },
   ])
 
+  const navigate = useNavigate();
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Quản lý livestream</h2>
         <button
-          onClick={() => openModal("create-livestream")}
+          onClick={() => navigate("/create-livestream")}
           className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <Video size={20} /> Tạo livestream

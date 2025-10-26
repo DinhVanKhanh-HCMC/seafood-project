@@ -22,7 +22,7 @@ function Login() {
     try {
       const response = await ApiService.login(email, password)
       localStorage.setItem("token",response.data.token);
-      navigate("/")
+      navigate("/users")
     } catch (err) {
       setError("Invalid email or password")
     } finally {

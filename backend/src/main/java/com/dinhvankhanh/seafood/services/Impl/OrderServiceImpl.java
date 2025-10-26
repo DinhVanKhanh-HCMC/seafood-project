@@ -115,6 +115,18 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public OrderResponse orderDetailForAdmin(String orderId) {
+        User user = userService.getUserLogin();
+        if (!UserRole.ADMIN.equals(user.getRole())) {
+            throw new ErrorException(ErrorCode.FORBIDDEN, "Chỉ ADMIN mới có quyền xem tất cả đơn hàng");
+        }
+
+        Order order =  orderRepository.findById(orderId)
+                .orElseThrow(() -> new ErrorException(ErrorCode.ORDER_NOT_FOUND));
+        return orderMapper.mapperToOrderResponse(order);
+    }
+
+    @Override
     public OrderResponse cancelOrder(String orderId) {
         User user = userService.getUserLogin();
         Order order = orderRepository.findById(orderId)

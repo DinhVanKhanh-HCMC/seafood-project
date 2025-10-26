@@ -50,6 +50,12 @@ public class OrderController {
         return ApiResource.ok(responses,"Lấy tất cả đơn hàng thành công");
     }
 
+    @GetMapping("/admin/{id}")
+    public ApiResource<OrderResponse> getDetailOrderForAdmin(@PathVariable String id){
+        OrderResponse responses = orderService.orderDetailForAdmin(id);
+        return ApiResource.ok(responses,"Lấy chi tiết đơn hàng thành công");
+    }
+
     @PostMapping("/update-status/{id}")
     public ApiResource<OrderResponse> updateOrderStatus(@PathVariable String id,@RequestParam OrderStatus status){
         OrderResponse response = orderService.updateOrderStatus(id,status);

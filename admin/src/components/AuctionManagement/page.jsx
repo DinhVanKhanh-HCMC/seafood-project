@@ -1,17 +1,20 @@
 import React,{useState} from "react";
 import { Plus, Eye, Edit, Trash2, Gavel } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-const AuctionsTab = ({ openModal }) => {
+const AuctionsTab = () => {
   const [auctions] = useState([
       { id: 1, item: 'iPhone 15 Pro Max', currentBid: '28.000.000', timeLeft: '2h 30m', status: 'Đang đấu giá' },
       { id: 2, item: 'MacBook Pro M3', currentBid: '45.000.000', timeLeft: 'Đã kết thúc', status: 'Đã kết thúc' },
     ]);
+
+  const navigate = useNavigate();
   return (
     <div className="space-y-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-gray-800">Quản lý đấu giá</h2>
                 <button 
-                  onClick={() => openModal('create-auction')}
+                  onClick={() => navigate("/create-auction")}
                   className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
                 >
                   <Gavel size={20} /> Tạo phiên đấu giá
@@ -47,7 +50,7 @@ const AuctionsTab = ({ openModal }) => {
                         <td className="px-6 py-4 text-sm">
                           <div className="flex gap-2">
                             <button 
-                              onClick={() => openModal('auction-view')}
+                              onClick={() => navigate("/auction-view")}
                               className="text-blue-600 hover:text-blue-800"
                             >
                               <Eye size={16} />

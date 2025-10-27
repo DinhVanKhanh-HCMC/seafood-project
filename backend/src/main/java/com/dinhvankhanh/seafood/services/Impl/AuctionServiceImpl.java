@@ -48,7 +48,15 @@ public class AuctionServiceImpl implements AuctionService {
             throw new ErrorException(ErrorCode.PRODUCT_AUCTION_EXISTS);
         }
 
-        // Create auction entity
+        // VALIDATE THỜI GIAN
+        if (request.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new ErrorException(ErrorCode.INVALID_START_TIME);
+        }
+        if (request.getEndTime().isBefore(request.getStartTime())) {
+            throw new ErrorException(ErrorCode.INVALID_END_TIME);
+        }
+
+        // Create auction entity - SET startTime từ request
         Auction auction = Auction.builder()
                 .productId(request.getProductId())
                 .productName(product.getName())
@@ -57,6 +65,7 @@ public class AuctionServiceImpl implements AuctionService {
                 .startPrice(request.getStartPrice())
                 .currentPrice(request.getStartPrice())
                 .bidStep(request.getBidStep())
+                .startTime(request.getStartTime()) // QUAN TRỌNG: SET startTime
                 .endTime(request.getEndTime())
                 .status(AuctionStatus.PENDING)
                 .build();

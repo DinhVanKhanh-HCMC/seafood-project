@@ -40,7 +40,11 @@ public enum ErrorCode {
     EXPIRED(410, "Mã OTP đã hết hạn hoặc không tồn tại", HttpStatus.GONE),
     CANNOT_DELETE_LAST_ADDRESS(400, "Không thể xoá địa chỉ cuối cùng", HttpStatus.BAD_REQUEST),
     CANNOT_REMOVE_DEFAULT_ADDRESS(400, "Không thể bỏ mặc định địa chỉ duy nhất", HttpStatus.BAD_REQUEST),
-    INVALID(401, "Mã OTP không đúng", HttpStatus.UNAUTHORIZED);
+    INVALID(401, "Mã OTP không đúng", HttpStatus.UNAUTHORIZED),
+
+    INVALID_START_TIME(401, "Thời gian bắt đầu không hợp lệ", HttpStatus.UNAUTHORIZED),
+    INVALID_END_TIME(401, "Thời gian kết thúc phải sau thời gian bắt đầu", HttpStatus.UNAUTHORIZED);
+
 
 
 

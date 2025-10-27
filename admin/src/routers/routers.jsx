@@ -46,7 +46,7 @@ const routers = [
                     { path: "create-livestream", component: CreateLivestream},
                     { path: "livestream-view", component: LivestreamView},
                     { path: "create-auction", component: CreateAuction},
-                    { path: "auction-view", component: AuctionView},
+                    { path: "auction-view/:id", component: AuctionView},
                     { path: "add-product", component: AddProduct},
                     { path: "/orders/:id", component: OrderDetail},
 

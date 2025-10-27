@@ -17,7 +17,7 @@ function Sidebar({ isOpen, onClose }) {
     { name: "Quản lý sản phẩm", href: "/products", icon: Package, children: ["/add-product"] },
     { name: "Quản lý đơn hàng", href: "/orders", icon: ShoppingCart, children: ["/orders/:id"] },
     { name: "Quản lý livestream", href: "/livestreams", icon: Video, children: ["/create-livestream"] },
-    { name: "Quản lý đấu giá", href: "/auctions", icon: Gavel, children: ["/create-auction"] },
+    { name: "Quản lý đấu giá", href: "/auctions", icon: Gavel, children: ["/create-auction", "/auction-view/:id"] },
     { name: "Quản lý bài viết", href: "/posts", icon: FileText },
   ]
 

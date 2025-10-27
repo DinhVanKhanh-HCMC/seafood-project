@@ -62,6 +62,51 @@ export default class ApiService {
 //-----------------------------------------------------------------------------------
 
 
+//-------PRODUCT------------------------------------------------------------------------
+
+    //get all product
+    static async getAllProduct() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả sản phẩm thất bại';
+        }
+    }
+
+    //get product by id
+    static async getProductById(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy sản phẩm theo id thất bại';
+        }
+    }
+
+    //get product by category id
+    static async getProductByCategoryId(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/products/category/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả sản phẩm theo danh mục thất bại';
+        }
+    }
+
+
+//-----------------------------------------------------------------------------------
+
+
 //-------ORDER------------------------------------------------------------------------
 
     //get all
@@ -105,4 +150,64 @@ export default class ApiService {
 
 
 //-----------------------------------------------------------------------------------
+
+
+//-------Auction------------------------------------------------------------------------
+
+    //get auction by id
+    static async getAuctionById(id) {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/auctions/${id}`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy phiên đấu giá theo id thất bại';
+        }
+    }
+
+    //end auction
+    static async endAuction(id) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/auctions/end/${id}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Kết thúc phiên đấu giá thất bại';
+        }
+    }
+
+    //bid
+    static async placeBid(id,data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/auctions/bid/${id}`,{data},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Đặt giá thất bại';
+        }
+    }
+
+    //create aucton
+    static async createAuction(data) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/auctions/create`,data,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Tạo phiên đấu giá thất bại';
+        }
+    }
+
+
+//-----------------------------------------------------------------------------------
+
+
 }

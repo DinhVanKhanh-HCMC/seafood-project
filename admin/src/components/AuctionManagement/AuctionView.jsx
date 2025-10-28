@@ -14,7 +14,7 @@ const AuctionView = ({closeModal}) => {
     const { id } = useParams();
     const [auctionTime, setAuctionTime] = useState(0);
     const navigate = useNavigate();
-     const [auction, setAuction] = useState(null);
+    const [auction, setAuction] = useState(null);
     const [auctionBids, setAuctionBids] = useState([]);
     const [bidAmount, setBidAmount] = useState('');
     const [loading, setLoading] = useState(true);
@@ -55,11 +55,19 @@ const AuctionView = ({closeModal}) => {
             setAuctionBids(auctionData.bids || []);
             
             // Tính thời gian còn lại
-            if (auctionData.endTime) {
+            if (auctionData.startTime && auctionData.endTime) {
+                const startTime = new Date(auctionData.startTime).getTime();
                 const endTime = new Date(auctionData.endTime).getTime();
                 const now = new Date().getTime();
-                const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
-                setAuctionTime(timeLeft);
+
+                if (now < startTime) {
+                    // Chưa bắt đầu
+                    setAuctionTime(-1);
+                } else {
+                    // Đã bắt đầu, tính thời gian còn lại
+                    const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+                    setAuctionTime(timeLeft);
+                }
             }
         } catch (error) {
             console.error('Error fetching auction:', error);
@@ -339,8 +347,10 @@ const AuctionView = ({closeModal}) => {
                         <div className="bg-gray-50 p-4 rounded-lg">
                             <h4 className="font-bold text-lg mb-2">Thời gian còn lại</h4>
                             <p className="text-3xl font-bold text-red-600">
-                                {formatTime(auctionTime)}
-                            </p>
+                                {auctionTime === -1
+                                    ? "Chưa bắt đầu"
+                                    : formatTime(auctionTime)}
+                                </p>
                         </div>
                     </div>
                     

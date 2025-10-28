@@ -48,11 +48,14 @@ public class AuctionServiceImpl implements AuctionService {
             throw new ErrorException(ErrorCode.PRODUCT_AUCTION_EXISTS);
         }
 
+        LocalDateTime now = LocalDateTime.now();
         // VALIDATE THỜI GIAN
-        if (request.getStartTime().isBefore(LocalDateTime.now())) {
+        if (request.getStartTime().isBefore(now.minusMinutes(1))) {
             throw new ErrorException(ErrorCode.INVALID_START_TIME);
         }
-        if (request.getEndTime().isBefore(request.getStartTime())) {
+
+        // End time phải sau start time ít nhất 1 phút
+        if (!request.getEndTime().isAfter(request.getStartTime().plusMinutes(1))) {
             throw new ErrorException(ErrorCode.INVALID_END_TIME);
         }
 
@@ -67,8 +70,14 @@ public class AuctionServiceImpl implements AuctionService {
                 .bidStep(request.getBidStep())
                 .startTime(request.getStartTime()) // QUAN TRỌNG: SET startTime
                 .endTime(request.getEndTime())
-                .status(AuctionStatus.PENDING)
                 .build();
+
+        if(request.getStartTime().equals(LocalDateTime.now())){
+            auction.setStatus(AuctionStatus.ACTIVE);
+            auctionWebSocketHandler.broadcastAuctionStarted(auction);
+        }else{
+            auction.setStatus(AuctionStatus.PENDING);
+        }
 
         Auction savedAuction = auctionRepository.save(auction);
 
@@ -188,6 +197,30 @@ public class AuctionServiceImpl implements AuctionService {
                 })
                 .orElseThrow(() -> new ErrorException(ErrorCode.AUCTION_NOT_FOUND));
     }
+
+    @Override
+    @Scheduled(fixedRate = 60000) // chạy mỗi phút
+    public void startScheduledAuctions() {
+        LocalDateTime now = LocalDateTime.now();
+        // Tìm tất cả các auction đã tới giờ mà vẫn pending
+        List<Auction> pendingAuctions = auctionRepository.findByStartTimeBeforeAndStatus(now, AuctionStatus.PENDING);
+
+        for (Auction auction : pendingAuctions) {
+            try {
+                auction.setStatus(AuctionStatus.ACTIVE);
+                auction.setStartTime(now);
+                auctionRepository.save(auction);
+
+                // Broadcast sang frontend
+                auctionWebSocketHandler.broadcastAuctionStarted(auction);
+
+                System.out.println("✅ Auto-started auction: " + auction.getId());
+            } catch (Exception e) {
+                System.out.println("❌ Error auto-starting auction " + auction.getId() + ": " + e.getMessage());
+            }
+        }
+    }
+
 
     @Override
     @Scheduled(fixedRate = 60000) // Run every minute

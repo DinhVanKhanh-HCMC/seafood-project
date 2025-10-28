@@ -16,6 +16,9 @@ public interface AuctionRepository extends MongoRepository<Auction,String> {
 
     List<Auction> findByEndTimeBeforeAndStatus(LocalDateTime endTime, AuctionStatus status);
 
+    List<Auction> findByStartTimeBeforeAndStatus(LocalDateTime now, AuctionStatus status);
+
+
     Optional<Auction> findByProductIdAndStatus(String productId, AuctionStatus status);
 
     @Query("{ 'status': 'ACTIVE', 'endTime': { $gt: ?0 } }")

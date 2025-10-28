@@ -4,9 +4,12 @@ class AdminAuctionWebSocketService {
     this.messageHandlers = new Map();
     this.reconnectAttempts = 0;
     this.maxReconnectAttempts = 5;
+    this.auctionId = null;
   }
 
   connect(auctionId) {
+    this.auctionId = auctionId;
+    
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.disconnect();
     }
@@ -34,7 +37,7 @@ class AdminAuctionWebSocketService {
 
     this.socket.onclose = (event) => {
       console.log('🔌 Admin WebSocket disconnected');
-      this.attemptReconnect(auctionId);
+      this.attemptReconnect();
     };
 
     this.socket.onerror = (error) => {
@@ -46,31 +49,74 @@ class AdminAuctionWebSocketService {
     if (this.socket && this.socket.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify({
         type: 'joinAuction',
-        auctionId: auctionId,
-        role: 'admin' // Gửi role admin để backend biết
+        auctionId: auctionId
       }));
     }
   }
 
   // Admin có thể kết thúc đấu giá
   endAuction(auctionId) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({
-        type: 'endAuction',
-        auctionId: auctionId
-      }));
-    }
+    return new Promise((resolve, reject) => {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        // Thêm handler tạm thời để xử lý response
+        const tempHandler = (message) => {
+          if (message.type === 'auctionEndedByAdmin') {
+            resolve(message);
+          } else if (message.type === 'error' && message.message.includes('đấu giá')) {
+            reject(new Error(message.message));
+          }
+          // Xóa handler sau khi sử dụng
+          this.messageHandlers.delete('temp_end_handler');
+        };
+        
+        this.messageHandlers.set('temp_end_handler', tempHandler);
+        
+        this.socket.send(JSON.stringify({
+          type: 'endAuction',
+          auctionId: auctionId
+        }));
+        
+        // Timeout sau 10 giây
+        setTimeout(() => {
+          reject(new Error('Timeout: Không nhận được phản hồi từ server'));
+        }, 10000);
+      } else {
+        reject(new Error('WebSocket chưa kết nối'));
+      }
+    });
   }
 
   // Admin có thể gia hạn thời gian
   extendTime(auctionId, additionalMinutes) {
-    if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-      this.socket.send(JSON.stringify({
-        type: 'extendTime',
-        auctionId: auctionId,
-        additionalMinutes: additionalMinutes
-      }));
-    }
+    return new Promise((resolve, reject) => {
+      if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+        // Thêm handler tạm thời để xử lý response
+        const tempHandler = (message) => {
+          if (message.type === 'timeExtended') {
+            resolve(message);
+          } else if (message.type === 'error' && message.message.includes('thời gian')) {
+            reject(new Error(message.message));
+          }
+          // Xóa handler sau khi sử dụng
+          this.messageHandlers.delete('temp_extend_handler');
+        };
+        
+        this.messageHandlers.set('temp_extend_handler', tempHandler);
+        
+        this.socket.send(JSON.stringify({
+          type: 'extendTime',
+          auctionId: auctionId,
+          additionalMinutes: additionalMinutes
+        }));
+        
+        // Timeout sau 10 giây
+        setTimeout(() => {
+          reject(new Error('Timeout: Không nhận được phản hồi từ server'));
+        }, 10000);
+      } else {
+        reject(new Error('WebSocket chưa kết nối'));
+      }
+    });
   }
 
   onMessage(type, handler) {
@@ -84,13 +130,13 @@ class AdminAuctionWebSocketService {
     }
   }
 
-  attemptReconnect(auctionId) {
-    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+  attemptReconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts && this.auctionId) {
       this.reconnectAttempts++;
       console.log(`🔄 Admin attempting to reconnect... (${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
       
       setTimeout(() => {
-        this.connect(auctionId);
+        this.connect(this.auctionId);
       }, 3000 * this.reconnectAttempts);
     }
   }
@@ -101,6 +147,7 @@ class AdminAuctionWebSocketService {
       this.socket = null;
     }
     this.messageHandlers.clear();
+    this.auctionId = null;
   }
 }
 

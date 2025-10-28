@@ -89,6 +89,7 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
                 "auction", Map.of(
                         "id", auction.getId(),
                         "productName", auction.getProductName(),
+                        "startTime",auction.getStartTime(),
                         "startPrice", auction.getStartPrice(),
                         "endTime", auction.getEndTime()
                 )

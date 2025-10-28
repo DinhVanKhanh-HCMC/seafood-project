@@ -15,4 +15,5 @@ public interface AuctionService {
     List<AuctionResponse> getAllAuctions();
     AuctionResponse getAuctionById(String id);
     void endExpiredAuctions();
+    public void startScheduledAuctions();
 }

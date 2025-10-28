@@ -93,7 +93,7 @@ const CreateAuction = ({ closeModal, openModal }) => {
         startTime: formData.startTime,
         startPrice: parseFloat(formData.startPrice),
         bidStep: parseFloat(formData.bidStep),
-        endTime: new Date(formData.endTime).toISOString()
+        endTime: formData.endTime
       };
 
       const response = await ApiService.createAuction(auctionData);

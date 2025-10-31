@@ -20,9 +20,9 @@ class AdminAuctionWebSocketService {
     this.socket.onopen = () => {
       console.log('🔌 Admin connected to auction WebSocket');
       this.reconnectAttempts = 0;
-      
-      // Join auction với vai trò admin
+      // join ngay + dự phòng
       this.joinAuction(auctionId);
+      setTimeout(() => this.joinAuction(auctionId), 200);
     };
 
     this.socket.onmessage = (event) => {
@@ -58,26 +58,22 @@ class AdminAuctionWebSocketService {
   endAuction(auctionId) {
     return new Promise((resolve, reject) => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        // Thêm handler tạm thời để xử lý response
+        const responseType = 'auctionEndedByAdmin'; // type server sẽ gửi
         const tempHandler = (message) => {
-          if (message.type === 'auctionEndedByAdmin') {
+          if (message.type === responseType) {
             resolve(message);
+            this.messageHandlers.delete(responseType);
           } else if (message.type === 'error' && message.message.includes('đấu giá')) {
             reject(new Error(message.message));
+            this.messageHandlers.delete(responseType);
           }
-          // Xóa handler sau khi sử dụng
-          this.messageHandlers.delete('temp_end_handler');
         };
-        
-        this.messageHandlers.set('temp_end_handler', tempHandler);
-        
-        this.socket.send(JSON.stringify({
-          type: 'endAuction',
-          auctionId: auctionId
-        }));
-        
-        // Timeout sau 10 giây
+        this.messageHandlers.set(responseType, tempHandler);
+
+        this.socket.send(JSON.stringify({ type: 'endAuction', auctionId }));
+
         setTimeout(() => {
+          this.messageHandlers.delete(responseType);
           reject(new Error('Timeout: Không nhận được phản hồi từ server'));
         }, 10000);
       } else {
@@ -90,27 +86,26 @@ class AdminAuctionWebSocketService {
   extendTime(auctionId, additionalMinutes) {
     return new Promise((resolve, reject) => {
       if (this.socket && this.socket.readyState === WebSocket.OPEN) {
-        // Thêm handler tạm thời để xử lý response
+        const responseType = 'timeExtended';
         const tempHandler = (message) => {
-          if (message.type === 'timeExtended') {
+          if (message.type === responseType) {
             resolve(message);
+            this.messageHandlers.delete(responseType);
           } else if (message.type === 'error' && message.message.includes('thời gian')) {
             reject(new Error(message.message));
+            this.messageHandlers.delete(responseType);
           }
-          // Xóa handler sau khi sử dụng
-          this.messageHandlers.delete('temp_extend_handler');
         };
-        
-        this.messageHandlers.set('temp_extend_handler', tempHandler);
-        
+        this.messageHandlers.set(responseType, tempHandler);
+
         this.socket.send(JSON.stringify({
           type: 'extendTime',
-          auctionId: auctionId,
-          additionalMinutes: additionalMinutes
+          auctionId,
+          additionalMinutes
         }));
-        
-        // Timeout sau 10 giây
+
         setTimeout(() => {
+          this.messageHandlers.delete(responseType);
           reject(new Error('Timeout: Không nhận được phản hồi từ server'));
         }, 10000);
       } else {
@@ -127,6 +122,12 @@ class AdminAuctionWebSocketService {
     const handler = this.messageHandlers.get(message.type);
     if (handler) {
       handler(message);
+      return;
+    }
+    // fallback: nếu có global error handler
+    const errHandler = this.messageHandlers.get('error');
+    if (errHandler && message.type === 'error') {
+      errHandler(message);
     }
   }
 

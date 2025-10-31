@@ -184,7 +184,7 @@ export default class ApiService {
     static async placeBid(id,data) {
         try {
             const response = await axios.post(
-                `${BASE_URL}/auctions/bid/${id}`,{data},
+                `${BASE_URL}/auctions/bid/${id}`,data,
                 {headers: this.getHeader(false)}
             );
             return response.data;

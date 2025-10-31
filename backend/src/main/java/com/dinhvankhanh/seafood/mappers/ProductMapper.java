@@ -48,6 +48,7 @@ public class ProductMapper {
                 .categoryId(product.getCategoryId())
                 .origin(product.getOrigin())
                 .avgRating(avgRating)
+                .inAuction(product.isInAuction())
                 .description(product.getDescription())
                 .reviewCount(reviewCount)
                 .images(product.getImages())

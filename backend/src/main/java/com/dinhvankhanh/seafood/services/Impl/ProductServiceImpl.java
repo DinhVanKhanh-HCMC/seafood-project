@@ -58,6 +58,7 @@ public class ProductServiceImpl implements ProductService {
                 .originalPrice(addProductRequest.getOriginalPrice())
                 .origin(addProductRequest.getOrigin())
                 .weight(addProductRequest.getWeight())
+                .inAuction(addProductRequest.isInAuction()) // Thêm trường isAution
                 .build();
 
         productRepository.save(product);
@@ -68,6 +69,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ProductResponse> getAllProduct() {
         List<Product> listProduct = productRepository.findAll();
         return listProduct.stream()
+                .filter(product -> !product.isInAuction()) // Ẩn sản phẩm đấu giá
                 .map(product -> {
                     return productMapper.mapperToProductResponse(product);
                 })
@@ -82,11 +84,11 @@ public class ProductServiceImpl implements ProductService {
 
         List<Product> products = productRepository.findByCategoryId(cateId);
         return products.stream()
+                .filter(product -> !product.isInAuction()) // Ẩn sản phẩm đấu giá
                 .map(product -> {
                     return productMapper.mapperToProductResponse(product);
                 })
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -104,6 +106,7 @@ public class ProductServiceImpl implements ProductService {
         product.setInStock(updateProductRequest.isInStock());
         product.setOrigin(updateProductRequest.getOrigin());
         product.setCategoryId(updateProductRequest.getCategoryId());
+        product.setInAuction(updateProductRequest.isInAuction()); // Cập nhật trường isAution
         product.setUpdatedAt(LocalDateTime.now());
 
         List<String> finalImagePaths = new ArrayList<>();
@@ -125,8 +128,6 @@ public class ProductServiceImpl implements ProductService {
         product.setImages(finalImagePaths);
         productRepository.save(product);
         return productMapper.mapperToProductResponse(product);
-
-
     }
 
     @Override
@@ -145,5 +146,19 @@ public class ProductServiceImpl implements ProductService {
         productRepository.deleteById(id);
     }
 
+    // Thêm phương thức mới để lấy sản phẩm đấu giá
+    public List<ProductResponse> getAuctionProducts() {
+        List<Product> auctionProducts = productRepository.findByInAuctionTrue();
+        return auctionProducts.stream()
+                .map(productMapper::mapperToProductResponse)
+                .collect(Collectors.toList());
+    }
 
+    // Thêm phương thức để lấy tất cả sản phẩm (bao gồm cả đấu giá) - cho admin
+    public List<ProductResponse> getAllProductsIncludingAuctions() {
+        List<Product> allProducts = productRepository.findAll();
+        return allProducts.stream()
+                .map(productMapper::mapperToProductResponse)
+                .collect(Collectors.toList());
+    }
 }

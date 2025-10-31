@@ -7,6 +7,7 @@ import ResetPassword from "./ResetPassword"
 import ApiService from "../../services/apis"
 import { toast } from "react-toastify"
 
+
 const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
   const [isLogin, setIsLogin] = useState(true)
   const [authStep, setAuthStep] = useState("main") // 'main', 'emailVerification', 'register', 'resetPassword'

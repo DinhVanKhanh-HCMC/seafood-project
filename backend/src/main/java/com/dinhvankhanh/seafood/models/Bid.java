@@ -22,6 +22,5 @@ public class Bid {
     private String userName;
     private BigDecimal amount;
 
-    @Builder.Default
-    private LocalDateTime bidTime = LocalDateTime.now();
+    private LocalDateTime bidTime;
 }

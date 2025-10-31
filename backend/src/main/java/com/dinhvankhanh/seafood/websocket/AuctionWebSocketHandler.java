@@ -3,11 +3,14 @@ package com.dinhvankhanh.seafood.websocket;
 import com.dinhvankhanh.seafood.models.Auction;
 import com.dinhvankhanh.seafood.models.Bid;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.time.ZoneId;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -18,18 +21,18 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
 
     private final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, String> sessionAuctions = new ConcurrentHashMap<>();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule());
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
         sessions.put(session.getId(), session);
         System.out.println("🔌 Auction WebSocket connected: " + session.getId());
-
-        // Gửi message chào mừng
-        Map<String, Object> welcomeMsg = Map.of(
-                "type", "connected",
-                "sessionId", session.getId()
-        );
+        System.out.println("🔍 Current sessions count: " + sessions.size());
+        // welcome
+        Map<String, Object> welcomeMsg = new HashMap<>();
+        welcomeMsg.put("type", "connected");
+        welcomeMsg.put("sessionId", session.getId());
         session.sendMessage(new TextMessage(objectMapper.writeValueAsString(welcomeMsg)));
     }
 
@@ -46,6 +49,7 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
             if ("joinAuction".equals(messageType)) {
                 sessionAuctions.put(session.getId(), auctionId);
                 System.out.println("🎯 Session " + session.getId() + " joined auction: " + auctionId);
+                System.out.println("🔍 sessionAuctions map: " + sessionAuctions);
 
                 // Gửi xác nhận join thành công
                 Map<String, Object> response = Map.of(
@@ -54,6 +58,7 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
                 );
                 session.sendMessage(new TextMessage(objectMapper.writeValueAsString(response)));
             }
+
 
         } catch (Exception e) {
             System.out.println("❌ Error processing auction message: " + e.getMessage());
@@ -74,7 +79,7 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
                 "bid", Map.of(
                         "userName", bid.getUserName(),
                         "amount", bid.getAmount(),
-                        "bidTime", bid.getBidTime()
+                        "bidTime", bid.getBidTime().atZone(ZoneId.systemDefault()).toInstant().toString()
                 ),
                 "currentPrice", auction.getCurrentPrice(),
                 "participantCount", auction.getParticipantCount()
@@ -84,16 +89,16 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
     }
 
     public void broadcastAuctionCreated(Auction auction) {
-        Map<String, Object> message = Map.of(
-                "type", "auctionCreated",
-                "auction", Map.of(
-                        "id", auction.getId(),
-                        "productName", auction.getProductName(),
-                        "startTime",auction.getStartTime(),
-                        "startPrice", auction.getStartPrice(),
-                        "endTime", auction.getEndTime()
-                )
-        );
+        Map<String, Object> auctionInfo = new HashMap<>();
+        auctionInfo.put("id", auction.getId());
+        auctionInfo.put("productName", auction.getProductName());
+        auctionInfo.put("startTime", auction.getStartTime());
+        auctionInfo.put("startPrice", auction.getStartPrice());
+        auctionInfo.put("endTime", auction.getEndTime());
+
+        Map<String, Object> message = new HashMap<>();
+        message.put("type", "auctionCreated");
+        message.put("auction", auctionInfo);
 
         broadcastToAll(message);
     }
@@ -108,12 +113,11 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
     }
 
     public void broadcastAuctionEnded(Auction auction) {
-        Map<String, Object> message = Map.of(
-                "type", "auctionEnded",
-                "auctionId", auction.getId(),
-                "winnerName", auction.getWinnerName(),
-                "finalPrice", auction.getCurrentPrice()
-        );
+        Map<String, Object> message = new HashMap<>();
+        message.put("type", "auctionEnded");
+        message.put("auctionId", auction.getId());
+        message.put("winnerName", auction.getWinnerName()); // null allowed in HashMap
+        message.put("finalPrice", auction.getCurrentPrice());
 
         broadcastToAuction(auction.getId(), message);
     }

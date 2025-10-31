@@ -17,6 +17,8 @@ public class UpdateProductRequest {
 
     private String description;
 
+    private boolean inAuction;
+
     private BigDecimal price;
 
     private String origin;

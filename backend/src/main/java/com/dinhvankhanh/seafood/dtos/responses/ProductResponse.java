@@ -27,6 +27,8 @@ public class ProductResponse {
 
     private boolean inStock;
 
+    private boolean inAuction;
+
     private BigDecimal originalPrice;
 
     private String origin;

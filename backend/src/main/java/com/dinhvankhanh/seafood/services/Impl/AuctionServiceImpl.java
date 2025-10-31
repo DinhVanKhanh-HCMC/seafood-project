@@ -16,6 +16,8 @@ import com.dinhvankhanh.seafood.services.AuctionService;
 import com.dinhvankhanh.seafood.services.ProductService;
 import com.dinhvankhanh.seafood.websocket.AuctionWebSocketHandler;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,13 @@ import java.util.stream.Collectors;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
-    private final AuctionWebSocketHandler auctionWebSocketHandler;
+
 
     private final AuctionMapper auctionMapper;
+
+    @Autowired
+    @Lazy
+    private AuctionWebSocketHandler auctionWebSocketHandler;
 
     @Override
     public AuctionResponse createAuction(AuctionRequest request) {
@@ -49,8 +55,9 @@ public class AuctionServiceImpl implements AuctionService {
         }
 
         LocalDateTime now = LocalDateTime.now();
-        // VALIDATE THỜI GIAN
-        if (request.getStartTime().isBefore(now.minusMinutes(1))) {
+
+        // VALIDATE THỜI GIAN - cho phép startTime là thời gian hiện tại hoặc tương lai
+        if (request.getStartTime().isBefore(now)) {
             throw new ErrorException(ErrorCode.INVALID_START_TIME);
         }
 
@@ -59,7 +66,7 @@ public class AuctionServiceImpl implements AuctionService {
             throw new ErrorException(ErrorCode.INVALID_END_TIME);
         }
 
-        // Create auction entity - SET startTime từ request
+        // Create auction entity
         Auction auction = Auction.builder()
                 .productId(request.getProductId())
                 .productName(product.getName())
@@ -68,18 +75,27 @@ public class AuctionServiceImpl implements AuctionService {
                 .startPrice(request.getStartPrice())
                 .currentPrice(request.getStartPrice())
                 .bidStep(request.getBidStep())
-                .startTime(request.getStartTime()) // QUAN TRỌNG: SET startTime
+                .startTime(request.getStartTime())
                 .endTime(request.getEndTime())
                 .build();
 
-        if(request.getStartTime().equals(LocalDateTime.now())){
+        // Kiểm tra nếu startTime là trong vòng 1 phút tới thì set ACTIVE luôn
+        // Điều này đảm bảo auction sẽ bắt đầu ngay lập tức
+        if (request.getStartTime().isBefore(now.plusMinutes(1))) {
             auction.setStatus(AuctionStatus.ACTIVE);
-            auctionWebSocketHandler.broadcastAuctionStarted(auction);
-        }else{
+
+        } else {
             auction.setStatus(AuctionStatus.PENDING);
+            System.out.println("⏰ Auction created as PENDING, will start at: " + request.getStartTime());
         }
 
         Auction savedAuction = auctionRepository.save(auction);
+
+        if (savedAuction.getStatus() == AuctionStatus.ACTIVE) {
+            savedAuction.setStartTime(LocalDateTime.now());
+            savedAuction = auctionRepository.save(savedAuction);
+            auctionWebSocketHandler.broadcastAuctionStarted(savedAuction);
+        }
 
         // Broadcast new auction
         auctionWebSocketHandler.broadcastAuctionCreated(savedAuction);
@@ -113,30 +129,43 @@ public class AuctionServiceImpl implements AuctionService {
 
         // Validate auction status
         if (auction.getStatus() != AuctionStatus.ACTIVE) {
-            throw new ErrorException(ErrorCode.BAD_REQUEST,"Phiên đấu giá chưa diễn ra");
+            throw new ErrorException(ErrorCode.BAD_REQUEST, "Phiên đấu giá chưa diễn ra");
         }
 
         // Validate time
         if (auction.getEndTime().isBefore(LocalDateTime.now())) {
-            throw new ErrorException(ErrorCode.BAD_REQUEST,"Phiên đấu giá đã kết thúc");
+            throw new ErrorException(ErrorCode.BAD_REQUEST, "Phiên đấu giá đã kết thúc");
         }
 
-        // Validate bid amount
-        BigDecimal minimumBid = auction.getCurrentPrice().add(auction.getBidStep());
-        if (request.getAmount().compareTo(minimumBid) < 0) {
-            throw new ErrorException(ErrorCode.BAD_REQUEST,"Số tiền đấu giá ít nhất là " + minimumBid);
+        BigDecimal currentPrice = auction.getCurrentPrice();
+        BigDecimal bidStep = auction.getBidStep();
+        BigDecimal bidAmount = request.getAmount();
+
+        // Validate bid amount >= currentPrice + bidStep
+        BigDecimal minimumBid = currentPrice.add(bidStep);
+        if (bidAmount.compareTo(minimumBid) < 0) {
+            throw new ErrorException(ErrorCode.BAD_REQUEST, "Số tiền đấu giá ít nhất là " + minimumBid);
+        }
+
+        // ✅ Validate bid amount phải chia hết cho bước giá
+        BigDecimal difference = bidAmount.subtract(currentPrice);
+        BigDecimal[] divisionResult = difference.divideAndRemainder(bidStep);
+        if (divisionResult[1].compareTo(BigDecimal.ZERO) != 0) {
+            throw new ErrorException(ErrorCode.BAD_REQUEST,
+                    "Giá đặt phải chia hết cho bước giá " + bidStep);
         }
 
         // Create new bid
         Bid bid = Bid.builder()
                 .userId(request.getUserId())
                 .userName(request.getUserName())
-                .amount(request.getAmount())
+                .amount(bidAmount)
+                .bidTime(LocalDateTime.now())
                 .build();
 
         // Update auction
         auction.getBids().add(bid);
-        auction.setCurrentPrice(request.getAmount());
+        auction.setCurrentPrice(bidAmount);
         auction.setWinnerId(request.getUserId());
         auction.setWinnerName(request.getUserName());
         auction.setUpdatedAt(LocalDateTime.now());
@@ -153,6 +182,7 @@ public class AuctionServiceImpl implements AuctionService {
 
         return auctionMapper.mapperToAuctionResponse(updatedAuction);
     }
+
 
     @Override
     public AuctionResponse endAuction(String auctionId) {
@@ -199,15 +229,23 @@ public class AuctionServiceImpl implements AuctionService {
     }
 
     @Override
-    @Scheduled(fixedRate = 60000) // chạy mỗi phút
+    @Scheduled(fixedRate = 30000) // Chạy mỗi 30 giây để chính xác hơn
     public void startScheduledAuctions() {
         LocalDateTime now = LocalDateTime.now();
-        // Tìm tất cả các auction đã tới giờ mà vẫn pending
-        List<Auction> pendingAuctions = auctionRepository.findByStartTimeBeforeAndStatus(now, AuctionStatus.PENDING);
+        System.out.println("⏰ Checking for scheduled auctions to start at: " + now);
+
+        // Tìm tất cả các auction có startTime <= now và status là PENDING
+        List<Auction> pendingAuctions = auctionRepository.findByStartTimeLessThanEqualAndStatus(now, AuctionStatus.PENDING);
+
+        System.out.println("📋 Found " + pendingAuctions.size() + " auctions to start");
 
         for (Auction auction : pendingAuctions) {
             try {
+                System.out.println("🚀 Starting auction: " + auction.getId() +
+                        ", scheduled start: " + auction.getStartTime());
+
                 auction.setStatus(AuctionStatus.ACTIVE);
+                // Cập nhật startTime thành thời gian thực tế khi bắt đầu
                 auction.setStartTime(now);
                 auctionRepository.save(auction);
 
@@ -217,7 +255,12 @@ public class AuctionServiceImpl implements AuctionService {
                 System.out.println("✅ Auto-started auction: " + auction.getId());
             } catch (Exception e) {
                 System.out.println("❌ Error auto-starting auction " + auction.getId() + ": " + e.getMessage());
+                e.printStackTrace();
             }
+        }
+
+        if (pendingAuctions.isEmpty()) {
+            System.out.println("ℹ️ No pending auctions to start");
         }
     }
 

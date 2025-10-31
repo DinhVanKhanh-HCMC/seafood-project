@@ -17,6 +17,8 @@ public class AddProductRequest {
 
     private String description;
 
+    private boolean inAuction;
+
     private BigDecimal originalPrice;
 
     private BigDecimal price;

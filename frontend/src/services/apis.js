@@ -582,4 +582,39 @@ export default class ApiService{
 
 //------------------------------------------
 
+//-------------AUCTION-----------------------
+
+    //get auction active
+    static async getAuctionActive() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auctions/active`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy danh sách các phiên đấu giá đang diễn ra thất bại';
+        }
+    }
+
+    //get auction active
+    static async getAllAuction() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auctions`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy danh sách các phiên đấu giá thất bại';
+        }
+    }
+
+
+
+
+
+
+//------------------------------------------
+
 }

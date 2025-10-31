@@ -40,6 +40,8 @@ public class Product {
 
     private List<String> images;
 
+    private boolean inAuction = false;
+
     @Builder.Default
     private LocalDateTime createdAt = LocalDateTime.now();
 

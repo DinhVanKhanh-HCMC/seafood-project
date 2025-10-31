@@ -25,4 +25,7 @@ public interface AuctionRepository extends MongoRepository<Auction,String> {
     List<Auction> findActiveAuctions(LocalDateTime currentTime);
 
     List<Auction> findByCreatedByOrderByCreatedAtDesc(String createdBy);
+
+    // Tìm auctions có startTime <= thời gian hiện tại và status là PENDING
+    List<Auction> findByStartTimeLessThanEqualAndStatus(LocalDateTime startTime, AuctionStatus status);
 }

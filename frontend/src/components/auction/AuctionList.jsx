@@ -35,6 +35,13 @@ export default function AuctionList({ onSelectAuction, auctions }) {
     }
   })
 
+  const formatPrice = (price) => {
+        return new Intl.NumberFormat('vi-VN', {
+            style: 'currency',
+            currency: 'VND'
+        }).format(price);
+    };
+
   // Update current time every second
   useEffect(() => {
     const interval = setInterval(() => {
@@ -246,7 +253,7 @@ export default function AuctionList({ onSelectAuction, auctions }) {
                 <div className="flex items-center justify-between mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl border border-green-100">
                   <div>
                     <div className="text-2xl font-bold text-green-600">
-                      ${(auction.currentBid || auction.minBid).toLocaleString()}
+                      {formatPrice(auction.currentBid || auction.minBid)}
                     </div>
                     <div className="text-xs text-green-600 font-medium">
                       {auction.status === "live"
@@ -338,7 +345,7 @@ export default function AuctionList({ onSelectAuction, auctions }) {
             </div>
             <div>
               <div className="text-3xl font-bold mb-2">
-                ${auctions.reduce((sum, a) => sum + (a.currentBid || a.minBid), 0).toLocaleString()}
+                {formatPrice(auctions.reduce((sum, a) => sum + (a.currentBid || a.minBid), 0))}
               </div>
               <div className="text-blue-100">Tổng giá trị</div>
             </div>

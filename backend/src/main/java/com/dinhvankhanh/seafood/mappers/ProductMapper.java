@@ -37,6 +37,8 @@ public class ProductMapper {
 
         avgRating = Math.round(avgRating * 10.0) / 10.0; // làm tròn 1 chữ số
 
+        Category category = categoryRepository.findById(product.getCategoryId())
+                .orElseThrow(() -> new ErrorException(ErrorCode.CATEGORY_NOT_FOUND));
 
 
         return ProductResponse.builder()
@@ -46,6 +48,7 @@ public class ProductMapper {
                 .price(product.getPrice())
                 .weight(product.getWeight())
                 .categoryId(product.getCategoryId())
+                .categoryName(category.getName())
                 .origin(product.getOrigin())
                 .avgRating(avgRating)
                 .inAuction(product.isInAuction())

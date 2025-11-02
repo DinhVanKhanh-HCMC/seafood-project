@@ -90,7 +90,7 @@ const AuctionView = ({closeModal}) => {
                 status: 'COMPLETED',
                 winnerName: message.winnerName
             }));
-            setAuctionTime(0);
+            setAuctionTime(-2);
         });
 
         AdminAuctionWebSocketService.onMessage('timeExtended', (message) => {
@@ -114,29 +114,34 @@ const AuctionView = ({closeModal}) => {
             setLoading(true);
             const response = await ApiService.getAuctionById(id);
             const auctionData = response.data;
-            
-            // 🧩 Sắp xếp danh sách bid theo thời gian giảm dần
+
             const sortedBids = (auctionData.bids || []).sort(
-                (a, b) => new Date(b.bidTime) - new Date(a.bidTime)
+            (a, b) => new Date(b.bidTime) - new Date(a.bidTime)
             );
 
             setAuction(auctionData);
             setAuctionBids(sortedBids || []);
-            
-            // Tính thời gian còn lại
-            if (auctionData.startTime && auctionData.endTime) {
-                const startTime = new Date(auctionData.startTime).getTime();
-                const endTime = new Date(auctionData.endTime).getTime();
-                const now = new Date().getTime();
 
-                if (now < startTime) {
-                    // Chưa bắt đầu
-                    setAuctionTime(-1);
-                } else {
-                    // Đã bắt đầu, tính thời gian còn lại
-                    const timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
-                    setAuctionTime(timeLeft);
-                }
+            // ✅ Kiểm tra trạng thái trước khi tính thời gian
+            if (auctionData.status === "COMPLETED") {
+            setAuctionTime(-2); // Đã kết thúc
+            return;
+            }
+
+            if (auctionData.startTime && auctionData.endTime) {
+            const startTime = new Date(auctionData.startTime).getTime();
+            const endTime = new Date(auctionData.endTime).getTime();
+            const now = new Date().getTime();
+
+            if (now < startTime) {
+                setAuctionTime(-1); // Chưa bắt đầu
+            } else if (now >= endTime) {
+                setAuctionTime(-2); // Đã kết thúc (quá hạn)
+            } else {
+                // Đang diễn ra, tính thời gian còn lại
+                const timeLeft = Math.floor((endTime - now) / 1000);
+                setAuctionTime(timeLeft);
+            }
             }
         } catch (error) {
             console.error('Error fetching auction:', error);
@@ -145,6 +150,7 @@ const AuctionView = ({closeModal}) => {
             setLoading(false);
         }
     };
+
 
     const handleEndAuction = async () => {
         if (!window.confirm('Bạn có chắc chắn muốn kết thúc đấu giá này?')) {
@@ -155,6 +161,7 @@ const AuctionView = ({closeModal}) => {
             // Gọi API kết thúc đấu giá
             await ApiService.endAuction(id);
             // WebSocket sẽ nhận message 'auctionEnded' và cập nhật UI
+            setAuctionTime(-2)
         } catch (error) {
             console.error('Error ending auction:', error);
             toast.error(error.message || 'Kết thúc đấu giá thất bại');
@@ -285,6 +292,8 @@ const AuctionView = ({closeModal}) => {
                             <p className="text-3xl font-bold text-red-600">
                                 {auctionTime === -1
                                     ? "Chưa bắt đầu"
+                                    : auctionTime === -2 
+                                    ? "Đã kết thúc" 
                                     : formatTime(auctionTime)}
                                 </p>
                         </div>
@@ -306,7 +315,9 @@ const AuctionView = ({closeModal}) => {
                                 />
                                 <button 
                                     onClick={handlePlaceBid}
-                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg"
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2 rounded-lg
+                                    disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                    disabled={auctionTime === 0 || auctionTime === -1 || auctionTime === -2}
                                 >
                                     Đặt giá
                                 </button>
@@ -316,13 +327,17 @@ const AuctionView = ({closeModal}) => {
                         <div className="flex gap-3">
                             <button 
                                 onClick={handleEndAuction}
-                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg 
+                                disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                disabled={auctionTime === 0 || auctionTime === -1 || auctionTime === -2}
                             >
                                 Kết thúc đấu giá
                             </button>
                             <button 
                                 onClick={handleExtendTime}
-                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg"
+                                className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg
+                                disabled:bg-gray-400 disabled:cursor-not-allowed"
+                                disabled={auctionTime === 0 || auctionTime === -1 || auctionTime === -2}
                             >
                                 Gia hạn thời gian (+10 phút)
                             </button>
@@ -358,7 +373,7 @@ const AuctionView = ({closeModal}) => {
                         <h5 className="font-medium text-yellow-800 mb-1">Thông tin đấu giá</h5>
                         <p className="text-sm text-yellow-700">Số lượng: 1</p>
                         <p className="text-sm text-yellow-700">Bước giá: {formatPrice(auction.bidStep || 100000)}</p>
-                        <p className="text-sm text-yellow-700">Người tham gia: {auction.participantCount || auctionBids.length}</p>
+                        <p className="text-sm text-yellow-700">Lượt đấu: {auction.participantCount || auctionBids.length}</p>
                         <p className="text-sm text-yellow-700">Trạng thái: {auction.status}</p>
                     </div>
                 </div>

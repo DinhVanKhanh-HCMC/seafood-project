@@ -1,11 +1,34 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import ClientAuctionWebSocketService from "../../services/ClientAuctionWebSocketService"
+import { authEvents } from "../../utils/authEvents"
+import ApiService from "../../services/apis"
 
 export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   const [bidAmount, setBidAmount] = useState("")
   const [currentTime, setCurrentTime] = useState(new Date())
   const [notification, setNotification] = useState(null)
+  const [realTimeAuction, setRealTimeAuction] = useState(auction)
+  const [isConnected, setIsConnected] = useState(false)
+  const [user, setUser] = useState(null)
+
+  useEffect(() => {
+      const token = localStorage.getItem("token")
+      if (token) {
+        ApiService.getCurrentUser()
+          .then((res) => {
+            setUser({
+              id: res.data.id,
+              fullName: res.data.fullName || "Chưa Xác Định"
+            })
+          })
+          .catch(() => {
+            localStorage.removeItem("token")
+            setUser(null)
+          })
+      }
+    }, [])
 
   // Hàm định dạng tiền Việt Nam
   const formatVND = (amount) => {
@@ -25,6 +48,103 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
     const value = e.target.value.replace(/[^\d]/g, '') // Chỉ cho phép số
     setBidAmount(value)
   }
+
+  // Kết nối WebSocket khi component mount và auction là live
+  useEffect(() => {
+    if (auction.status === "live" && !ClientAuctionWebSocketService.isConnected()) {
+      connectToWebSocket();
+    }
+
+    return () => {
+      // Chỉ ngắt nếu thực sự đang kết nối
+      if (ClientAuctionWebSocketService.isConnected()) {
+        ClientAuctionWebSocketService.disconnect();
+      }
+    };
+  }, [auction.id, auction.status]);
+
+  const connectToWebSocket = () => {
+    if (!auction?.id) return;
+
+    try {
+      // 1️⃣ Kết nối WebSocket (chỉ gọi 1 lần)
+      ClientAuctionWebSocketService.connect(auction.id);
+
+      // 2️⃣ Khi kết nối thành công
+      ClientAuctionWebSocketService.onMessage('connected', () => {
+        setIsConnected(true);
+        console.log(`✅ Connected to auction room #${auction.id}`);
+      });
+      
+
+      // 4️⃣ Khi có người khác đặt giá
+      ClientAuctionWebSocketService.onMessage('newBid', (message) => {
+        console.log("📩 newBid message:", message);
+        setRealTimeAuction(prev => ({
+          ...prev,
+          currentBid: message.bid.amount,
+          bidCount: (prev?.bidCount || 0) + 1,
+          bidHistory: [
+            {
+              bidder: `User***${message.bid.userId?.substring(0, 4)}`,
+              amount: message.bid.amount,
+              time: message.bid.bidTime
+            },
+            ...(prev?.bidHistory || [])
+          ]
+        }));
+
+        setNotification({
+          type: "info",
+          message: `Có người vừa đặt giá ${formatVND(message.bid.amount)}!`
+        });
+      });
+
+      // 5️⃣ Khi đấu giá kết thúc
+      ClientAuctionWebSocketService.onMessage('auctionEnded', (message) => {
+        setRealTimeAuction(prev => ({
+          ...prev,
+          status: "ended",
+          winnerName: message.winnerName,
+          currentBid: message.finalPrice
+        }));
+
+        setNotification({
+          type: "info",
+          message: `Đấu giá đã kết thúc! Người thắng: ${message.winnerName}`
+        });
+      });
+
+      // 6️⃣ Khi thời gian được gia hạn
+      ClientAuctionWebSocketService.onMessage('timeExtended', (message) => {
+        setRealTimeAuction(prev => ({
+          ...prev,
+          endTime: new Date(message.newEndTime)
+        }));
+
+        setNotification({
+          type: "info",
+          message: `Đấu giá được gia hạn thêm ${message.additionalMinutes} phút!`
+        });
+      });
+
+      // 7️⃣ Khi có lỗi từ server
+      ClientAuctionWebSocketService.onMessage('error', (message) => {
+        setNotification({
+          type: "error",
+          message: message.message || "Lỗi không xác định từ server"
+        });
+      });
+
+    } catch (error) {
+      console.error('❌ Failed to connect to WebSocket:', error);
+      setNotification({
+        type: "error",
+        message: "Không thể kết nối đến phiên đấu giá real-time"
+      });
+    }
+  };
+
 
   // Update current time every second
   useEffect(() => {
@@ -60,27 +180,49 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
     return `${seconds}s`
   }
 
-  const handlePlaceBid = (e) => {
+  const handlePlaceBid = async (e) => {
     e.preventDefault()
-    const bidValue = parseInt(bidAmount.replace(/[^\d]/g, ''))
-    if (bidAmount && bidValue >= auction.minBid) {
-      const success = onPlaceBid(auction.id, bidValue)
-      if (success) {
-        setNotification({
-          type: "success",
-          message: `Đấu giá thành công với giá ${formatVND(bidValue)}!`
-        })
-        setBidAmount("")
-      } else {
-        setNotification({
-          type: "error",
-          message: "Đấu giá thất bại!"
-        })
-      }
-    } else {
+    
+    // Kiểm tra đăng nhập
+    const token = localStorage.getItem("token")
+    if (!token) {
+      authEvents.openModal();
+      
+      const handleLoginSuccess = () => {
+        // Sau khi đăng nhập, thử đặt giá lại
+        handlePlaceBid(e);
+        window.removeEventListener('authLoginSuccess', handleLoginSuccess);
+      };
+      
+      window.addEventListener('authLoginSuccess', handleLoginSuccess);
+      return;
+    }
+
+    const bidValue = parseFloat(bidAmount.replace(/[^\d]/g, ''))
+    
+    if (!bidAmount || bidValue < realTimeAuction.minBid) {
       setNotification({
         type: "error",
-        message: "Vui lòng nhập giá đấu hợp lệ!"
+        message: `Vui lòng nhập giá đấu tối thiểu ${formatVND(realTimeAuction.minBid)}!`
+      })
+      return
+    }
+
+    try {
+      const bidData = {
+          amount: bidAmount,
+          userId: user.id, // ID của admin
+          userName: user.fullName
+      };
+      // Sử dụng WebSocket để đặt giá real-time
+      await ApiService.placeBid(realTimeAuction.id, bidData)
+      // Notification sẽ được xử lý trong WebSocket message handler
+      setBidAmount('')
+      
+    } catch (error) {
+      setNotification({
+        type: "error",
+        message: error.message || "Đấu giá thất bại!"
       })
     }
   }
@@ -103,6 +245,12 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
     }
   }
 
+  const currentAuction = realTimeAuction;
+
+  if (!auction || !auction.id) {
+    return <div className="text-center py-10 text-gray-500">Đang tải dữ liệu...</div>;
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Notification */}
@@ -110,9 +258,14 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
         <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 ${
           notification.type === "success" 
             ? "bg-green-500 text-white" 
+            : notification.type === "info"
+            ? "bg-blue-500 text-white"
             : "bg-red-500 text-white"
         }`}>
           <div className="flex items-center gap-2">
+            {isConnected && currentAuction.status === "live" && (
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+            )}
             <span>{notification.message}</span>
             <button 
               onClick={() => setNotification(null)}
@@ -131,27 +284,30 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
             onClick={onBack}
             className="inline-flex items-center gap-2 p-3 bg-amber-600 text-white hover:text-amber-400 font-medium mb-6 transition-colors group"
           >
-            <span className="group-hover:-translate-x-1 transition-transform"></span>
+            <span className="group-hover:-translate-x-1 transition-transform">←</span>
             Trở Về
           </button>
 
           <div className="bg-white rounded-2xl overflow-hidden shadow-xl border border-gray-100">
             <div className="relative">
               <img
-                src={auction.image}
-                alt={auction.title}
+                src={currentAuction.image}
+                alt={currentAuction.title}
                 className="w-full h-80 object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"></div>
-              <div className={`absolute top-4 left-4 ${getStatusColor(auction.status)} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2`}>
-                {auction.status === "live" && (
+              <div className={`absolute top-4 left-4 ${getStatusColor(currentAuction.status)} text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-2`}>
+                {currentAuction.status === "live" && (
                   <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
                 )}
-                {getStatusText(auction.status)}
+                {getStatusText(currentAuction.status)}
+                {isConnected && currentAuction.status === "live" && (
+                  <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                )}
               </div>
               <div className="absolute bottom-4 left-4 text-white">
-                <h2 className="text-3xl font-bold mb-1">{auction.title}</h2>
-                <p className="text-white/90">{auction.seller}</p>
+                <h2 className="text-3xl font-bold mb-1">{currentAuction.title}</h2>
+                <p className="text-white/90">{currentAuction.seller}</p>
               </div>
             </div>
 
@@ -161,38 +317,38 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <div className="text-2xl mb-2">📍</div>
                   <div className="text-sm text-gray-500">Nguồn gốc</div>
-                  <div className="font-semibold text-gray-800">{auction.location}</div>
+                  <div className="font-semibold text-gray-800">{currentAuction.location}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <div className="text-2xl mb-2">⚖️</div>
                   <div className="text-sm text-gray-500">Trọng lượng</div>
-                  <div className="font-semibold text-gray-800">{auction.weight}</div>
+                  <div className="font-semibold text-gray-800">{currentAuction.weight}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <div className="text-2xl mb-2">⭐</div>
                   <div className="text-sm text-gray-500">Cấp độ</div>
-                  <div className="font-semibold text-gray-800">{auction.grade}</div>
+                  <div className="font-semibold text-gray-800">{currentAuction.grade}</div>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <div className="text-2xl mb-2">🧊</div>
                   <div className="text-sm text-gray-500">Tình trạng</div>
-                  <div className="font-semibold text-gray-800">{auction.freshness}</div>
+                  <div className="font-semibold text-gray-800">{currentAuction.freshness}</div>
                 </div>
               </div>
 
               {/* Bid History */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-6">Lịch sử đấu giá</h3>
+                <h3 className="text-xl font-semibold text-gray-800 mb-6">Lịch sử đấu giá {currentAuction.status === "live" && "(Real-time)"}</h3>
                 <div className="bg-gray-50 rounded-xl p-6">
                   <div className="space-y-4">
-                    {auction.bidHistory.length > 0 ? (
-                      auction.bidHistory.map((bid, index) => (
+                    {currentAuction.bidHistory.length > 0 ? (
+                      currentAuction.bidHistory.map((bid, index) => (
                         <div key={index} className="flex justify-between items-center py-3 px-4 bg-white rounded-lg shadow-sm">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {index + 1}
                             </div>
-                            <span className="font-medium text-gray-800">{bid.bidder}</span>
+                            <span className="font-medium text-gray-800">{`User***${bid.bidder?.substring(0, 4)}`}</span>
                           </div>
                           <div className="text-right">
                             <div className="text-xl font-bold text-green-600">{formatVND(bid.amount)}</div>
@@ -218,22 +374,25 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
           <div className="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 sticky top-8">
             <div className="text-center mb-6">
               <div className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-2">
-                {formatVND(auction.currentBid || auction.minBid)}
+                {formatVND(currentAuction.currentBid || currentAuction.minBid)}
               </div>
               <div className="text-sm text-gray-500">
-                {auction.status === "live" ? "Giá hiện tại" : 
-                  auction.status === "upcoming" ? "Giá khởi điểm" : "Giá cuối"}
+                {currentAuction.status === "live" ? "Giá hiện tại" : 
+                  currentAuction.status === "upcoming" ? "Giá khởi điểm" : "Giá cuối"}
               </div>
-              <div className="text-sm text-gray-400">{auction.bidCount} lượt đấu</div>
+              <div className="text-sm text-gray-400">{currentAuction.bidCount} lượt đấu</div>
             </div>
 
-            {auction.status === "live" && (
+            {currentAuction.status === "live" && (
               <>
                 <div className="text-center mb-6 p-4 bg-red-50 rounded-xl border border-red-200">
                   <div className="text-2xl font-bold text-red-600 mb-1">
-                    {formatTimeLeft(auction.endTime)}
+                    {formatTimeLeft(currentAuction.endTime)}
                   </div>
                   <div className="text-sm text-red-500 font-medium">Thời gian còn lại</div>
+                  {isConnected && (
+                    <div className="text-xs text-green-600 mt-1">✅ Kết nối real-time</div>
+                  )}
                 </div>
 
                 <form onSubmit={handlePlaceBid} className="space-y-4">
@@ -245,22 +404,23 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
                         type="text"
                         value={formatBidAmount(bidAmount)}
                         onChange={handleBidAmountChange}
-                        placeholder={auction.minBid.toLocaleString('vi-VN')}
+                        placeholder={formatVND(currentAuction.currentBid + (currentAuction.bidStep || 100000))}
                         className="w-full pl-8 pr-4 py-4 text-xl font-bold border-2 border-gray-200 rounded-xl focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all"
                       />
                     </div>
                   </div>
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200"
+                    className="w-full bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-600 hover:to-amber-700 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={!isConnected}
                   >
-                    🎯 Đấu Giá Ngay
+                    {isConnected ? "🎯 Đấu Giá Ngay" : "⏳ Đang kết nối..."}
                   </button>
                 </form>
 
                 <div className="mt-4 p-3 bg-yellow-50 rounded-lg border border-yellow-200">
                   <p className="text-sm text-yellow-800 text-center">
-                    <span className="font-semibold">Giá tối thiểu:</span> {formatVND(auction.minBid)}
+                    <span className="font-semibold">Giá tối thiểu:</span> {formatVND(currentAuction.currentBid + (currentAuction.bidStep || 100000))}
                   </p>
                 </div>
               </>
@@ -286,7 +446,7 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
                     {formatVND(auction.currentBid)}
                   </div>
                   <div className="text-sm text-gray-500 mb-4">
-                    🏆 Người thắng: <span className="font-semibold">{auction.winner}</span>
+                    🏆 Người thắng: <span className="font-semibold">{auction.winnerName}</span>
                   </div>
                 </div>
                 <button className="w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-semibold cursor-not-allowed">

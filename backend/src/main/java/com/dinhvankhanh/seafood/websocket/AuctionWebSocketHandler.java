@@ -77,6 +77,7 @@ public class AuctionWebSocketHandler extends TextWebSocketHandler {
                 "type", "newBid",
                 "auctionId", auction.getId(),
                 "bid", Map.of(
+                        "userId", bid.getUserId(),
                         "userName", bid.getUserName(),
                         "amount", bid.getAmount(),
                         "bidTime", bid.getBidTime().atZone(ZoneId.systemDefault()).toInstant().toString()

@@ -610,6 +610,18 @@ export default class ApiService{
         }
     }
 
+    //bid
+        static async placeBid(id,data) {
+            try {
+                const response = await axios.post(
+                    `${BASE_URL}/auctions/bid/${id}`,data,
+                    {headers: this.getHeader(false)}
+                );
+                return response.data;
+            } catch (error) {
+                throw error.response?.data?.message || 'Đặt giá thất bại';
+            }
+        }
 
 
 

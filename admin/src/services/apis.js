@@ -206,6 +206,19 @@ export default class ApiService {
         }
     }
 
+    //get all
+    static async getAllAuction() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auctions`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy danh sách các phiên đấu giá thất bại';
+        }
+    }
+
 
 //-----------------------------------------------------------------------------------
 

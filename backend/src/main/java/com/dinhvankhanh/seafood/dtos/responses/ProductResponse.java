@@ -39,6 +39,8 @@ public class ProductResponse {
 
     private String categoryId;
 
+    private String categoryName;
+
     private int reviewCount;
 
     private double avgRating;

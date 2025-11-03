@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import ClientAuctionWebSocketService from "../../services/ClientAuctionWebSocketService"
 import { authEvents } from "../../utils/authEvents"
 import ApiService from "../../services/apis"
+import { toast } from "react-toastify"
 
 export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   const [bidAmount, setBidAmount] = useState("")
@@ -11,24 +12,21 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   const [notification, setNotification] = useState(null)
   const [realTimeAuction, setRealTimeAuction] = useState(auction)
   const [isConnected, setIsConnected] = useState(false)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState([])
 
-  useEffect(() => {
-      const token = localStorage.getItem("token")
-      if (token) {
-        ApiService.getCurrentUser()
-          .then((res) => {
-            setUser({
-              id: res.data.id,
-              fullName: res.data.fullName || "Chưa Xác Định"
-            })
-          })
-          .catch(() => {
-            localStorage.removeItem("token")
-            setUser(null)
-          })
+  const fetchCurrentUser = async () => {
+      try {
+        const response = await ApiService.getCurrentUser();
+        setUser(response.data);
+      } catch (error) {
+        toast.error("Không thể tải thông tin đơn hàng");
+        console.error(error);
       }
-    }, [])
+    };
+  
+  useEffect(() => {
+      fetchCurrentUser();
+  }, []);
 
   // Hàm định dạng tiền Việt Nam
   const formatVND = (amount) => {
@@ -86,7 +84,7 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
           bidCount: (prev?.bidCount || 0) + 1,
           bidHistory: [
             {
-              bidder: `User***${message.bid.userId?.substring(0, 4)}`,
+              bidder: message.bid.userId,
               amount: message.bid.amount,
               time: message.bid.bidTime
             },
@@ -94,10 +92,19 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
           ]
         }));
 
-        setNotification({
-          type: "info",
-          message: `Có người vừa đặt giá ${formatVND(message.bid.amount)}!`
-        });
+        if(message.bid.userId === user.id){
+          setNotification({
+            type: "success",
+            message: `Bạn vừa đặt giá ${formatVND(message.bid.amount)} thành công!`
+          });
+        }else{
+          setNotification({
+            type: "info",
+            message: `Có người vừa đặt giá ${formatVND(message.bid.amount)}!`
+          });
+        }
+
+        
       });
 
       // 5️⃣ Khi đấu giá kết thúc
@@ -182,6 +189,10 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
 
   const handlePlaceBid = async (e) => {
     e.preventDefault()
+
+    console.log("🔍 User object:", user);
+    console.log(user.id)
+    console.log(user.fullName)
     
     // Kiểm tra đăng nhập
     const token = localStorage.getItem("token")
@@ -209,6 +220,9 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
     }
 
     try {
+      console.log("🔍 User ID:", user?.id);
+      console.log("🔍 User fullName:", user?.fullName);
+
       const bidData = {
           amount: bidAmount,
           userId: user.id, // ID của admin
@@ -348,11 +362,19 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
                             <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-amber-300 rounded-full flex items-center justify-center text-white font-bold text-sm">
                               {index + 1}
                             </div>
-                            <span className="font-medium text-gray-800">{`User***${bid.bidder?.substring(0, 4)}`}</span>
+                            <span className="font-medium text-gray-800">
+                              {bid.bidder === user.id
+                                ? "Bạn"
+                                : `User***${bid.bidder?.substring(0, 4)}`}
+                            </span>
                           </div>
                           <div className="text-right">
                             <div className="text-xl font-bold text-green-600">{formatVND(bid.amount)}</div>
-                            <div className="text-sm text-gray-500">{bid.time}</div>
+                            <div className="text-sm text-gray-500"> {new Date(bid.time).toLocaleTimeString('vi-VN', {
+                                            hour: '2-digit',
+                                            minute: '2-digit',
+                                            second: '2-digit'
+                                        })}</div>
                           </div>
                         </div>
                       ))
@@ -380,7 +402,7 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
                 {currentAuction.status === "live" ? "Giá hiện tại" : 
                   currentAuction.status === "upcoming" ? "Giá khởi điểm" : "Giá cuối"}
               </div>
-              <div className="text-sm text-gray-400">{currentAuction.bidCount} lượt đấu</div>
+              <div className="text-sm text-gray-400">{realTimeAuction.bidCount} lượt đấu</div>
             </div>
 
             {currentAuction.status === "live" && (

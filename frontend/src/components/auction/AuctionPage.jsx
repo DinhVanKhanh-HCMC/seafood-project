@@ -39,11 +39,16 @@ export default function AuctionPage() {
               grade: product.data.inAuction ? "Đang đấu giá" : "Hàng bán lẻ",
               status: auction.status === "ACTIVE" ? "live" : auction.status === "PENDING" ? "upcoming" : "ended",
               description: product.data.description || "Không có mô tả.",
-              bidHistory: auction.bids?.map((b) => ({
-                bidder: b.userId || "Ẩn danh",
-                amount: b.amount,
-                time: new Date(b.createdAt).toLocaleTimeString(),
-              })) || [],
+              bidHistory:
+                (auction.bids
+                  ?.filter(b => b.bidTime || b.createdAt)
+                  .map((b) => ({
+                    bidder: b.userId || "Ẩn danh",
+                    amount: b.amount,
+                    time: b.bidTime || b.createdAt,
+                  }))
+                  .sort((a, b) => new Date(b.time) - new Date(a.time))
+                ) || [],
               category: product.data.categoryName || "Chưa phân loại",
               freshness: product.data.inStock ? "Còn hàng" : "Hết hàng",
               origin: product.data.origin,

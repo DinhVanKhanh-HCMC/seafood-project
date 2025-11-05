@@ -59,8 +59,25 @@ export default class ApiService {
         }
     }
 
-//-----------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------
 
+//-------------CATEGORY-----------------------------------------------------------------
+
+    //get all category
+    static async getAllCategory() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/category`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả danh mục thất bại';
+        }
+    }
+
+
+//-------------------------------------------------------------------------------------
 
 //-------PRODUCT------------------------------------------------------------------------
 
@@ -68,7 +85,7 @@ export default class ApiService {
     static async getAllProduct() {
         try {
             const response = await axios.get(
-                `${BASE_URL}/products`,
+                `${BASE_URL}/products/admin`,
                 {headers: this.getHeader(false)}
             );
             return response.data;
@@ -103,8 +120,49 @@ export default class ApiService {
         }
     }
 
+    //add product
+    static async addProduct(data) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/products/add`,data,
+            {headers: this.getHeader(true)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Thêm sản phẩm thất bại';
+        }
+    }
+
+    //add product
+    static async updateProduct(id,data) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/products/update/${id}`,data,
+            {headers: this.getHeader(true)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Cập nhật sản phẩm thất bại';
+        }
+    }
+
+    //delete product by id
+    static async deleteProduct(id) {
+        try {
+        const response = await axios.post(
+            `${BASE_URL}/products/delete/${id}`,{},
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'xoá sản phẩm thất bại';
+        }
+    }
+
 
 //-----------------------------------------------------------------------------------
+
+
 
 
 //-------ORDER------------------------------------------------------------------------

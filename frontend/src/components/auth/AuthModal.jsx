@@ -274,7 +274,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                 </p>
               </div>
 
-              {/* Social Login */}
+              {/* Social Login
               <div className="space-y-3 mb-6">
                 <button
                   onClick={() => handleSocialLogin("Google")}
@@ -310,7 +310,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
                   </svg>
                   Tiếp tục với Facebook
                 </button>
-              </div>
+              </div> */}
 
               {/* Render form */}
               <LoginForm

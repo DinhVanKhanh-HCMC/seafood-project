@@ -1,6 +1,6 @@
 import axios from "axios";
 const BASE_URL = "http://localhost:8080/api";
-const URL_PROVINCE = 'https://provinces.open-api.vn/api';
+const URL_PROVINCE = 'http://provinces.open-api.vn/api';
 
 export default class ApiService{
 
@@ -147,7 +147,7 @@ export default class ApiService{
         }
     }
 
-    //update user
+    //change password
     static async changePassword(data) {
         try {
         const response = await axios.post(

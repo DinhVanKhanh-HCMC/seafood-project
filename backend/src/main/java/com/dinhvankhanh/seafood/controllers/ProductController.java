@@ -30,12 +30,18 @@ public class ProductController {
     @PostMapping("/update/{id}")
     public ApiResource<ProductResponse> updateProduct(@PathVariable String id,@Valid @ModelAttribute UpdateProductRequest updateProductRequest, @RequestPart(value = "images", required = false) List<MultipartFile> images){
         ProductResponse response = productService.updateProduct(id,updateProductRequest,images);
-        return ApiResource.ok(response,"Thêm sản phẩm thành công");
+        return ApiResource.ok(response,"Cập nhật sản phẩm thành công");
     }
 
     @GetMapping
     public ApiResource<List<ProductResponse>> getALlProduct(){
         List<ProductResponse> responses = productService.getAllProduct();
+        return ApiResource.ok(responses,"Lấy danh sách sản phẩm đang bán thành công");
+    }
+
+    @GetMapping("/admin")
+    public ApiResource<List<ProductResponse>> getALlProductForAdmin(){
+        List<ProductResponse> responses = productService.getAllProductsIncludingAuctions();
         return ApiResource.ok(responses,"Lấy danh sách sản phẩm thành công");
     }
 

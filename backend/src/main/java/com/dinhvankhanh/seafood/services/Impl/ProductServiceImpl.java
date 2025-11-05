@@ -147,6 +147,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Thêm phương thức mới để lấy sản phẩm đấu giá
+    @Override
     public List<ProductResponse> getAuctionProducts() {
         List<Product> auctionProducts = productRepository.findByInAuctionTrue();
         return auctionProducts.stream()
@@ -155,6 +156,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     // Thêm phương thức để lấy tất cả sản phẩm (bao gồm cả đấu giá) - cho admin
+    @Override
     public List<ProductResponse> getAllProductsIncludingAuctions() {
         List<Product> allProducts = productRepository.findAll();
         return allProducts.stream()

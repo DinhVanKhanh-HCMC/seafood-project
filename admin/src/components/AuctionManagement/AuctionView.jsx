@@ -375,6 +375,7 @@ const AuctionView = ({closeModal}) => {
                         <p className="text-sm text-yellow-700">Bước giá: {formatPrice(auction.bidStep || 100000)}</p>
                         <p className="text-sm text-yellow-700">Lượt đấu: {auction.participantCount || auctionBids.length}</p>
                         <p className="text-sm text-yellow-700">Trạng thái: {auction.status}</p>
+                        <p className="text-sm text-yellow-700">Người thắng: {auction.winnerName}</p>
                     </div>
                 </div>
             </div>

@@ -19,4 +19,8 @@ public interface ProductService {
     public ProductResponse getProductById(String id);
 
     public void deleteProduct(String id);
+
+    public List<ProductResponse> getAuctionProducts();
+
+    public List<ProductResponse> getAllProductsIncludingAuctions();
 }

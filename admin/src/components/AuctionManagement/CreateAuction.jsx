@@ -299,11 +299,8 @@ const CreateAuction = ({ closeModal, openModal }) => {
               type="button"
               onClick={() => {
                 // Mở modal thêm sản phẩm mới
-                if (openModal) {
-                  openModal('add-product');
-                } else {
-                  navigate('/products/add');
-                }
+                
+                  navigate('/add-product');
               }}
               className="flex items-center gap-2 text-blue-600 hover:text-blue-800 text-sm"
             >

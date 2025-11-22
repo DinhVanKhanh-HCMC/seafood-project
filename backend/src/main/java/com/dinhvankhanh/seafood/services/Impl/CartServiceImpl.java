@@ -45,12 +45,17 @@ public class CartServiceImpl implements CartService {
         List<CartItemResponse> itemResponses = cart.getItems().stream().map(i -> {
             Product p = productRepository.findById(i.getProductId())
                     .orElseThrow(() -> new ErrorException(ErrorCode.PRODUCT_NOT_FOUND, null));
+
+            BigDecimal price = i.isAuctionItem() && i.getAuctionPrice() != null
+                    ? i.getAuctionPrice()
+                    : p.getPrice();
+
             return new CartItemResponse(
                     p.getId(),
                     p.getName(),
-                    p.getPrice(),
+                    price,
                     i.getQuantity(),
-                    p.getPrice().multiply(BigDecimal.valueOf(i.getQuantity())),
+                    price.multiply(BigDecimal.valueOf(i.getQuantity())),
                     p.getImages(),
                     p.getOrigin()
             );
@@ -68,20 +73,37 @@ public class CartServiceImpl implements CartService {
         User user = userService.getUserLogin();
 
         Cart cart = cartRepository.findByUserId(user.getId())
-                .orElseGet(() -> cartRepository.save(Cart.builder().userId(user.getId()).build()));
+                .orElseGet(() -> cartRepository.save(Cart.builder()
+                        .userId(user.getId())
+                        .createdAt(LocalDateTime.now())
+                        .build()));
 
         Product product = productRepository.findById(request.getProductId())
                 .orElseThrow(() -> new ErrorException(ErrorCode.PRODUCT_NOT_FOUND, null));
 
-        CartItem existing = cart.getItems().stream()
-                .filter(i -> i.getProductId().equals(request.getProductId()))
-                .findFirst()
-                .orElse(null);
+        // kiểm tra nếu là sản phẩm đấu giá
+        if (request.isAuctionItem()) {
+            // Thêm như một item riêng biệt, không gộp với sản phẩm thường
+            CartItem auctionItem = CartItem.builder()
+                    .productId(product.getId())
+                    .quantity(1)
+                    .isAuctionItem(true)
+                    .auctionPrice(request.getAuctionPrice())
+                    .build();
 
-        if (existing != null) {
-            existing.setQuantity(existing.getQuantity() + request.getQuantity());
+            cart.getItems().add(auctionItem);
         } else {
-            cart.getItems().add(new CartItem(product.getId(), request.getQuantity()));
+            // logic cũ cho sản phẩm bình thường
+            CartItem existing = cart.getItems().stream()
+                    .filter(i -> !i.isAuctionItem() && i.getProductId().equals(request.getProductId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existing != null) {
+                existing.setQuantity(existing.getQuantity() + request.getQuantity());
+            } else {
+                cart.getItems().add(new CartItem(product.getId(), request.getQuantity(), false, null));
+            }
         }
 
         cartRepository.save(cart);
@@ -94,23 +116,25 @@ public class CartServiceImpl implements CartService {
         Cart cart = cartRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ErrorException(ErrorCode.CART_NOT_FOUND));
 
-        // Tìm item hiện có
+        // Tìm item trong giỏ (bất kể là thường hay đấu giá)
         Optional<CartItem> existingItem = cart.getItems().stream()
                 .filter(i -> i.getProductId().equals(productId))
                 .findFirst();
 
-        if (existingItem.isPresent()) {
-            if (quantity <= 0) {
-                // Xóa nếu số lượng <= 0
-                cart.getItems().remove(existingItem.get());
-            } else {
-                // Cập nhật nếu có sẵn
-                existingItem.get().setQuantity(quantity);
-            }
+        if (existingItem.isEmpty()) {
+            throw new ErrorException(ErrorCode.CART_ITEM_NOT_FOUND);
+        }
+
+        CartItem item = existingItem.get();
+
+        // 🔒 Nếu là sản phẩm đấu giá
+        if (item.isAuctionItem()) {
+            throw new ErrorException(ErrorCode.AUCTION_ITEM_CANNOT_UPDATE_QUANTITY);
         } else {
-            // Nếu chưa có thì thêm mới
-            if (quantity > 0) {
-                cart.getItems().add(new CartItem(productId, quantity));
+            if (quantity <= 0) {
+                cart.getItems().remove(item);
+            } else {
+                item.setQuantity(quantity);
             }
         }
 

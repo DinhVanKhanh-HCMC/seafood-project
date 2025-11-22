@@ -11,6 +11,8 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(404, "Không tìm thấy sản phẩm", HttpStatus.NOT_FOUND),
     REVIEW_NOT_FOUND(404, "Không tìm thấy đánh giá", HttpStatus.NOT_FOUND),
     CART_NOT_FOUND(404, "Không tìm thấy giỏ hàng", HttpStatus.NOT_FOUND),
+    CART_ITEM_NOT_FOUND(404, "Không tìm thấy sản phẩm trong giỏ hàng", HttpStatus.NOT_FOUND),
+    AUCTION_ITEM_CANNOT_UPDATE_QUANTITY(400, "Không thể cập nhật sản phẩm đấu giá", HttpStatus.BAD_REQUEST),
     ADDRESS_NOT_FOUND(404, "Không tìm thấy địa chỉ", HttpStatus.NOT_FOUND),
     ORDER_NOT_FOUND(404, "Không tìm thấy đơn hàng", HttpStatus.NOT_FOUND),
     POST_NOT_FOUND(404, "Không tìm thấy bài viết", HttpStatus.NOT_FOUND),

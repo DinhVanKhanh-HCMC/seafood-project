@@ -3,15 +3,19 @@ package com.dinhvankhanh.seafood.services.Impl;
 import com.dinhvankhanh.seafood.dtos.requests.AuctionRequest;
 import com.dinhvankhanh.seafood.dtos.requests.BidRequest;
 import com.dinhvankhanh.seafood.dtos.responses.AuctionResponse;
+import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.enums.AuctionStatus;
 import com.dinhvankhanh.seafood.exception.ErrorCode;
 import com.dinhvankhanh.seafood.exception.ErrorException;
 import com.dinhvankhanh.seafood.mappers.AuctionMapper;
+import com.dinhvankhanh.seafood.mappers.UserMapper;
 import com.dinhvankhanh.seafood.models.Auction;
 import com.dinhvankhanh.seafood.models.Bid;
 import com.dinhvankhanh.seafood.models.Product;
+import com.dinhvankhanh.seafood.models.User;
 import com.dinhvankhanh.seafood.repositories.AuctionRepository;
 import com.dinhvankhanh.seafood.repositories.ProductRepository;
+import com.dinhvankhanh.seafood.repositories.UserRepository;
 import com.dinhvankhanh.seafood.services.AuctionService;
 import com.dinhvankhanh.seafood.services.ProductService;
 import com.dinhvankhanh.seafood.websocket.AuctionWebSocketHandler;
@@ -33,7 +37,8 @@ import java.util.stream.Collectors;
 public class AuctionServiceImpl implements AuctionService {
     private final AuctionRepository auctionRepository;
     private final ProductRepository productRepository;
-
+    private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     private final AuctionMapper auctionMapper;
 
@@ -262,6 +267,20 @@ public class AuctionServiceImpl implements AuctionService {
         if (pendingAuctions.isEmpty()) {
             System.out.println("ℹ️ No pending auctions to start");
         }
+    }
+
+    @Override
+    public UserResponse getAuctionWinner(String id) {
+        Auction auction = auctionRepository.findById(id)
+                .orElseThrow(() -> new ErrorException(ErrorCode.AUCTION_NOT_FOUND));
+        if(!AuctionStatus.COMPLETED.equals(auction.getStatus())){
+            throw new ErrorException(ErrorCode.BAD_REQUEST, "Phiên đấu giá chưa kết thúc");
+        }
+
+        User user = userRepository.findById(auction.getWinnerId())
+                .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));
+
+        return userMapper.mapToUserResponse(user);
     }
 
 

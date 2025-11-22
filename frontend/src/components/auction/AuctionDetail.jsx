@@ -5,6 +5,7 @@ import ClientAuctionWebSocketService from "../../services/ClientAuctionWebSocket
 import { authEvents } from "../../utils/authEvents"
 import ApiService from "../../services/apis"
 import { toast } from "react-toastify"
+import { useNavigate } from "react-router-dom"
 
 export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   const [bidAmount, setBidAmount] = useState("")
@@ -13,6 +14,8 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   const [realTimeAuction, setRealTimeAuction] = useState(auction)
   const [isConnected, setIsConnected] = useState(false)
   const [user, setUser] = useState([])
+  const [isWinner, setIsWinner] = useState(false) // Thêm state kiểm tra người thắng
+  const navigate = useNavigate()
 
   const fetchCurrentUser = async () => {
       try {
@@ -27,6 +30,62 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
   useEffect(() => {
       fetchCurrentUser();
   }, []);
+
+  // Hàm kiểm tra xem user hiện tại có phải là người thắng cuộc không
+  const checkIfWinner = async () => {
+    try {
+      if (user.id && realTimeAuction.status === "ended") {
+        // Gọi API để kiểm tra người thắng
+        const response = await ApiService.getAuctionWinner(realTimeAuction.id);
+        if (response.data.winnerId === user.id) {
+          setIsWinner(true);
+        }
+      }
+    } catch (error) {
+      console.error("Lỗi khi kiểm tra người thắng:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user.id && realTimeAuction.status === "ended") {
+      checkIfWinner();
+    }
+  }, [user.id, realTimeAuction.status, realTimeAuction.id]);
+
+  // Hàm xử lý thanh toán - chuyển đến giỏ hàng với sản phẩm đấu giá
+  const handlePayment = async () => {
+    try {
+      // Tạo đối tượng sản phẩm từ đấu giá
+      const auctionProduct = {
+        productId: currentAuction.productId,
+        name: currentAuction.title,
+        price: currentAuction.currentBid,
+        quantity: 1,
+        images: [currentAuction.image],
+        weight: currentAuction.weight,
+        origin: currentAuction.location,
+        grade: currentAuction.grade,
+        freshness: currentAuction.freshness,
+        isAuction: true, // Đánh dấu là sản phẩm từ đấu giá
+        auctionId: currentAuction.id,
+        auctionPrice: currentAuction.currentBid
+      };
+
+      // Chuyển đến trang giỏ hàng với state
+      navigate("/cart", { 
+        state: { 
+          auctionProduct: auctionProduct,
+          fromAuction: true
+        }
+      });
+      
+    } catch (error) {
+      setNotification({
+        type: "error",
+        message: error.message || "Có lỗi xảy ra khi chuyển đến giỏ hàng!"
+      });
+    }
+  };
 
   // Hàm định dạng tiền Việt Nam
   const formatVND = (amount) => {
@@ -113,8 +172,14 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
           ...prev,
           status: "ended",
           winnerName: message.winnerName,
+          winnerId: message.winnerId, // Thêm winnerId từ message
           currentBid: message.finalPrice
         }));
+
+        // Kiểm tra xem user hiện tại có phải là người thắng không
+        if (message.winnerId === user.id) {
+          setIsWinner(true);
+        }
 
         setNotification({
           type: "info",
@@ -448,11 +513,11 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
               </>
             )}
 
-            {auction.status === "upcoming" && (
+            {currentAuction.status === "upcoming" && (
               <div className="text-center">
                 <div className="p-6 bg-blue-50 rounded-xl border border-blue-200 mb-6">
                   <div className="text-lg font-semibold text-blue-800 mb-2">Đấu giá bắt đầu sau</div>
-                  <div className="text-2xl font-bold text-blue-600 mb-4">{auction.timeLeft}</div>
+                  <div className="text-2xl font-bold text-blue-600 mb-4">{currentAuction.timeLeft}</div>
                 </div>
                 <button className="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 py-3 rounded-xl font-semibold transition-colors">
                   🔔 Đặt Nhắc Nhở
@@ -460,17 +525,38 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
               </div>
             )}
 
-            {auction.status === "ended" && (
+            {currentAuction.status === "ended" && (
               <div className="text-center">
                 <div className="p-6 bg-gray-50 rounded-xl border border-gray-200 mb-6">
                   <div className="text-lg font-semibold text-gray-600 mb-2">Đấu giá đã kết thúc</div>
                   <div className="text-2xl font-bold text-green-600 mb-2">
-                    {formatVND(auction.currentBid)}
+                    {formatVND(currentAuction.currentBid)}
                   </div>
                   <div className="text-sm text-gray-500 mb-4">
-                    🏆 Người thắng: <span className="font-semibold">{auction.winnerName}</span>
+                    🏆 Người thắng: <span className="font-semibold">{currentAuction.winnerName}</span>
                   </div>
+                  
+                  {/* Hiển thị thông báo và nút thanh toán cho người thắng */}
+                  {isWinner && (
+                    <div className="p-4 bg-amber-50 rounded-lg border border-amber-300 mb-4">
+                      <div className="text-amber-700">
+                        <div className="font-semibold text-lg">🎉 Chúc mừng bạn đã thắng!</div>
+                        <div className="text-sm mt-1">Vui lòng hoàn tất thanh toán cho sản phẩm</div>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Hiển thị nút thanh toán cho người thắng */}
+                {isWinner && (
+                  <button
+                    onClick={handlePayment}
+                    className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-200 mb-4"
+                  >
+                    💳 Thanh Toán Ngay
+                  </button>
+                )}
+
                 <button className="w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-semibold cursor-not-allowed">
                   Đấu Giá Đã Đóng
                 </button>
@@ -481,11 +567,11 @@ export default function AuctionDetail({ auction, onBack, onPlaceBid }) {
             <div className="mt-6 pt-6 border-t border-gray-200">
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div>
-                  <div className="text-lg font-bold text-gray-800">{auction.bidCount}</div>
+                  <div className="text-lg font-bold text-gray-800">{currentAuction.bidCount}</div>
                   <div className="text-xs text-gray-500">Lượt đấu</div>
                 </div>
                 <div>
-                  <div className="text-lg font-bold text-gray-800">{auction.category}</div>
+                  <div className="text-lg font-bold text-gray-800">{currentAuction.category}</div>
                   <div className="text-xs text-gray-500">Danh mục</div>
                 </div>
               </div>

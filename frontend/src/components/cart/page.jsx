@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate, useLocation } from "react-router-dom"
 import { toast } from "react-toastify"
 import ApiService from "../../services/apis";
 import AuthModal from "../auth/AuthModal";
@@ -7,6 +7,7 @@ import {authEvents} from "../../utils/authEvents"
 
 const CartPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
@@ -16,6 +17,81 @@ const CartPage = () => {
   const [addressLoading, setAddressLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
+
+  // Xử lý khi nhận sản phẩm từ đấu giá
+  useEffect(() => {
+    if (location.state?.fromAuction && location.state?.auctionProduct) {
+      const auctionProduct = location.state.auctionProduct;
+      addAuctionProductToCart(auctionProduct);
+      
+      // Xóa state để không thêm lại khi refresh
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Hàm thêm sản phẩm đấu giá vào giỏ hàng
+  const addAuctionProductToCart = async (auctionProduct) => {
+    const token = localStorage.getItem("token");
+    
+    try {
+      // Kiểm tra xem sản phẩm đấu giá đã có trong giỏ hàng chưa
+      const existingAuctionItem = cartItems.find(item => 
+        item.isAuction && item.auctionId === auctionProduct.auctionId
+      );
+
+      if (existingAuctionItem) {
+        toast.info("Sản phẩm đấu giá đã có trong giỏ hàng");
+        return;
+      }
+
+      if (token) {
+        // Nếu đã đăng nhập: thêm vào cart API
+        await addAuctionProductToUserCart(auctionProduct);
+      } else {
+        // Nếu chưa đăng nhập: thêm vào localStorage
+        addAuctionProductToLocalCart(auctionProduct);
+      }
+      
+      toast.success("Đã thêm sản phẩm đấu giá vào giỏ hàng");
+    } catch (error) {
+      console.error("Lỗi khi thêm sản phẩm đấu giá:", error);
+      toast.error("Không thể thêm sản phẩm đấu giá vào giỏ hàng");
+    }
+  };
+
+  // Hàm thêm sản phẩm đấu giá vào cart của user đã đăng nhập
+  const addAuctionProductToUserCart = async (auctionProduct) => {
+    try {
+      await ApiService.addCartItem({
+        productId: auctionProduct.productId,
+        quantity: auctionProduct.quantity,
+        isAuction: true,
+        auctionId: auctionProduct.auctionId,
+      });
+      
+      // Load lại giỏ hàng
+      await loadUserCart();
+    } catch (error) {
+      console.error("Lỗi khi thêm sản phẩm đấu giá:", error);
+      throw error;
+    }
+  };
+
+  // Hàm thêm sản phẩm đấu giá vào localStorage cart
+  const addAuctionProductToLocalCart = (auctionProduct) => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    
+    // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
+    const existingIndex = cart.findIndex(item => 
+      item.isAuction && item.auctionId === auctionProduct.auctionId
+    );
+    
+    if (existingIndex === -1) {
+      cart.push(auctionProduct);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      setCartItems(cart);
+    }
+  };
 
   const loadUserCart = async () => {
     try {
@@ -56,14 +132,12 @@ const CartPage = () => {
       const handleLoginSuccess = () => {
         loadUserCart();
         loadUserAddresses();
-        // Xóa listener sau khi dùng
         window.removeEventListener('authLoginSuccess', handleLoginSuccess);
       };
       
       window.addEventListener('authLoginSuccess', handleLoginSuccess);
       return;
     }
-    // Tiến hành thanh toán...
   };
 
   const loadLocalCart = () => {
@@ -95,6 +169,21 @@ const CartPage = () => {
   }, []);
 
   const updateQuantity = async (productId, newQuantity) => {
+    // Tìm sản phẩm để kiểm tra có phải sản phẩm đấu giá không
+    const item = cartItems.find(item => item.productId === productId);
+    
+    // Nếu là sản phẩm đấu giá, không cho phép thay đổi số lượng hoặc xóa
+    if (item?.isAuction) {
+      if (newQuantity === 0) {
+        toast.warning("Không thể xóa sản phẩm đấu giá khỏi giỏ hàng");
+        return;
+      }
+      if (newQuantity !== 1) {
+        toast.warning("Sản phẩm đấu giá chỉ có số lượng 1");
+        return;
+      }
+    }
+
     if (newQuantity < 0) return; 
     const token = localStorage.getItem("token");
 
@@ -133,12 +222,11 @@ const CartPage = () => {
     }
   };
 
-  
   const createOrder = async () => {
     try {
       const response = await ApiService.createOrder(selectedAddress,paymentMethod);
       if (response.code===200) {
-        return response.data; // OrderResponse với orderId
+        return response.data;
       }
     } catch (error) {
       toast.error("Tạo đơn hàng thất bại");
@@ -174,7 +262,6 @@ const CartPage = () => {
       const paymentResponse = await ApiService.createPayment(orderId,paymentMethod);
       if (paymentResponse.data.success) {
         if (paymentMethod === "CASH") {
-          // Xử lý CASH - chuyển trang success ngay
           toast.success("Đặt hàng thành công!");
           
           localStorage.removeItem("cart");
@@ -188,10 +275,8 @@ const CartPage = () => {
           });
           
         } else if (paymentMethod === "CARD") {
-
           setLoading(true)
           
-          // Xử lý CREDIT_CARD - redirect đến Stripe
           if (paymentResponse.data.sessionUrl) {
             window.location.href = paymentResponse.data.sessionUrl;
           } else {
@@ -225,6 +310,9 @@ const CartPage = () => {
     navigate("/products");
   };
 
+  // Kiểm tra xem có sản phẩm đấu giá trong giỏ hàng không
+  const hasAuctionProducts = cartItems.some(item => item.isAuction);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -242,6 +330,18 @@ const CartPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Giỏ hàng của bạn</h1>
           <p className="text-gray-600">Xem lại và chỉnh sửa đơn hàng trước khi thanh toán</p>
+          
+          {/* Thông báo nếu có sản phẩm đấu giá */}
+          {hasAuctionProducts && (
+            <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-amber-600">🏆</span>
+                <p className="text-amber-800 font-medium">
+                  Có sản phẩm đấu giá trong giỏ hàng. Sản phẩm đấu giá không thể xóa hoặc thay đổi số lượng.
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {cartItems.length === 0 ? (
@@ -277,7 +377,14 @@ const CartPage = () => {
 
                 <div className="divide-y divide-gray-200">
                   {cartItems.map((item) => (
-                    <div key={item.productId} className="p-6 flex items-center gap-4">
+                    <div key={item.productId} className="p-6 flex items-center gap-4 relative">
+                      {/* Badge cho sản phẩm đấu giá */}
+                      {item.isAuction && (
+                        <div className="absolute -top-2 -left-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-bold z-10">
+                          🏆 ĐẤU GIÁ
+                        </div>
+                      )}
+                      
                       <img
                         src={item.images[0] || "/placeholder.svg"}
                         alt={item.name}
@@ -290,37 +397,64 @@ const CartPage = () => {
                           {item.weight} • Xuất xứ: {item.origin}
                         </p>
                         <p className="text-lg font-bold text-amber-600">{formatPrice(item.price)}</p>
+                        
+                        {/* Thông tin đặc biệt cho sản phẩm đấu giá */}
+                        {item.isAuction && (
+                          <div className="mt-2 p-2 bg-amber-50 rounded border border-amber-200">
+                            <p className="text-xs text-amber-700">
+                              🎯 Sản phẩm thắng đấu giá • Giá cuối: {formatPrice(item.price)}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
-                        >
-                          -
-                        </button>
-                        <span className="w-8 text-center font-medium">{item.quantity}</span>
-                        <button
-                          onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
-                        >
-                          +
-                        </button>
+                        {item.isAuction ? (
+                          // Đối với sản phẩm đấu giá, chỉ hiển thị số lượng (luôn là 1)
+                          <span className="text-sm text-gray-500">Số lượng: 1</span>
+                        ) : (
+                          // Đối với sản phẩm thường, cho phép thay đổi số lượng
+                          <>
+                            <button
+                              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
+                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            >
+                              -
+                            </button>
+                            <span className="w-8 text-center font-medium">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
+                              className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-50"
+                            >
+                              +
+                            </button>
+                          </>
+                        )}
                       </div>
 
-                      <button
-                        onClick={() => updateQuantity(item.productId, 0)}
-                        className="text-red-500 hover:text-red-700 p-2"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                          />
-                        </svg>
-                      </button>
+                      {/* Chỉ cho phép xóa sản phẩm không phải đấu giá */}
+                      {!item.isAuction ? (
+                        <button
+                          onClick={() => updateQuantity(item.productId, 0)}
+                          className="text-red-500 hover:text-red-700 p-2"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                            />
+                          </svg>
+                        </button>
+                      ) : (
+                        // Hiển thị icon khóa cho sản phẩm đấu giá
+                        <div className="text-gray-400 p-2 cursor-not-allowed" title="Không thể xóa sản phẩm đấu giá">
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -457,6 +591,11 @@ const CartPage = () => {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
                         <p className="text-xs text-gray-500">Số lượng: {item.quantity}</p>
+                        {item.isAuction && (
+                          <span className="inline-block bg-red-100 text-red-800 text-xs px-1 rounded">
+                            Đấu giá
+                          </span>
+                        )}
                       </div>
                       <span className="text-sm font-semibold text-amber-600">
                         {formatPrice(item.price * item.quantity)}

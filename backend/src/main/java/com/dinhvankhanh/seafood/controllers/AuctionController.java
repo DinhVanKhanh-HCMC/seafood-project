@@ -4,6 +4,7 @@ import com.dinhvankhanh.seafood.dtos.requests.ApiResource;
 import com.dinhvankhanh.seafood.dtos.requests.AuctionRequest;
 import com.dinhvankhanh.seafood.dtos.requests.BidRequest;
 import com.dinhvankhanh.seafood.dtos.responses.AuctionResponse;
+import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 import com.dinhvankhanh.seafood.services.AuctionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,7 +59,13 @@ public class AuctionController {
     @GetMapping("/{id}")
     public ApiResource<AuctionResponse> getAuctionById(@PathVariable String id) {
         AuctionResponse response = auctionService.getAuctionById(id);
-        return ApiResource.ok(response, "Lấy phiên đấu giá theo thành công");
+        return ApiResource.ok(response, "Lấy phiên đấu giá theo id thành công");
+    }
+
+    @GetMapping("/{id}/winner")
+    public ApiResource<UserResponse> getAuctionWinner(@PathVariable String id) {
+        UserResponse response = auctionService.getAuctionWinner(id);
+        return ApiResource.ok(response, "Lấy phiên đấu giá theo id thành công");
     }
 
 

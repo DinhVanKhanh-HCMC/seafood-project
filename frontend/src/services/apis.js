@@ -623,8 +623,18 @@ export default class ApiService{
             }
         }
 
-
-
+    //get auction active
+    static async getAuctionWinner(id) {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auctions/${id}/winner`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy người thắng phiên đấu giá thất bại';
+        }
+    }
 
 
 //------------------------------------------

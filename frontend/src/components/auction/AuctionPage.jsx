@@ -25,6 +25,7 @@ export default function AuctionPage() {
             return {
               id: auction.id,
               title: product.data.name,
+              productId: product.data.id,
               currentBid: auction.currentPrice,
               minBid: auction.currentPrice + (auction.bidStep || 0),
               bidStep: auction.bidStep,

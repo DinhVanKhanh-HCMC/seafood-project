@@ -3,6 +3,7 @@ package com.dinhvankhanh.seafood.services;
 import com.dinhvankhanh.seafood.dtos.requests.AuctionRequest;
 import com.dinhvankhanh.seafood.dtos.requests.BidRequest;
 import com.dinhvankhanh.seafood.dtos.responses.AuctionResponse;
+import com.dinhvankhanh.seafood.dtos.responses.UserResponse;
 
 import java.util.List;
 
@@ -16,4 +17,5 @@ public interface AuctionService {
     AuctionResponse getAuctionById(String id);
     void endExpiredAuctions();
     public void startScheduledAuctions();
+    UserResponse getAuctionWinner(String id);
 }

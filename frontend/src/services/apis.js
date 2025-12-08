@@ -597,7 +597,7 @@ export default class ApiService{
         }
     }
 
-    //get auction active
+    //get all auction
     static async getAllAuction() {
         try {
         const response = await axios.get(
@@ -607,6 +607,19 @@ export default class ApiService{
         return response.data;
         } catch (error) {
         throw error.response?.data?.message || 'Lấy danh sách các phiên đấu giá thất bại';
+        }
+    }
+
+    //get auction active
+    static async getMyAuction() {
+        try {
+        const response = await axios.get(
+            `${BASE_URL}/auctions/my-auctions`,
+            {headers: this.getHeader(false)}
+        );
+        return response.data;
+        } catch (error) {
+        throw error.response?.data?.message || 'Lấy danh sách các phiên đấu giá của user đăng nhập thất bại';
         }
     }
 

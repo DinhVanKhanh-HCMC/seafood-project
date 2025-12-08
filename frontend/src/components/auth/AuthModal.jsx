@@ -59,6 +59,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
       }
       localStorage.removeItem("cart");
       toast.success("Đã đồng bộ giỏ hàng của bạn!");
+      window.dispatchEvent(new Event('cartUpdated'));
     } catch (error) {
       console.error("Lỗi đồng bộ giỏ hàng:", error);
     }

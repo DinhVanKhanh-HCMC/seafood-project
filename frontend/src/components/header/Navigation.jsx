@@ -6,7 +6,7 @@ import ApiService from "../../services/apis";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { authEvents } from "../../utils/authEvents";
-import useCart from "../hooks/useCart";
+import { useCart } from '../../contexts/CartContext';
 
 
 const Navigation = () => {
@@ -16,7 +16,10 @@ const Navigation = () => {
   const [isUserChecked, setIsUserChecked] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const navigate = useNavigate()
-  const { cart } = useCart(isUserChecked ? user : null);
+  const { cartItems } = useCart();
+
+  // Tính tổng số lượng sản phẩm
+  const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
 
   // Khi component mount, kiểm tra token
   useEffect(() => {
@@ -120,8 +123,12 @@ const Navigation = () => {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"
                 />
               </svg>
-              {cart.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-amber-600 w-3 h-3 rounded-full"></span>
+              
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-amber-600 text-white text-xs 
+                                flex items-center justify-center min-w-[18px] h-5 px-1 rounded-full">
+                  {totalItems}
+                </span>
               )}
             </Link>
             {user ? (
@@ -200,7 +207,7 @@ const Navigation = () => {
                 </a>
               ))}
               <a href="/cart" className="text-gray-700 hover:text-amber-600 block px-3 py-2 text-base font-medium">
-                Giỏ hàng (3)
+                Giỏ hàng
               </a>
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <button 

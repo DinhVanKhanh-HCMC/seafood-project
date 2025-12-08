@@ -6,6 +6,7 @@ import "aos/dist/aos.css";
 import "./App.css"
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { CartProvider } from "./contexts/CartContext"; // IMPORT CartProvider
 
 function renderRoutes(routes) {
   return routes.map((route, index) => {
@@ -42,17 +43,16 @@ function App() {
   }, []);
 
   return (
-    <>
-  
-    <BrowserRouter basename="/seafood-project">
-      <Suspense fallback={<div>Loading ...</div>}>
-        <Routes>
-          {renderRoutes(routers)}
-        </Routes>
-      </Suspense>
-    </BrowserRouter>
+    <CartProvider> {/* BỌC CartProvider Ở NGOÀI CÙNG */}
+      <BrowserRouter basename="/seafood-project">
+        <Suspense fallback={<div>Loading ...</div>}>
+          <Routes>
+            {renderRoutes(routers)}
+          </Routes>
+        </Suspense>
+      </BrowserRouter>
 
-    <ToastContainer
+      <ToastContainer
         position="top-right"
         autoClose={4000}
         hideProgressBar={false}
@@ -62,8 +62,7 @@ function App() {
         draggable
         theme="light"
       />
-      
-    </>
+    </CartProvider>
   );
 }
 

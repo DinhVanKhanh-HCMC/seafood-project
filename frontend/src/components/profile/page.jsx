@@ -26,6 +26,7 @@ export default function ProfilePage() {
   const navigate = useNavigate();
   const [changePasswordPopupOpen, setChangePasswordPopupOpen] = useState(false);
   const [errors, setErrors] = useState([])
+  const [auctionHistory, setAuctionHistory] = useState([])
   const [profileData, setProfileData] = useState({
     // name: "Nguyễn Văn An",
     // email: "nguyenvanan@email.com",
@@ -42,6 +43,7 @@ export default function ProfilePage() {
     confirmPassword: "",
   });
   const [isLoading, setIsLoading] = useState(false)
+  
 
 
   useEffect(() => {
@@ -92,6 +94,30 @@ export default function ProfilePage() {
     //   isDefault: false,
     // },
   ])
+
+  const fetchAuctions = async () => {
+    try {
+      const response = await ApiService.getMyAuction();
+      setAuctionHistory(response.data);
+    } catch (err) {
+      console.error("Lỗi khi fetch:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (profileData?.id) {
+      fetchAuctions();
+    }
+  }, [profileData]);
+
+  const handleViewAuctionDetail = (auction) => {
+    // Chỉ cần truyền auction object qua state
+    navigate("/auction", { 
+      state: { 
+        selectedAuction: auction 
+      } 
+    });
+  };
 
   // Load provinces khi component mount
   useEffect(() => {
@@ -309,34 +335,6 @@ export default function ProfilePage() {
     }
   }
 
-  // const orders = [
-  //   {
-  //     id: "DH001",
-  //     date: "2024-01-15",
-  //     status: "Đã giao",
-  //     total: 2500000,
-  //     items: [
-  //       { name: "Cá Hồi Atlantic 2kg", quantity: 1, price: 1200000 },
-  //       { name: "Tôm Hùm Maine 1kg", quantity: 1, price: 1300000 },
-  //     ],
-  //   },
-  //   {
-  //     id: "DH002",
-  //     date: "2024-01-10",
-  //     status: "Đang vận chuyển",
-  //     total: 1800000,
-  //     items: [{ name: "Cá Ngừ Vây Xanh 1.5kg", quantity: 1, price: 1800000 }],
-  //   },
-  //   {
-  //     id: "DH003",
-  //     date: "2024-01-05",
-  //     status: "Đã hủy",
-  //     total: 950000,
-  //     items: [{ name: "Cua Hoàng Đế 1kg", quantity: 1, price: 950000 }],
-  //   },
-  // ]
-
-  // Load provinces khi component mount
   useEffect(() => {
     const fetchMyOrders = async () => {
       try {
@@ -361,35 +359,35 @@ export default function ProfilePage() {
     return texts[status] || status;
   };
 
-  const auctionHistory = [
-    {
-      id: "DG001",
-      title: "Cá Hồi Atlantic Cao Cấp - 50kg",
-      date: "2024-01-12",
-      status: "Thắng",
-      finalBid: 3750000,
-      myBid: 3750000,
-      image: "/auction-premium-atlantic-salmon-50lbs.png",
-    },
-    {
-      id: "DG002",
-      title: "Tôm Hùm Maine - 24 con",
-      date: "2024-01-08",
-      status: "Thua",
-      finalBid: 2800000,
-      myBid: 2700000,
-      image: "/auction-maine-lobster-lot-24pieces.png",
-    },
-    {
-      id: "DG003",
-      title: "Cá Ngừ Vây Xanh - 20kg",
-      date: "2024-01-03",
-      status: "Đang đấu giá",
-      currentBid: 6300000,
-      myBid: 6100000,
-      image: "/auction-yellowfin-tuna-steaks-20lbs.png",
-    },
-  ]
+  // const auctionHistory = [
+  //   {
+  //     id: "DG001",
+  //     title: "Cá Hồi Atlantic Cao Cấp - 50kg",
+  //     date: "2024-01-12",
+  //     status: "Thắng",
+  //     finalBid: 3750000,
+  //     myBid: 3750000,
+  //     image: "/auction-premium-atlantic-salmon-50lbs.png",
+  //   },
+  //   {
+  //     id: "DG002",
+  //     title: "Tôm Hùm Maine - 24 con",
+  //     date: "2024-01-08",
+  //     status: "Thua",
+  //     finalBid: 2800000,
+  //     myBid: 2700000,
+  //     image: "/auction-maine-lobster-lot-24pieces.png",
+  //   },
+  //   {
+  //     id: "DG003",
+  //     title: "Cá Ngừ Vây Xanh - 20kg",
+  //     date: "2024-01-03",
+  //     status: "Đang đấu giá",
+  //     currentBid: 6300000,
+  //     myBid: 6100000,
+  //     image: "/auction-yellowfin-tuna-steaks-20lbs.png",
+  //   },
+  // ]
 
 
   const tabs = [
@@ -460,6 +458,7 @@ export default function ProfilePage() {
     const colors = {
       PENDING: "bg-yellow-100 text-yellow-800",
       CONFIRMED: "bg-blue-100 text-blue-800",
+      ACTIVE: "bg-blue-100 text-blue-800",
       PAID: "bg-green-100 text-green-800",
       SHIPPING: "bg-purple-100 text-purple-800",
       COMPLETED: "bg-green-100 text-green-800",
@@ -714,37 +713,44 @@ export default function ProfilePage() {
                       <div key={auction.id} className="border border-neutral-200 rounded-xl p-6">
                         <div className="flex items-start space-x-4">
                           <img
-                            src={auction.image || "/placeholder.svg"}
-                            alt={auction.title}
+                            src={auction.productImage || "/placeholder.svg"}
+                            alt={auction.productName}
                             className="w-20 h-20 object-cover rounded-lg"
                           />
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">
                               <div>
-                                <h3 className="font-semibold text-neutral-900">{auction.title}</h3>
-                                <p className="text-sm text-neutral-600">{auction.date}</p>
+                                <h3 className="font-semibold text-neutral-900">{auction.productName}</h3>
+                                <p className="text-sm text-neutral-600">{formatDate(auction.startTime)}</p>
                               </div>
+                              <div className="flex items-center gap-2">
+                              {profileData?.id && auction.winnerId === profileData.id && auction.status === "COMPLETED" && (
+                                <span className="px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-amber-500 to-amber-600 text-white">
+                                  🏆 Bạn thắng
+                                </span>
+                              )}
                               <span
                                 className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(auction.status)}`}
                               >
                                 {auction.status}
                               </span>
+                              </div>
                             </div>
                             <div className="grid grid-cols-2 gap-4 text-sm">
-                              <div>
+                              {/* <div>
                                 <span className="text-neutral-600">Giá của tôi:</span>
                                 <span className="ml-2 font-medium">{auction.myBid.toLocaleString()}₫</span>
-                              </div>
+                              </div> */}
                               <div>
                                 <span className="text-neutral-600">
                                   {auction.status === "Đang đấu giá" ? "Giá hiện tại:" : "Giá cuối:"}
                                 </span>
                                 <span className="ml-2 font-medium">
-                                  {(auction.finalBid || auction.currentBid).toLocaleString()}₫
+                                  {(auction.currentPrice || auction.currentBid).toLocaleString()}₫
                                 </span>
                               </div>
                             </div>
-                            <div className="flex space-x-3 mt-4">
+                            {/* <div className="flex space-x-3 mt-4">
                               <button className="border border-neutral-300 text-neutral-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-colors">
                                 Xem chi tiết
                               </button>
@@ -753,7 +759,7 @@ export default function ProfilePage() {
                                   Đấu giá tiếp
                                 </button>
                               )}
-                            </div>
+                            </div> */}
                           </div>
                         </div>
                       </div>

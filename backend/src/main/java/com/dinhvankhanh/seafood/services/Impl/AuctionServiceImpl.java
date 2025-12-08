@@ -18,6 +18,7 @@ import com.dinhvankhanh.seafood.repositories.ProductRepository;
 import com.dinhvankhanh.seafood.repositories.UserRepository;
 import com.dinhvankhanh.seafood.services.AuctionService;
 import com.dinhvankhanh.seafood.services.ProductService;
+import com.dinhvankhanh.seafood.services.UserService;
 import com.dinhvankhanh.seafood.websocket.AuctionWebSocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,8 @@ public class AuctionServiceImpl implements AuctionService {
     private final UserMapper userMapper;
 
     private final AuctionMapper auctionMapper;
+
+    private final UserService userService;
 
     @Autowired
     @Lazy
@@ -221,6 +224,22 @@ public class AuctionServiceImpl implements AuctionService {
                 .map(auction -> {
                     return auctionMapper.mapperToAuctionResponse(auction);
                 })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AuctionResponse> getMyAuctions() {
+        User user = userService.getUserLogin();
+
+        return auctionRepository.findAll()
+                .stream()
+                .filter(auction -> {
+                    // Kiểm tra xem user có tham gia đấu giá trong auction này không
+                    return auction.getBids()
+                            .stream()
+                            .anyMatch(bid -> bid.getUserId().equals(user.getId()));
+                })
+                .map(auctionMapper::mapperToAuctionResponse)
                 .collect(Collectors.toList());
     }
 

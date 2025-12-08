@@ -2,9 +2,11 @@ import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import ApiService from "../../services/apis";
+import { useCart } from "../../contexts/CartContext"; // IMPORT CONTEXT
 
 export const useAddToCart = () => {
   const [loading, setLoading] = useState(false);
+  const { refreshCart } = useCart(); // LẤY HÀM REFRESH
 
   const addToCart = async (product, quantity) => {
     if (!product || !product.id) {
@@ -20,25 +22,27 @@ export const useAddToCart = () => {
         await ApiService.verifyToken();
 
         const data = {
-            productId: product.id,
-            quantity: quantity
-        }
+          productId: product.id,
+          quantity: quantity
+        };
 
-
-        const response = await ApiService.addCartItem(data)
-        toast.success(response.message)
+        const response = await ApiService.addCartItem(data);
+        toast.success(response.message);
+        
+        // QUAN TRỌNG: GỌI REFRESH CART
+        refreshCart();
+        
       } else {
-        // 🧱 Nếu chưa đăng nhập → lưu tạm vào localStorage
+        // Nếu chưa đăng nhập → lưu tạm vào localStorage
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
-        // 🔁 Đổi chỗ so sánh và lưu key từ id → productId
         const existing = cart.find((item) => item.productId === product.id);
 
         if (existing) {
           existing.quantity += quantity;
         } else {
           cart.push({
-            productId: product.id, // ✅ Dùng productId thay vì id
+            productId: product.id,
             name: product.name,
             price: product.price,
             images: product.images,
@@ -50,6 +54,9 @@ export const useAddToCart = () => {
 
         localStorage.setItem("cart", JSON.stringify(cart));
         toast.info("Sản phẩm đã được thêm vào giỏ (chưa đăng nhập)");
+        
+        // QUAN TRỌNG: GỌI REFRESH CART
+        refreshCart();
       }
     } catch (error) {
       console.error(error);

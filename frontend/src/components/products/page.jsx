@@ -287,7 +287,7 @@ export default function ProductsPage() {
                     <div className="flex items-center justify-between text-sm text-gray-500 mb-4 bg-gray-50 rounded-lg p-2">
                       <span className="flex items-center">
                         <span className="mr-1">⚖️</span>
-                        {product.weight}
+                        {product.weight} kg
                       </span>
                       <span className="flex items-center">
                         <span className="mr-1">📍</span>

@@ -56,6 +56,12 @@ public class AuctionController {
         return ApiResource.ok(response, "Lấy tất cả phiên đấu giá thành công");
     }
 
+    @GetMapping("/my-auctions")
+    public ApiResource<List<AuctionResponse>> getMyAuctions() {
+        List<AuctionResponse> response = auctionService.getMyAuctions();
+        return ApiResource.ok(response, "Lấy tất cả phiên đấu giá của user đang đăng nhập thành công");
+    }
+
     @GetMapping("/{id}")
     public ApiResource<AuctionResponse> getAuctionById(@PathVariable String id) {
         AuctionResponse response = auctionService.getAuctionById(id);

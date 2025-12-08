@@ -4,11 +4,12 @@ import { toast } from "react-toastify"
 import ApiService from "../../services/apis";
 import AuthModal from "../auth/AuthModal";
 import {authEvents} from "../../utils/authEvents"
+import { useCart } from '../../contexts/CartContext';
 
 const CartPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [cartItems, setCartItems] = useState([]);
+  //const [cartItems, setCartItems] = useState([]);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("CASH");
@@ -17,6 +18,7 @@ const CartPage = () => {
   const [addressLoading, setAddressLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const { cartItems, setCartItems, refreshCart } = useCart();
 
   // Xử lý khi nhận sản phẩm từ đấu giá
   useEffect(() => {

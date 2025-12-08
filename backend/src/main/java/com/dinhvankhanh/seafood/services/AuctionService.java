@@ -14,6 +14,8 @@ public interface AuctionService {
     AuctionResponse endAuction(String auctionId);
     List<AuctionResponse> getActiveAuctions();
     List<AuctionResponse> getAllAuctions();
+
+    List<AuctionResponse> getMyAuctions();
     AuctionResponse getAuctionById(String id);
     void endExpiredAuctions();
     public void startScheduledAuctions();

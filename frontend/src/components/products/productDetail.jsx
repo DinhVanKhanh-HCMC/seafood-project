@@ -166,12 +166,11 @@ export default function ProductDetailPage() {
               )}
             </div>
 
-            <p className="text-neutral-700 leading-relaxed">{product?.description}</p>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium text-neutral-900">Trọng lượng:</span>
-                <span className="ml-2 text-neutral-600">{product?.weight}</span>
+                <span className="ml-2 text-neutral-600">{product?.weight} kg</span>
               </div>
               <div>
                 <span className="font-medium text-neutral-900">Xuất xứ:</span>

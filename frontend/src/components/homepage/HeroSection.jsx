@@ -18,14 +18,6 @@ const HeroSection = () => {
       buttonLink: "#cua-ca-mau"
     },
     {
-      title: "Livestream bán cua",
-      subtitle: "Trải nghiệm mua sắm trực tuyến",
-      desc: "Tham gia buổi livestream để mua cua tươi ngon với giá tốt!",
-      img: `${import.meta.env.BASE_URL}assets/slide-2.jpg`,
-      buttonText: "Tham gia ngay",
-      buttonLink: "#livestream"
-    },
-    {
       title: "Đấu giá trực tuyến",
       subtitle: "Cơ hội sở hữu cua chất lượng",
       desc: "Tham gia phiên đấu giá cua độc quyền, giá cực tốt...",

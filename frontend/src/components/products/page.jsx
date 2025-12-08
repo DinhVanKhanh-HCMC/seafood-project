@@ -16,6 +16,7 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState([]);
   const [visibleCount, setVisibleCount] = useState(6);
   const { addToCart, loading } = useAddToCart();
+  const [loadingProduct, setLoadingProduct] = useState(true);
 
   // Easter egg: Konami code for fish animation
   const konamiCode = [
@@ -54,6 +55,8 @@ export default function ProductsPage() {
         setCategories([{ id: "all", name: "Tất cả sản phẩm" }, ...categoryRes.data]);
       } catch (err) {
         console.error("Lỗi khi fetch:", err);
+      }finally{
+        setLoadingProduct(false)
       }
     };
 
@@ -103,19 +106,30 @@ export default function ProductsPage() {
 
   const visibleProducts = sortedProducts.slice(0, visibleCount);
 
+  if (loadingProduct) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-orange-50 relative">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Page Header */}
-        <div className="mb-8 text-center">
+        {/* <div className="mb-8 text-center">
           <h1 className="text-4xl font-bold text-gray-800 mb-4">
             🐟 Sản phẩm hải sản tươi sống
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
             Khám phá bộ sưu tập hải sản cao cấp của chúng tôi - từ đại dương đến bàn ăn của bạn
           </p>
-        </div>
+        </div> */}
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}

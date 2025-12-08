@@ -136,10 +136,10 @@ export default function IntroductionPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="bg-yellow-400 text-gray-950 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-500 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-              🦀 Đặt Cua Tươi Sống Ngay
+              Đặt Cua Tươi Sống Ngay
             </button>
             <button className="bg-yellow-400 text-gray-950 px-8 py-4 rounded-xl font-bold text-lg hover:bg-orange-500 transition-all duration-300">
-              📹 Xem Live Stream Từ Ao Nuôi
+              Đấu giá trực tiếp sản phẩm
             </button>
           </div>
         </div>

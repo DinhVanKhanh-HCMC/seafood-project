@@ -210,12 +210,10 @@ export default function HomePage() {
                   Nhận hải sản cao cấp với giá cạnh tranh.
                 </p>
                 <div className="flex gap-4">
-                  <button className="bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors">
+                  <button className="bg-amber-600 text-white px-10 py-3 rounded-lg font-semibold hover:bg-amber-700 transition-colors">
                     Tham gia đấu giá
                   </button>
-                  <button className="border border-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors">
-                    Xem livestream
-                  </button>
+                  
                 </div>
               </div>
               <div className="relative">

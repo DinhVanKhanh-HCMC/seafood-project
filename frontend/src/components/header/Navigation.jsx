@@ -6,14 +6,17 @@ import ApiService from "../../services/apis";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { authEvents } from "../../utils/authEvents";
+import useCart from "../hooks/useCart";
 
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [user, setUser] = useState(null)
+  const [isUserChecked, setIsUserChecked] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const navigate = useNavigate()
+  const { cart } = useCart(isUserChecked ? user : null);
 
   // Khi component mount, kiểm tra token
   useEffect(() => {
@@ -30,6 +33,11 @@ const Navigation = () => {
           localStorage.removeItem("token")
           setUser(null)
         })
+        .finally(() => {
+        setIsUserChecked(true);   
+      });
+    } else {
+      setIsUserChecked(true); 
     }
   }, [])
 
@@ -60,7 +68,7 @@ const Navigation = () => {
     { name: "Giới thiệu", href: "/about" },
     { name: "Sản phẩm", href: "/products", Children: ["/product-detail/:id"] },
     { name: "Tin tức", href: "/news", Children: ["/news-detail/:id"] },
-    { name: "Livestream", href: "/livestreaming" }, 
+    // { name: "Livestream", href: "/livestreaming" }, 
     { name: "Đấu giá", href: "/auction" },
     { name: "Liên hệ", href: "/contact" },
   ]
@@ -112,9 +120,9 @@ const Navigation = () => {
                   d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01"
                 />
               </svg>
-              <span className="absolute -top-1 -right-1 bg-amber-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                3
-              </span>
+              {cart.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-amber-600 w-3 h-3 rounded-full"></span>
+              )}
             </Link>
             {user ? (
               <div>

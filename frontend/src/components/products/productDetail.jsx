@@ -230,14 +230,6 @@ export default function ProductDetailPage() {
           {activeTab === "description" && (
             <div className="prose max-w-none">
               <p className="text-neutral-700 leading-relaxed mb-6">{product?.description}</p>
-              <h3 className="text-lg font-semibold text-neutral-900 mb-4">Đặc điểm nổi bật</h3>
-              <ul className="space-y-2 text-neutral-700">
-                <li>• Cá hồi Atlantic nuôi tại vùng biển lạnh Na Uy</li>
-                <li>• Thịt cá chắc, ngọt tự nhiên, giàu Omega-3</li>
-                <li>• Được chứng nhận ASC về nuôi trồng thủy sản bền vững</li>
-                <li>• Đóng băng ngay sau khi đánh bắt để giữ độ tươi ngon</li>
-                <li>• Thích hợp cho nhiều món ăn: nướng, chiên, làm sashimi</li>
-              </ul>
             </div>
           )}
 

@@ -21,7 +21,7 @@ export default function ContactPage() {
       email: "info@seafresh.com",
       phone: "+84 28 1234 5678",
       hours: "Thứ 2 - Thứ 6, 8:00 - 18:00",
-      icon: "📧",
+      // icon: "📧",
     },
     {
       title: "Hỗ Trợ Khách Hàng",
@@ -29,7 +29,7 @@ export default function ContactPage() {
       email: "support@seafresh.com",
       phone: "+84 28 1234 5679",
       hours: "Hỗ trợ 24/7",
-      icon: "🛟",
+      //icon: "🛟",
     },
     {
       title: "Cơ Hội Hợp Tác",
@@ -37,7 +37,7 @@ export default function ContactPage() {
       email: "partnerships@seafresh.com",
       phone: "+84 28 1234 5680",
       hours: "Thứ 2 - Thứ 6, 9:00 - 17:00",
-      icon: "🤝",
+      //icon: "🤝",
     },
     {
       title: "Truyền Thông & Báo Chí",
@@ -45,7 +45,7 @@ export default function ContactPage() {
       email: "press@seafresh.com",
       phone: "+84 28 1234 5681",
       hours: "Thứ 2 - Thứ 6, 9:00 - 17:00",
-      icon: "📰",
+      //icon: "📰",
     },
   ]
 
@@ -100,12 +100,12 @@ export default function ContactPage() {
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="text-center mb-12">
+        {/* <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-foreground mb-4">Liên Hệ Với Chúng Tôi</h1>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Chúng tôi luôn sẵn sàng hỗ trợ bạn với mọi thắc mắc về hải sản tươi sống, đấu giá hoặc tính năng nền tảng.
           </p>
-        </div>
+        </div> */}
 
         {/* Emergency Contact Banner */}
         <div className="bg-destructive/10 border border-destructive/20 rounded-xl p-4 mb-12">

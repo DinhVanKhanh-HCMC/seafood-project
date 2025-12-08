@@ -53,7 +53,7 @@ const AuthModal = ({ isOpen, onClose, onLoginSuccess }) => {
     try {
       for (const item of localCart) {
         await ApiService.addCartItem({
-          productId: item.id,
+          productId: item.productId,
           quantity: item.quantity
         })
       }

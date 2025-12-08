@@ -62,6 +62,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserById(String id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));
+        UserResponse response = userMapper.mapToUserResponse(user);
+        return response;
+    }
+
+    @Override
     public UserResponse updateUser(String id, MultipartFile avt, UserUpdateRequest userUpdateRequest) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ErrorException(ErrorCode.USER_NOT_FOUND));

@@ -61,6 +61,36 @@ export default class ApiService {
 
 //--------------------------------------------------------------------------------------
 
+//-------------USER-----------------------------------------------------------------
+
+    //get all user
+    static async getAllUsers() {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/users`,
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Lấy tất cả user thất bại';
+        }
+    }
+
+    //delete user by id
+    static async deleteUserById(id) {
+        try {
+            const response = await axios.post(
+                `${BASE_URL}/users/delete/${id}`,{},
+                {headers: this.getHeader(false)}
+            );
+            return response.data;
+        } catch (error) {
+            throw error.response?.data?.message || 'Xoá user thất bại';
+        }
+    }
+
+//--------------------------------------------------------------------------------------
+
 //-------------CATEGORY-----------------------------------------------------------------
 
     //get all category

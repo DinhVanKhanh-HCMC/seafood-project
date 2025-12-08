@@ -189,6 +189,10 @@ const CreateAuction = ({ closeModal, openModal }) => {
                       <div className="text-sm font-semibold text-green-600">
                         {formatPrice(product.price)}
                       </div>
+                      {product.inAuction && (<div className="text-sm font-semibold text-orange-600">
+                        Sản phẩm đấu giá
+                      </div>
+                      )}
                     </div>
                   ))
                 )}

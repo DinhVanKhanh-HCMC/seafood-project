@@ -35,6 +35,12 @@ public class UserController {
         return ApiResource.ok(response,"Lấy thông tin user hiện tại thành công");
     }
 
+    @GetMapping("/{id}")
+    public ApiResource<UserResponse> getUserById(@PathVariable String id){
+        UserResponse response = userService.getUserById(id);
+        return ApiResource.ok(response,"Lấy thông tin user theo id thành công");
+    }
+
     @PostMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResource<UserResponse> updateUser(@PathVariable String id,
                                                 @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,

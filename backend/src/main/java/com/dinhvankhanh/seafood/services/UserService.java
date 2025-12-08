@@ -12,6 +12,8 @@ import java.util.List;
 public interface UserService {
     public UserResponse getCurrentUser(HttpServletRequest request);
 
+    public UserResponse getUserById(String id);
+
     public UserResponse updateUser(String id, MultipartFile avt, UserUpdateRequest userUpdateRequest);
 
     public List<UserResponse> getAllUser();

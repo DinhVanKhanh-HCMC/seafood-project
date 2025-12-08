@@ -1,13 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
-  Plus, Edit, Trash2 
+  Plus, Edit, Trash2, Eye 
 } from 'lucide-react';
+import ApiService from "../../services/apis";
+import { toast } from "react-toastify"
 
 const UsersPage = () => {
-  const [users] = useState([
-    { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@email.com', role: 'Khách hàng', status: 'Hoạt động' },
-    { id: 2, name: 'Trần Thị B', email: 'tranthib@email.com', role: 'Người bán', status: 'Hoạt động' },
+  const [users, setUsers] = useState([
+    // { id: 1, name: 'Nguyễn Văn A', email: 'nguyenvana@email.com', role: 'Khách hàng', status: 'Hoạt động' },
+    // { id: 2, name: 'Trần Thị B', email: 'tranthib@email.com', role: 'Người bán', status: 'Hoạt động' },
   ]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await ApiService.getAllUsers();
+        setUsers(response.data);
+      } catch (err) {
+        console.error("Lỗi khi fetch:", err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("Bạn có chắc chắn muốn xóa người dùng này?")) {
+      return;
+    }
+
+    try {
+      // Gọi API xóa đơn hàng
+      await ApiService.deleteUserById(id);
+      
+      // Cập nhật state local
+      const updateUsers = users.filter(user => user.id !== id);
+      setUsers(updateUsers);
+      
+      toast.success("Xóa người dùng thành công!");
+    } catch (error) {
+      console.error("Lỗi khi xóa người dùng:", error);
+      toast.error("Xóa đơn hàng thất bại!");
+    }
+  };
+
+
   
   // State quản lý modal cục bộ
   const [showAddUserModal, setShowAddUserModal] = useState(false);
@@ -24,44 +60,65 @@ const UsersPage = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Quản lý người dùng</h2>
-        <button 
+        {/* <button 
           onClick={handleAddUser}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
         >
           <Plus size={20} /> Thêm người dùng
-        </button>
+        </button> */}
       </div>
       
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
         <table className="w-full">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">ID</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">STT</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Tên</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Email</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Số điện thoại</th>
+              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Ngày sinh</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Vai trò</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Trạng thái</th>
               <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td className="px-6 py-4 text-sm text-gray-900">{user.id}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{user.name}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{user.email}</td>
-                <td className="px-6 py-4 text-sm text-gray-900">{user.role}</td>
-                <td className="px-6 py-4">
-                  <span className="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                    {user.status}
-                  </span>
+            {users.map((user, index) => (
+              <tr key={user.id} className="align-middle">
+                {/* STT */}
+                <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
+
+                {/* Avatar + Tên */}
+                <td className="px-4 py-3 text-sm text-gray-900 flex items-center gap-3">
+                  <img 
+                    src={user.avatar}
+                    alt={user.fullName}
+                    className="w-10 h-10 rounded-full object-cover border"
+                  />
+                  <span>{user.fullName}</span>
                 </td>
-                <td className="px-6 py-4 text-sm">
+
+                {/* Email */}
+                <td className="px-4 py-3 text-sm text-gray-900">{user.email}</td>
+
+                {/* Phone */}
+                <td className="px-4 py-3 text-sm text-gray-900">{user.phone || "-"}</td>
+
+                {/* Date of Birth */}
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {user.dateOfBirth || "-"}
+                </td>
+
+                {/* Role */}
+                <td className="px-4 py-3 text-sm text-gray-900">
+                  {user.role}
+                </td>
+
+                {/* Actions */}
+                <td className="px-4 py-3 text-sm">
                   <div className="flex gap-2">
-                    <button className="text-blue-600 hover:text-blue-800 transition-colors">
-                      <Edit size={16} />
-                    </button>
-                    <button className="text-red-600 hover:text-red-800 transition-colors">
+                    <button 
+                    onClick={() => handleDeleteUser(user.id)}
+                    className="text-red-600 hover:text-red-800 transition-colors">
                       <Trash2 size={16} />
                     </button>
                   </div>
@@ -69,6 +126,7 @@ const UsersPage = () => {
               </tr>
             ))}
           </tbody>
+
         </table>
       </div>
 

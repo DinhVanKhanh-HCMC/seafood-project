@@ -146,12 +146,12 @@ const OrdersTab = ({ openModal }) => {
       {/* Header với nút thêm và bộ lọc */}
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-800">Quản lý đơn hàng</h2>
-        <button 
+        {/* <button 
           onClick={() => openModal('add-order')}
           className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2"
         >
           <Plus size={20} /> Thêm đơn hàng
-        </button>
+        </button> */}
       </div>
 
       {/* Bộ lọc trạng thái */}

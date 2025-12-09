@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { authEvents } from "../../utils/authEvents";
 import { useCart } from '../../contexts/CartContext';
-
+import { Search } from 'lucide-react';
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -17,6 +17,12 @@ const Navigation = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false)
   const navigate = useNavigate()
   const { cartItems } = useCart();
+  const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [productsLoading, setProductsLoading] = useState(true);
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   // Tính tổng số lượng sản phẩm
   const totalItems = cartItems.reduce((sum, item) => sum + (item.quantity || 1), 0);
@@ -45,6 +51,42 @@ const Navigation = () => {
   }, [])
 
   useEffect(() => {
+    fetchProducts();
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery) {
+      const filtered = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts(products);
+    }
+  }, [searchQuery, products]);
+
+  const fetchProducts = async () => {
+    try {
+      setProductsLoading(true);
+      // Giả sử bạn có API lấy danh sách sản phẩm
+      const response = await ApiService.getAllProduct();
+      setProducts(response.data || []);
+      setFilteredProducts(response.data || []);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      alert('Không thể tải danh sách sản phẩm');
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  const handleProductSelect = (id) => {
+    navigate(`/product-detail/${id}`)
+    setShowProductDropdown(false)
+  };
+
+  useEffect(() => {
     // Lắng nghe event mở modal
     const handleOpenModal = () => setIsAuthModalOpen(true);
     
@@ -52,6 +94,13 @@ const Navigation = () => {
     
     return () => authEvents.offOpen(handleOpenModal);
   }, []);
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(price);
+  };
 
   const handleLogout = async () =>{
     try {
@@ -106,14 +155,60 @@ const Navigation = () => {
           </div>
 
           {/* Search, Cart and Sign In */}
-          <div className="hidden md:flex items-center gap-4">
-            <div className="relative">
-              <input
+          <div className="hidden md:flex items-start gap-4 relative">
+            <div className="relative w-64">
+              <input 
                 type="text"
-                placeholder="Tìm kiếm hải sản..."
-                className="bg-gray-50 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setShowProductDropdown(true);
+                }}
+                onFocus={() => setShowProductDropdown(true)}
+                placeholder="Tìm kiếm sản phẩm..."
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 pr-10 focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                required
               />
+              <Search size={16} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             </div>
+            
+            {showProductDropdown && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                {/* Nút đóng */}
+                <button
+                  onClick={() => setShowProductDropdown(false)}
+                  className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl leading-none"
+                >
+                  X
+                </button>
+
+                {productsLoading ? (
+                  <div className="p-3 text-center text-gray-500">Đang tải sản phẩm...</div>
+                ) : filteredProducts.length === 0 ? (
+                  <div className="p-3 text-center text-gray-500">Không tìm thấy sản phẩm</div>
+                ) : (
+                  filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleProductSelect(product.id)}
+                      className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
+                    >
+                      <div className="font-medium text-gray-800">{product.name}</div>
+                      <div className="text-sm text-gray-600 truncate">
+                        {product.description}
+                      </div>
+                      <div className="text-sm font-semibold text-green-600">
+                        {formatPrice(product.price)}
+                      </div>
+                      {product.inAuction && (<div className="text-sm font-semibold text-orange-600">
+                        Sản phẩm đấu giá
+                      </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
             <Link to="/cart" className="relative p-2 text-gray-700 hover:text-amber-600 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
